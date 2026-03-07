@@ -1,0 +1,690 @@
+{% extends "base.html" %}
+
+{% block title %}UserControl - Gerenciamento de Usuários{% endblock %}
+
+{% block styles %}
+<style>
+    .card {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .user-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .user-table thead th {
+        background-color: #f9fafb;
+        color: #6b7280;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #e5e7eb;
+        position: sticky;
+        top: 0;
+    }
+
+    .user-table tbody tr {
+        transition: background-color 0.15s ease;
+    }
+
+    .user-table tbody tr:hover {
+        background-color: #f9fafb;
+    }
+
+    .user-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+        vertical-align: middle;
+    }
+
+    .user-avatar {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        background-color: #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
+        font-weight: 600;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .user-name {
+        font-weight: 500;
+        color: #111827;
+    }
+
+    .user-details {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .badge-online {
+        background-color: #ecfdf5;
+        color: #059669;
+    }
+
+    .badge-idle {
+        background-color: #fef3c7;
+        color: #d97706;
+    }
+
+    .badge-offline {
+        background-color: #f3f4f6;
+        color: #6b7280;
+    }
+
+    .badge-banned {
+        background-color: #fee2e2;
+        color: #dc2626;
+    }
+
+    .action-btn {
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #6b7280;
+        transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+        background-color: #f3f4f6;
+        color: #111827;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        z-index: 10;
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        min-width: 12rem;
+        padding: 0.5rem 0;
+        display: none;
+    }
+
+    .dropdown-menu.show {
+        display: block;
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        color: #4b5563;
+        font-size: 0.875rem;
+        transition: all 0.15s ease;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f3f4f6;
+        color: #111827;
+    }
+
+    .dropdown-item i {
+        margin-right: 0.5rem;
+        width: 1.25rem;
+        text-align: center;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1.5rem;
+    }
+
+    .page-info {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .page-controls {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .page-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.375rem;
+        border: 1px solid #e5e7eb;
+        color: #6b7280;
+        transition: all 0.15s ease;
+    }
+
+    .page-btn:hover {
+        background-color: #f3f4f6;
+        color: #111827;
+    }
+
+    .page-btn.active {
+        background-color: #4f46e5;
+        border-color: #4f46e5;
+        color: white;
+    }
+
+    .page-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .search-bar {
+        display: flex;
+        gap: 0.5rem;
+        max-width: 24rem;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 0.5rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+    }
+
+    .search-btn {
+        padding: 0.5rem 1rem;
+        background-color: #4f46e5;
+        color: white;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        transition: background-color 0.15s ease;
+    }
+
+    .search-btn:hover {
+        background-color: #4338ca;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Usuários Conectados</h2>
+            <div class="flex items-center space-x-4">
+                <button id="btn-test-smtp"
+                    class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition flex items-center text-sm font-medium shadow-sm">
+                    <i class="fas fa-paper-plane mr-2"></i> Teste SMTP
+                </button>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar usuários...">
+                    <button id="searchButton" class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="user-table">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th style="width: 40px;">
+                            <input type="checkbox" id="select-all-users"
+                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        </th>
+                        <th>Usuário</th>
+                        <th>Status</th>
+                        <th>Email Notif.</th>
+                        <th>Dispositivo</th>
+                        <th>Última Atividade</th>
+                        <th style="width: 40px;"></th>
+                    </tr>
+                </thead>
+                <tbody id="user-table-body">
+                    <!-- Rows will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            <div id="pagination-info" class="page-info"></div>
+            <div id="pagination-controls" class="page-controls"></div>
+        </div>
+    </div>
+</div> <!-- fechamento do container -->
+
+<!-- Modal de confirmação -->
+<div id="confirmation-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-lg p-6 max-w-sm mx-auto">
+        <h3 id="modal-title" class="text-lg font-semibold mb-4"></h3>
+        <p id="modal-message" class="text-gray-600 mb-6"></p>
+        <div class="flex justify-end space-x-4">
+            <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                Cancelar
+            </button>
+            <button id="modal-confirm-btn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                Confirmar
+            </button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentPage = 1;
+    const usersPerPage = 5; // Ou pegue do servidor se configurável
+
+    function fetchUsers(page = 1, searchTerm = '') {
+        currentPage = page;
+        const url = `/api/users_list?page=${page}&per_page=${usersPerPage}&search=${encodeURIComponent(searchTerm)}`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                renderUsersTable(data.users);
+                renderPagination(data.pagination);
+            })
+            .catch(error => {
+                console.error('Error fetching users:', error);
+                const tableBody = document.getElementById('user-table-body');
+                if (tableBody) tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-red-500 py-4">Erro ao carregar usuários.</td></tr>';
+            });
+    }
+
+    function renderUsersTable(users) {
+        const tableBody = document.getElementById('user-table-body');
+        if (!tableBody) return;
+        tableBody.innerHTML = ''; // Clear existing rows
+
+        if (users.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-gray-500 py-4">Nenhum usuário encontrado.</td></tr>';
+            return;
+        }
+
+        users.forEach(user => {
+            const row = `
+            <tr data-user-id="${user.id}">
+                <td class="px-4 py-3">
+                    <input type="checkbox" class="user-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-user-id="${user.id}">
+                </td>
+                <td><div class="user-avatar">${user.avatar_initials}</div></td>
+                <td>
+                    <div class="user-info">
+                        <div>
+                            <div class="user-name">${user.name}</div>
+                            <div class="user-details">${user.email}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="badge ${user.status_class}">
+                        <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
+                        ${user.status}
+                    </span>
+                </td>
+                <td>
+                    <div class="flex items-center justify-center">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer email-toggle" data-user-id="${user.id}" ${user.email_notifications ? 'checked' : ''}>
+                            <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <div class="user-details">
+                        <div>${user.device_name}</div>
+                        <div>${user.ip_address}</div>
+                    </div>
+                </td>
+                <td>
+                    <div class="user-details">
+                        <div>${user.last_activity_time}</div>
+                        <div>${user.last_activity_details}</div>
+                    </div>
+                </td>
+                <td>
+                    <div class="relative">
+                        <button class="action-btn dropdown-toggle">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item"><i class="fas fa-eye text-blue-500"></i> Ver detalhes</a>
+                            ${user.is_banned
+                    ? `<a href="#" class="dropdown-item"><i class="fas fa-unlock text-green-500"></i> Remover ban</a>`
+                    : `<a href="#" class="dropdown-item"><i class="fas fa-sign-out-alt text-orange-500"></i> Forçar logout</a>
+                                   <a href="#" class="dropdown-item"><i class="fas fa-lock text-yellow-500"></i> Bloquear temp.</a>
+                                   <a href="#" class="dropdown-item"><i class="fas fa-ban text-red-500"></i> Banir perm.</a>`
+                }
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `;
+            tableBody.insertAdjacentHTML('beforeend', row);
+        });
+    }
+
+    function renderPagination(pagination) {
+        const paginationInfo = document.getElementById('pagination-info');
+        const paginationControls = document.getElementById('pagination-controls');
+        if (!paginationInfo || !paginationControls) return;
+
+        const startItem = (pagination.page - 1) * pagination.per_page + 1;
+        const endItem = Math.min(startItem + pagination.per_page - 1, pagination.total_items);
+        paginationInfo.textContent = `Mostrando ${startItem}-${endItem} de ${pagination.total_items} usuários`;
+
+        paginationControls.innerHTML = ''; // Clear existing controls
+
+        // Prev button
+        const prevButton = `<button class="page-btn" ${pagination.page === 1 ? 'disabled' : ''} onclick="fetchUsers(${pagination.page - 1}, document.getElementById('searchInput').value)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>`;
+        paginationControls.insertAdjacentHTML('beforeend', prevButton);
+
+        // Page numbers (simplified: just show current page for now, could be extended)
+        for (let i = 1; i <= pagination.total_pages; i++) {
+            const pageButton = `<button class="page-btn ${i === pagination.page ? 'active' : ''}" onclick="fetchUsers(${i}, document.getElementById('searchInput').value)">
+                                ${i}
+                            </button>`;
+            paginationControls.insertAdjacentHTML('beforeend', pageButton);
+        }
+
+        // Next button
+        const nextButton = `<button class="page-btn" ${pagination.page === pagination.total_pages || pagination.total_pages === 0 ? 'disabled' : ''} onclick="fetchUsers(${pagination.page + 1}, document.getElementById('searchInput').value)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>`;
+        paginationControls.insertAdjacentHTML('beforeend', nextButton);
+    }
+
+    function closeModal() {
+        document.getElementById('confirmation-modal').classList.add('hidden');
+    }
+
+    function executeUserAction(userId, action) {
+        const actions = {
+            'ver-detalhes': '/api/user/details',
+            'remover-ban': '/api/user/unban',
+            'forcar-logout': '/api/user/logout',
+            'bloquear-temp': '/api/user/temp-block',
+            'banir-perm': '/api/user/ban'
+        };
+
+        const url = actions[action];
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: userId })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Atualiza a tabela após a ação
+                    fetchUsers(currentPage, document.getElementById('searchInput').value);
+                    closeModal();
+                } else {
+                    alert(data.message || 'Erro ao executar ação');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro ao executar ação');
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const userTableBody = document.getElementById('user-table-body');
+
+        if (userTableBody) {
+            userTableBody.addEventListener('click', function (event) {
+                // Lidar com o toggle do dropdown
+                const toggleButton = event.target.closest('.dropdown-toggle');
+                if (toggleButton) {
+                    event.stopPropagation(); // Impedir que o clique no botão feche o menu imediatamente
+                    const dropdown = toggleButton.nextElementSibling;
+
+                    // Fechar outros dropdowns abertos, exceto o atual
+                    document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                        if (menu !== dropdown) {
+                            menu.classList.remove('show');
+                        }
+                    });
+                    dropdown.classList.toggle('show'); // Toggle o dropdown atual
+                    return;
+                }
+
+                // Lidar com o clique no item do dropdown (para o modal)
+                const dropdownItem = event.target.closest('.dropdown-item');
+                if (dropdownItem && (!dropdownItem.href || dropdownItem.getAttribute('href') === '#')) {
+                    event.preventDefault();
+                    const actionText = dropdownItem.textContent.trim();
+                    const modal = document.getElementById('confirmation-modal');
+
+                    if (!modal) {
+                        console.warn('Modal de confirmação não encontrado no DOM. Ação:', actionText);
+                        // Aqui você poderia implementar uma confirmação simples com window.confirm se o modal não existir
+                        // if (window.confirm(`Tem certeza que deseja ${actionText.toLowerCase()} este usuário?`)) {
+                        //     console.log(`Ação "${actionText}" confirmada para o usuário (sem modal).`);
+                        //     // Adicionar lógica para executar a ação
+                        // }
+                        return;
+                    }
+
+                    // Configurar e exibir o modal
+                    document.getElementById('modal-title').textContent = actionText;
+                    document.getElementById('modal-message').textContent =
+                        `Tem certeza que deseja ${actionText.toLowerCase()} este usuário?`;
+
+                    const confirmBtn = document.getElementById('modal-confirm-btn');
+                    // Lógica de cor do botão (como estava antes)
+                    if (dropdownItem.querySelector('.fa-ban')) { /* ... */ }
+                    // ... (resto da lógica de estilização do botão de confirmação) ...
+
+                    modal.classList.remove('hidden');
+                }
+            });
+        }
+
+        if (userTableBody) {
+            userTableBody.addEventListener('click', function (event) {
+                const dropdownItem = event.target.closest('.dropdown-item');
+                if (dropdownItem) {
+                    event.preventDefault();
+
+                    const row = dropdownItem.closest('tr');
+                    const userId = row.dataset.userId; // Adicione data-user-id="${user.id}" na TR
+                    const icon = dropdownItem.querySelector('i');
+                    let action, title, message, buttonClass;
+
+                    if (icon.classList.contains('fa-eye')) {
+                        action = 'ver-detalhes';
+                        title = 'Ver Detalhes do Usuário';
+                        message = 'Deseja visualizar os detalhes completos deste usuário?';
+                        buttonClass = 'bg-blue-500 hover:bg-blue-600';
+                    } else if (icon.classList.contains('fa-unlock')) {
+                        action = 'remover-ban';
+                        title = 'Remover Banimento';
+                        message = 'Deseja remover o banimento deste usuário?';
+                        buttonClass = 'bg-green-500 hover:bg-green-600';
+                    } else if (icon.classList.contains('fa-sign-out-alt')) {
+                        action = 'forcar-logout';
+                        title = 'Forçar Logout';
+                        message = 'Deseja forçar o logout deste usuário?';
+                        buttonClass = 'bg-orange-500 hover:bg-orange-600';
+                    } else if (icon.classList.contains('fa-lock')) {
+                        action = 'bloquear-temp';
+                        title = 'Bloquear Temporariamente';
+                        message = 'Deseja bloquear temporariamente este usuário?';
+                        buttonClass = 'bg-yellow-500 hover:bg-yellow-600';
+                    } else if (icon.classList.contains('fa-ban')) {
+                        action = 'banir-perm';
+                        title = 'Banir Permanentemente';
+                        message = 'Deseja banir permanentemente este usuário?';
+                        buttonClass = 'bg-red-500 hover:bg-red-600';
+                    }
+
+                    const modal = document.getElementById('confirmation-modal');
+                    const confirmBtn = document.getElementById('modal-confirm-btn');
+
+                    document.getElementById('modal-title').textContent = title;
+                    document.getElementById('modal-message').textContent = message;
+
+                    // Remove classes antigas e adiciona novas
+                    confirmBtn.className = `px-4 py-2 text-white rounded ${buttonClass}`;
+
+                    // Atualiza o onclick do botão de confirmação
+                    confirmBtn.onclick = () => executeUserAction(userId, action);
+
+                    modal.classList.remove('hidden');
+                }
+            });
+        }
+
+        // Fechar dropdowns quando clicar fora deles
+        document.addEventListener('click', function (event) {
+            if (!event.target.closest('.dropdown-toggle') && !event.target.closest('.dropdown-menu')) {
+                document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
+        });
+
+        // SMTP Test Functionality
+        const btnTestSmtp = document.getElementById('btn-test-smtp');
+        if (btnTestSmtp) {
+            btnTestSmtp.addEventListener('click', function () {
+                const selectedCheckboxes = document.querySelectorAll('.user-checkbox:checked');
+                const userIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.userId);
+
+                if (userIds.length === 0) {
+                    alert('Por favor, selecione ao menos um usuário para o teste.');
+                    return;
+                }
+
+                if (!confirm(`Deseja enviar um e-mail de teste para ${userIds.length} usuário(s)?`)) {
+                    return;
+                }
+
+                btnTestSmtp.disabled = true;
+                btnTestSmtp.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Enviando...';
+
+                fetch('/api/test_smtp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_ids: userIds })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                    })
+                    .catch(error => {
+                        console.error('SMTP Test Error:', error);
+                        alert('Erro ao processar solicitação de teste.');
+                    })
+                    .finally(() => {
+                        btnTestSmtp.disabled = false;
+                        btnTestSmtp.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Teste SMTP';
+                    });
+            });
+        }
+
+        // Select All functionality
+        const selectAllCheckbox = document.getElementById('select-all-users');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function () {
+                const checkboxes = document.querySelectorAll('.user-checkbox');
+                checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+            });
+        }
+
+        // Initial fetch
+        fetchUsers(currentPage, '');
+
+        // Search functionality
+        const searchButton = document.getElementById('searchButton');
+        const searchInput = document.getElementById('searchInput');
+        if (searchButton && searchInput) {
+            searchButton.addEventListener('click', () => fetchUsers(1, searchInput.value));
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') fetchUsers(1, searchInput.value);
+            });
+        }
+
+        // Toggle email notification
+        if (userTableBody) {
+            userTableBody.addEventListener('change', function (event) {
+                if (event.target.classList.contains('email-toggle')) {
+                    const userId = event.target.dataset.userId;
+                    const enabled = event.target.checked;
+
+                    fetch('/api/user/update_email_notification', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user_id: userId, enabled: enabled })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (!data.success) {
+                                event.target.checked = !enabled; // Reverte se falhar
+                                alert(data.message || 'Erro ao atualizar preferência');
+                            }
+                        })
+                        .catch(error => {
+                            event.target.checked = !enabled;
+                            console.error('Error:', error);
+                            alert('Erro de conexão');
+                        });
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

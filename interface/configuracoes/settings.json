@@ -1,0 +1,153 @@
+{
+    "MODEL_PARAMS": {
+        "model_path": "model/visionalign_v11s.pt",
+        "model_version": "3.4.1",
+        "model_type": "yolo26.openvino",
+        "size_dataset": "79",
+        "last_training": "2026-02-06"
+    },
+    "AI_PARAMS": {
+        "conf_default": 0.1,
+        "iou_default": 0.1,
+        "max_queue_size": 30,
+        "advanced": {
+            "exclusion_zones": [],
+            "gamma": 1.5,
+            "clahe_enabled": true,
+            "drawing": {
+                "box_thickness": 8,
+                "font_scale": 0.6,
+                "font_thickness": 2,
+                "show_label": true,
+                "show_conf": false,
+                "show_bg": false
+            }
+        },
+        "thresholds": {
+            "lata_normal": 0.5,
+            "lata_tombada": 0.75,
+            "lata_invertida": 0.75,
+            "fracture": 0.84
+        },
+        "dataset_collection": {
+            "enabled": false,
+            "save_on_event": true,
+            "save_interval": 1300,
+            "retention_days": 2,
+            "distrust_range": [
+                0.3,
+                0.6
+            ]
+        }
+    },
+    "VIDEO_PARAMS": {
+        "save_path": "rtsp://admin:VisionAlign123@10.81.50.64:554/cam/realmonitor?channel=1&subtype=0",
+        "default_resolution": "640x480",
+        "default_fps": 30,
+        "resolutions": {
+            "1280x720": {
+                "height": 720,
+                "width": 1280
+            },
+            "1920x1080": {
+                "height": 1080,
+                "width": 1920
+            },
+            "640x480": {
+                "height": 480,
+                "width": 640
+            }
+        },
+        "fps_options": [
+            15,
+            30,
+            60
+        ],
+        "source_type": "stream",
+        "source_param": "rtsp://admin:Abc123456@10.81.50.64/Streaming/Channels/101?tcp=1&buffer=100",
+        "resolution": "",
+        "fps": "15"
+    },
+    "UI_PARAMS": {
+        "update_interval": 30,
+        "max_log_lines": 1000,
+        "font_size": 12,
+        "default_theme": "dark"
+    },
+    "COLORS": {
+        "background": "#1a1a1a",
+        "text": "#ffffff",
+        "widget_bg": "#2d2d2d",
+        "border": "#3d3d3d",
+        "interface_primary": "#0066cc",
+        "interface_hover": "#0077ee",
+        "detection": {
+            "lata_normal": [
+                0,
+                255,
+                0
+            ],
+            "lata_invertida": [
+                0,
+                0,
+                255
+            ],
+            "lata_tombada": [
+                255,
+                165,
+                0
+            ],
+            "fracture": [
+                0,
+                0,
+                255
+            ]
+        },
+        "success": "#00cc00",
+        "warning": "#ffcc00",
+        "error": "#cc0000"
+    },
+    "VISUAL_STYLE": {
+        "detection_box": {
+            "thickness": 2,
+            "line_type": "solid",
+            "show_label": true,
+            "show_confidence": false,
+            "label_position": "top"
+        },
+        "detection_alert": {
+            "thickness": 3,
+            "line_type": "solid",
+            "blink_enabled": false,
+            "icon_type": "circle"
+        },
+        "fracture_alert": {
+            "thickness": 3,
+            "line_type": "dashed",
+            "text_size": "large",
+            "background_color": [
+                0,
+                0,
+                255
+            ],
+            "text_color": [
+                255,
+                255,
+                255
+            ]
+        },
+        "roi_display": {
+            "show_circle_mask": true,
+            "circle_color": [
+                0,
+                255,
+                255
+            ],
+            "circle_thickness": 2
+        }
+    },
+    "SERVER_CONFIG": {
+        "remote_host": "10.81.5.219",
+        "remote_port": 7586
+    }
+}

@@ -1,0 +1,60 @@
+# === AMBIENTE PYTHON ===
+venv/
+.env
+.env*/
+
+# === CACHES PYTHON ===
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# === LOGS ===
+logs/
+*.log
+server.log
+
+# === SECURITY / KEYS ===
+security.key
+*.key
+*.pem
+
+# === ARQUIVOS TEMPORÁRIOS / QUE NÃO DEVEM IR ===
+capturas/
+temp/
+tmp/
+backup/
+
+# === TESTES ===
+testes/
+*/testes/
+data/
+# === MODELOS E SAÍDAS ===
+*.pt
+*.onnx
+runs/
+export/
+output/
+output/*.xml
+output/*.bin
+
+# === IMAGENS/VÍDEOS DE TESTE ===
+images/
+videos/
+
+# === CONFIGS LOCAIS ===
+*.local
+*.DS_Store
+
+# === IDEs ===
+.vscode/
+.idea/
+
+# === BUILD ===
+dist/
+build/
+
+# === FLASK ===
+instance/
+*.sqlite3
+model/backup/

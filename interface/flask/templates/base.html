@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- O título será definido em cada página filha -->
+    <title>{% block title %}VisionAlign - Classificação de Latas{% endblock %}</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos inline do HTML fornecido -->
+    <style>
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            background: #1a202c;
+        }
+
+        .video-container video,
+        .video-container canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .tab-content {
+            display: none;
+            /* Será controlado por JS se necessário na página filha */
+        }
+
+        .tab-content.active {
+            display: block;
+            /* Será controlado por JS se necessário na página filha */
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-online {
+            background-color: #10B981;
+        }
+
+        .status-offline {
+            background-color: #EF4444;
+        }
+
+        .status-warning {
+            background-color: #F59E0B;
+        }
+
+        /* Estilos para o modo escuro */
+        .dark body {
+            background-color: #1a202c;
+            /* bg-gray-900 */
+            color: #f7fafc;
+            /* text-gray-100 */
+        }
+
+        .dark .bg-white {
+            background-color: #2d3748;
+            /* bg-gray-800 */
+        }
+
+        .dark .text-gray-900,
+        .dark .text-gray-800,
+        .dark .text-gray-700,
+        .dark .text-gray-600,
+        .dark .text-gray-500 {
+            color: #e2e8f0;
+            /* text-gray-300 ou similar */
+        }
+
+        .dark .border-gray-200,
+        .dark .border-gray-100 {
+            border-color: #4a5568;
+            /* border-gray-700 */
+        }
+
+        .dark .hover\:bg-gray-100:hover {
+            background-color: #4a5568;
+            /* bg-gray-700 */
+        }
+
+        /* Ajustes específicos para os elementos solicitados no modo escuro */
+        .dark .bg-gray-50 {
+            /* Usado no painel de Estatísticas e no thead */
+            background-color: #374151;
+            /* bg-gray-700 (um pouco mais claro que o card-bg do dark mode) */
+        }
+
+        .dark .text-gray-500 {
+            /* Usado nos textos dos cards de estatísticas e no thead */
+            color: #9ca3af;
+            /* text-gray-400 */
+        }
+
+        .dark .text-gray-700 {
+            /* Usado nos textos das barras de progresso */
+            color: #d1d5db;
+            /* text-gray-300 */
+        }
+
+        .dark .border-gray-200 {
+            /* Usado nas bordas internas do painel de estatísticas */
+            border-color: #4b5563;
+            /* border-gray-600 */
+        }
+
+        .dark .border-gray-300 {
+            /* Usado na borda do select */
+            border-color: #6b7280;
+            /* border-gray-500 */
+        }
+
+        /* Para o select especificamente, se ele não herdar a cor do texto corretamente */
+        .dark select,
+        .dark input[type="text"],
+        .dark input[type="number"],
+        .dark textarea {
+            color: #f7fafc !important;
+            /* text-gray-100 */
+            background-color: #1a202c !important;
+            /* bg-gray-900 */
+            border-color: #4a5568 !important;
+            /* border-gray-700 */
+        }
+
+        /* Placeholder color for dark mode */
+        .dark ::placeholder {
+            color: #718096 !important;
+            /* gray-500 */
+            opacity: 1;
+        }
+
+        /* Para o botão com bg-gray-200 e text-gray-800 */
+        .dark .bg-gray-200 {
+            background-color: #4b5563;
+            /* bg-gray-600 */
+        }
+
+        .dark .text-gray-800 {
+            color: #e5e7eb;
+            /* text-gray-200 */
+        }
+
+        .dark .hover\:bg-gray-300:hover {
+            background-color: #6b7280;
+            /* bg-gray-500 */
+        }
+
+        .dark .focus\:ring-gray-500:focus {
+            /* Adapta a cor do anel de foco */
+            --tw-ring-color: #9ca3af;
+            /* ring-gray-400 */
+        }
+
+        /* Para botões com bg-gray-100 e hover:bg-gray-200 */
+        .dark .bg-gray-100 {
+            background-color: #374151;
+            /* bg-gray-700 */
+        }
+
+        .dark .hover\:bg-gray-200:hover {
+            background-color: #4b5563;
+            /* bg-gray-600 */
+        }
+
+        /* Estilos para a tabela de usuários e seus componentes no modo escuro */
+        .dark .card {
+            background-color: #2d3748;
+            /* bg-gray-800 */
+            border-color: #4a5568;
+            /* border-gray-700 */
+        }
+
+        .dark .card-header {
+            border-bottom-color: #4a5568;
+            /* border-gray-700 */
+        }
+
+        .dark .card-title {
+            color: #e2e8f0;
+            /* text-gray-300 */
+        }
+
+        .dark .search-input {
+            background-color: #374151;
+            /* bg-gray-700 */
+            border-color: #6b7280;
+            /* border-gray-500 */
+            color: #e2e8f0;
+            /* text-gray-300 */
+        }
+
+        .dark .search-input::placeholder {
+            color: #9ca3af;
+            /* text-gray-400 */
+        }
+
+        .dark .search-btn {
+            background-color: #4b5563;
+            /* bg-gray-600 */
+            color: #e2e8f0;
+            /* text-gray-300 */
+        }
+
+        .dark .search-btn:hover {
+            background-color: #6b7280;
+            /* bg-gray-500 */
+        }
+
+        .dark .user-table thead tr {
+            /* Mantém apenas se houver estilos de TR que não são cobertos por TH */
+            /* background-color: #374151; */
+            /* Removido: TH agora controla o fundo */
+            /* border-bottom-color: #4a5568; */
+            /* Removido: TH agora controla sua borda inferior */
+        }
+
+        .dark .user-table th {
+            background-color: #374151;
+            /* bg-gray-700 */
+            color: #9ca3af;
+            /* text-gray-400 */
+            border-bottom: 1px solid #4a5568;
+            /* Cor da borda inferior para o modo escuro */
+        }
+
+        .dark .user-table td {
+            border-bottom-color: #4a5568;
+            /* border-gray-700 */
+            color: #d1d5db;
+            /* text-gray-300 */
+        }
+
+        .dark .user-table tbody tr:hover {
+            /* Efeito hover para as linhas do corpo da tabela */
+            background-color: #374151;
+            /* bg-gray-700, um pouco mais claro que o fundo do card */
+        }
+
+        .dark .user-name {
+            /* Se for uma classe específica e não herdar de .text-gray-xxx */
+            color: #e2e8f0;
+            /* text-gray-300 */
+        }
+
+        .dark .user-details {
+            /* Se for uma classe específica e não herdar de .text-gray-xxx */
+            color: #9ca3af;
+            /* text-gray-400 */
+        }
+
+        .dark .badge {
+            /* Estilo base para badges no modo escuro */
+            color: #1f2937;
+            /* text-gray-800 (para contraste com fundos claros de badge) */
+        }
+
+        /* .dark .badge-online, .dark .badge-offline, etc. podem precisar de ajustes se as cores de fundo não contrastarem bem */
+        .dark .dropdown-menu {
+            background-color: #374151;
+            /* bg-gray-700 */
+            border-color: #4a5568;
+            /* border-gray-700 */
+        }
+
+        .dark .dropdown-item {
+            color: #d1d5db;
+            /* text-gray-300 */
+        }
+
+        .dark .dropdown-item:hover {
+            background-color: #4b5563;
+            /* bg-gray-600 */
+        }
+
+        .dark .pagination {
+            border-top-color: #4a5568;
+            /* border-gray-700 */
+        }
+
+        .dark .page-info {
+            color: #9ca3af;
+            /* text-gray-400 */
+        }
+
+        .dark .page-btn {
+            background-color: #374151;
+            /* bg-gray-700 */
+            color: #d1d5db;
+            /* text-gray-300 */
+            border-color: #4b5563;
+            /* border-gray-600 */
+        }
+
+        .dark .page-btn:hover:not(:disabled) {
+            background-color: #4b5563;
+            /* bg-gray-600 */
+        }
+
+        .dark .page-btn.active {
+            background-color: #60a5fa;
+            /* Cor primária do tema escuro (azul claro) */
+            color: #1f2937;
+            /* text-gray-800 (para contraste) */
+            border-color: #60a5fa;
+        }
+
+        .dark .page-btn:disabled {
+            color: #6b7280;
+            /* text-gray-500 */
+            border-color: #374151;
+            /* bg-gray-700 */
+        }
+    </style>
+    <!-- Bloco para estilos CSS específicos da página -->
+    {% block styles %}{% endblock %}
+</head>
+
+<body class="bg-gray-100 text-gray-900 font-sans">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+                        <i class="fas fa-cogs text-white text-xl"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-800">VisionAlign - Classificador de Latas</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button class="p-2 rounded-full hover:bg-gray-100">
+                            <i class="fas fa-bell text-gray-600"></i>
+                            <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                        </button>
+                    </div>
+                    <!-- Menu de Usuário com Dropdown -->
+                    <div class="relative">
+                        <button id="user-menu-button"
+                            class="flex items-center space-x-2 focus:outline-none p-1 rounded-md hover:bg-gray-100">
+                            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                                <i class="fas fa-user text-gray-600"></i>
+                            </div>
+                            <span class="text-sm font-medium">{{ (current_user.first_name ~ " " ~
+                                current_user.last_name) | trim | default(current_user.username) | default('Operador')
+                                }}</span>
+                            <i class="fas fa-chevron-down text-gray-500 text-xs"></i>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div id="user-menu-dropdown"
+                            class="hidden absolute right-0 mt-2 w-60 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                            <div class="px-4 py-3 border-b border-gray-100">
+                                <p class="text-sm font-medium truncate">{{ (current_user.first_name ~ " " ~
+                                    current_user.last_name) | trim | default(current_user.username) |
+                                    default('Operador') }}</p>
+                                <p class="text-xs text-gray-500 truncate">{{ current_user.email |
+                                    default(current_user.username ~ '@example.com') | default('email@example.com') }}
+                                </p>
+                            </div>
+
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-cog w-5 mr-2 text-gray-500"></i>
+                                Configurações da Conta
+                            </a>
+
+                            <div class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex justify-between items-center cursor-pointer"
+                                onclick="document.getElementById('theme-toggle').click()">
+                                <div>
+                                    <i class="fas fa-moon w-5 mr-2 text-gray-500"></i>
+                                    Tema Escuro
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="theme-toggle" class="sr-only peer">
+                                    <div
+                                        class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600">
+                                    </div>
+                                </label>
+                            </div>
+
+                            <a href="{{ url_for('logout') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-t border-gray-100">
+                                <i class="fas fa-sign-out-alt w-5 mr-2 text-gray-500"></i>
+                                Sair
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6"> <!-- Adicionado pt-6 para espaçamento -->
+                <!-- Tabs Navigation -->
+                <div class="border-b border-gray-200 mb-6"> <!-- Adicionado mb-6 para espaçamento -->
+                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                        <!-- Links usam url_for e verificam endpoint ativo -->
+                        <a href="{{ url_for('index') }}"
+                            class="tab-button {% if request.endpoint == 'index' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Monitoramento</a>
+                        <a href="{{ url_for('analytics_page') }}"
+                            class="tab-button {% if request.endpoint == 'analytics_page' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Análises</a>
+                        <!-- Placeholder -->
+                        {% if current_user.role == 'admin' %}
+                        <a href="{{ url_for('settings_page') }}"
+                            class="tab-button {% if request.endpoint == 'settings_page' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Configurações</a>
+                        <a href="{{ url_for('users') }}"
+                            class="tab-button {% if request.endpoint == 'users' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">users</a>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+            <!-- Bloco onde o conteúdo específico da página será inserido -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center">
+                            <i class="fas fa-cogs text-white text-xs"></i>
+                        </div>
+                        <span class="text-sm text-gray-600">VisionAlign Classificador v3.2.1</span>
+                    </div>
+                    <div class="mt-4 md:mt-0 text-sm text-gray-500">
+                        <!-- Usando a variável 'now' injetada pelo context processor -->
+                        &copy; {{ now().year if now else '2023' }} VisionAlign Technologies. Todos os direitos
+                        reservados.
+                    </div>
+                    <div class="mt-4 md:mt-0 flex space-x-6">
+                        <span class="text-sm text-gray-500 flex items-center">
+                            <span class="status-indicator status-online"></span>
+                            Status: Online
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Video Stream Modal (Esperado pelo script.js) -->
+    <div id="video-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+        <div class="relative bg-gray-900 p-4 rounded-lg max-w-4xl w-full">
+            <button
+                class="close-modal-btn absolute top-2 right-2 text-white bg-red-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-700 z-10">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="video-container-modal relative" style="padding-bottom: 56.25%;"> <!-- Aspect ratio 16:9 -->
+                <img id="modal-video-stream" src="" alt="Live Stream Fullscreen"
+                    class="absolute top-0 left-0 w-full h-full object-contain">
+            </div>
+            <div class="mt-4 flex justify-center space-x-4">
+                <button id="snapshot-btn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"><i
+                        class="fas fa-camera mr-2"></i> Capturar Frame</button>
+                <button id="modal-pause-resume-btn"
+                    class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600"><i
+                        class="fas fa-pause mr-2"></i> Pausar Stream</button>
+            </div>
+            <div id="status-message-bottom" class="mt-2 text-center text-sm text-white"></div>
+            <!-- Status message area -->
+        </div>
+    </div>
+
+    <script>
+        window.USER_ROLE = "{{ current_user.role if current_user.is_authenticated else 'anonymous' }}";
+    </script>
+    <!-- Incluir o script.js principal -->
+    <script src="{{ url_for('static', filename='script.js') }}?v={{ range(1, 100000) | random }}"></script>
+    <script>
+        // Controle do dropdown do menu do usuário
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenuDropdown = document.getElementById('user-menu-dropdown');
+        const themeToggle = document.getElementById('theme-toggle');
+
+        if (userMenuButton && userMenuDropdown) {
+            userMenuButton.addEventListener('click', (event) => {
+                event.stopPropagation(); // Impede que o clique no botão feche o menu imediatamente
+                userMenuDropdown.classList.toggle('hidden');
+            });
+
+            // Fechar o dropdown ao clicar fora
+            document.addEventListener('click', (event) => {
+                if (!userMenuButton.contains(event.target) && !userMenuDropdown.contains(event.target)) {
+                    userMenuDropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        // Lógica do Tema Escuro
+        if (themeToggle) {
+            // Verifica o tema salvo no localStorage ao carregar a página
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark'); // Aplica no <html> para herança
+                themeToggle.checked = true;
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            themeToggle.addEventListener('change', () => {
+                document.documentElement.classList.toggle('dark');
+                localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+            });
+        }
+    </script>
+    <!-- Removida linha que carregava analytics.js -->
+    {% block scripts %}{% endblock %}
+    <!-- Bloco para JS específico da página -->
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

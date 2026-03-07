@@ -1,0 +1,474 @@
+{% extends "base.html" %}
+
+{% block title %}VisionAlign - Analytics{% endblock %}
+
+{% block styles %}
+<style>
+    /* Estilos para os charts - prevenção de crescimento infinito */
+    .chart-container,
+    #classificationChartContainer,
+    #trendChartContainer,
+    #distribution-chart,
+    #comparison-chart,
+    #trend-chart {
+        position: relative !important;
+        height: 350px !important;
+        max-height: 350px !important;
+        width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    #classificationChartCanvas,
+    #trendChartCanvas,
+    #distribution-chart,
+    #comparison-chart,
+    #trend-chart {
+        max-height: 350px !important;
+        height: 350px !important;
+        width: 100% !important;
+        display: block !important;
+    }
+
+    canvas {
+        max-height: 350px !important;
+    }
+
+    canvas[id*="chart"] {
+        height: 350px !important;
+        max-height: 350px !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <!-- Seletor de Período -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
+        <div class="flex flex-wrap gap-4 items-center">
+            <div>
+                <label for="period-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    data-i18n="analytics.period">Período</label>
+                <select id="period-select"
+                    class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-gray-300">
+                    <option value="hour" data-i18n="analytics.last_hour">Última Hora</option>
+                    <option value="day" data-i18n="analytics.today">Hoje</option>
+                    <option value="week" selected data-i18n="analytics.last_week">Última Semana</option>
+                    <option value="month" data-i18n="analytics.last_month">Último Mês</option>
+                    <option value="year" data-i18n="analytics.year">Ano Completo</option>
+                </select>
+            </div>
+            <button id="export-btn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+                data-i18n="analytics.export">Exportar</button>
+            <button id="refresh-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                data-i18n="analytics.refresh">Atualizar</button>
+        </div>
+    </div>
+
+    <!-- Gráficos Principais -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Gráfico de Pizza: Distribuição -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-200" data-i18n="analytics.distribution">
+                Distribuição de Classificações</h3>
+            <canvas id="distribution-chart"></canvas>
+        </div>
+
+        <!-- Gráfico de Barras: Comparação -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-200" data-i18n="analytics.comparison">
+                Comparação por Tipo</h3>
+            <canvas id="comparison-chart"></canvas>
+        </div>
+    </div>
+
+    <!-- Gráfico de Linhas: Tendência -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
+        <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-200" data-i18n="analytics.trend">Tendência ao
+            Longo do Tempo</h3>
+        <canvas id="trend-chart"></canvas>
+    </div>
+
+    <!-- Métricas de Desempenho -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2" data-i18n="analytics.total_detections">
+                Total de Detecções</p>
+            <p class="text-3xl font-bold text-blue-600 dark:text-blue-400" id="metric-total">0</p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2" data-i18n="analytics.avg_confidence">
+                Confiança Média</p>
+            <p class="text-3xl font-bold text-green-600 dark:text-green-400" id="metric-confidence">0%</p>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2" data-i18n="analytics.error_rate">Taxa
+                de Erro</p>
+            <p class="text-3xl font-bold text-red-600 dark:text-red-400" id="metric-error">0%</p>
+        </div>
+    </div>
+
+    <!-- KPIs e Informações do Modelo -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- KPIs -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-200">KPIs</h3>
+            <div class="space-y-4">
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Detecções (última hora)</p>
+                    <p class="text-2xl font-bold text-blue-600" id="kpiTotalDetections">--</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Taxa de Erro</p>
+                    <div class="flex items-center gap-2">
+                        <p class="text-2xl font-bold text-red-600" id="kpiErrorRate">--%</p>
+                        <div class="w-32 h-2 bg-gray-200 rounded-full">
+                            <div id="kpiErrorRateBar" class="h-full bg-red-500 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Tempo Médio (ms)</p>
+                    <p class="text-2xl font-bold text-green-600" id="kpiAvgTime">--</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações do Modelo -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-200">Informações do Modelo</h3>
+            <div class="space-y-4">
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Versão</p>
+                    <p class="text-lg font-semibold text-gray-900 dark:text-gray-200" id="modelVersion">--</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Último Treinamento</p>
+                    <p class="text-lg font-semibold text-gray-900 dark:text-gray-200" id="lastTrained">--</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Tamanho Dataset</p>
+                    <p class="text-lg font-semibold text-gray-900 dark:text-gray-200" id="datasetSize">--</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos com Seletores de Período -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Gráfico de Classificação -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200">Distribuição de Classificações</h3>
+                <select id="classificationPeriodSelect" class="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-gray-300">
+                    <option value="hour">Última Hora</option>
+                    <option value="day">Hoje</option>
+                    <option value="week" selected>Última Semana</option>
+                    <option value="month">Último Mês</option>
+                </select>
+            </div>
+            <div id="classificationChartContainer" class="relative overflow-hidden" style="height: 350px; width: 100%;">
+                <canvas id="classificationChartCanvas" style="display: block; height: 350px; max-height: 350px;"></canvas>
+            </div>
+            <div id="classificationChartPlaceholder"></div>
+        </div>
+
+        <!-- Gráfico de Tendência -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200">Tendência de Rejeições</h3>
+                <select id="trendPeriodSelect" class="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-gray-300">
+                    <option value="hour">Última Hora</option>
+                    <option value="day">Hoje</option>
+                    <option value="week" selected>Última Semana</option>
+                    <option value="month">Último Mês</option>
+                </select>
+            </div>
+            <div id="trendChartContainer" class="relative overflow-hidden" style="height: 350px; width: 100%;">
+                <canvas id="trendChartCanvas" style="display: block; height: 350px; max-height: 350px;"></canvas>
+            </div>
+            <div id="trendChartPlaceholder"></div>
+        </div>
+    </div>
+
+    <!-- Tabela de Histórico -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200">Histórico de Eventos</h3>
+            <button id="openFilterModalBtn" class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+                <i class="fas fa-filter mr-1"></i> Filtrar
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-900 dark:text-gray-300">Horário</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-900 dark:text-gray-300">Tipo</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-900 dark:text-gray-300">Confiança</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-900 dark:text-gray-300">Detalhes</th>
+                    </tr>
+                </thead>
+                <tbody id="eventHistoryTableBody" class="divide-y divide-gray-200 dark:divide-gray-700">
+                    <tr class="bg-gray-50 dark:bg-gray-800">
+                        <td colspan="4" class="px-4 py-4 text-center text-gray-500 dark:text-gray-400">Carregando...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação -->
+        <div class="mt-4 flex justify-between items-center">
+            <div id="paginationInfo" class="text-sm text-gray-600 dark:text-gray-400"></div>
+            <div id="paginationControls" class="flex gap-2"></div>
+        </div>
+
+        <!-- Botão de Exportação -->
+        <button id="exportAlertsBtn" class="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+            <i class="fas fa-download mr-2"></i> Exportar
+        </button>
+    </div>
+
+    <!-- Manter a tabela de histórico anterior para compatibilidade -->
+    <div id="history-tbody-old" style="display: none;"></div>
+</div>
+
+<!-- Modal de Filtro -->
+<div id="filterModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200">Filtrar Eventos</h3>
+            <button id="closeFilterModalBtn" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <form id="filterForm" class="space-y-4">
+            <div>
+                <label for="filterStartDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data Inicial</label>
+                <input type="date" id="filterStartDate" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-gray-300">
+            </div>
+            <div>
+                <label for="filterEndDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data Final</label>
+                <input type="date" id="filterEndDate" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-gray-300">
+            </div>
+            <div>
+                <label for="filterEventType" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Evento</label>
+                <input type="text" id="filterEventType" placeholder="Ex: Normal, Fratura..." class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-gray-300">
+            </div>
+            <div>
+                <label for="filterLataId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ID da Lata</label>
+                <input type="text" id="filterLataId" placeholder="Ex: LATA_001, LATA_002..." class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-gray-300">
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Aplicar</button>
+                <button type="button" id="clearFiltersBtn" class="flex-1 px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500">Limpar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- Carregar Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+
+<!-- Carregar arquivo analytics.js -->
+<script src="{{ url_for('static', filename='analytics.js') }}?v={{ range(1, 100000) | random }}"></script>
+
+<script>
+    // Objeto para gerenciar as instâncias dos gráficos e evitar sobreposição
+    const chartInstances = {
+        distribution: null,
+        comparison: null,
+        trend: null
+    };
+
+    // Função para criar ou atualizar gráficos
+    function updateChart(canvasId, type, data, options = {}) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) {
+            console.error(`Canvas com ID "${canvasId}" não encontrado`);
+            return;
+        }
+        
+        // Limpar parent
+        const parent = canvas.parentElement;
+        if (parent) {
+            parent.style.height = '350px';
+            parent.style.maxHeight = '350px';
+            parent.style.overflow = 'hidden';
+        }
+
+        // Resetar canvas
+        canvas.width = canvas.offsetWidth;
+        canvas.height = 350;
+        canvas.style.maxHeight = '350px';
+        canvas.style.height = '350px';
+        
+        const ctx = canvas.getContext('2d');
+        const key = canvasId.split('-')[0]; // Ex: distribution-chart -> distribution
+
+        if (chartInstances[key]) {
+            chartInstances[key].destroy();
+        }
+
+        chartInstances[key] = new Chart(ctx, {
+            type: type,
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 750
+                },
+                ...options
+            }
+        });
+    }
+
+    // Atualizar página de analytics
+    async function loadAnalytics() {
+        try {
+            const period = document.getElementById('period-select').value || 'week';
+            const response = await fetch(`/api/detection_history?period=${period}`);
+            if (!response.ok) throw new Error('Erro ao buscar dados');
+
+            const data = await response.json();
+
+            // Atualizar métricas
+            document.getElementById('metric-total').textContent = data.total || 0;
+            document.getElementById('metric-confidence').textContent = Math.round((data.avg_confidence || 0) * 100) + '%';
+            document.getElementById('metric-error').textContent = Math.round((data.error_rate || 0) * 100) + '%';
+
+            // Gráfico de Pizza: Distribuição
+            if (data.detection_types) {
+                const pieData = {
+                    labels: [
+                        'Latas Normais',
+                        'Latas Invertidas',
+                        'Latas Tombadas',
+                        'Fraturas'
+                    ],
+                    datasets: [{
+                        data: [
+                            data.detection_types.normal || 0,
+                            data.detection_types.inverted || 0,
+                            data.detection_types.fallen || 0,
+                            data.detection_types.fracture || 0
+                        ],
+                        backgroundColor: ['#10b981', '#ef4444', '#eab308', '#a855f7'],
+                        borderColor: ['#047857', '#dc2626', '#ca8a04', '#7e22ce'],
+                        borderWidth: 2
+                    }]
+                };
+                updateChart('distribution-chart', 'pie', pieData);
+            }
+
+            // Gráfico de Barras: Comparação
+            if (data.detection_types) {
+                const barData = {
+                    labels: ['Normal', 'Invertida', 'Tombada', 'Fratura'],
+                    datasets: [{
+                        label: 'Contagem',
+                        data: [
+                            data.detection_types.normal || 0,
+                            data.detection_types.inverted || 0,
+                            data.detection_types.fallen || 0,
+                            data.detection_types.fracture || 0
+                        ],
+                        backgroundColor: ['#10b981', '#ef4444', '#eab308', '#a855f7']
+                    }]
+                };
+                updateChart('comparison-chart', 'bar', barData);
+            }
+
+            // Gráfico de Linhas: Tendência
+            if (data.detections_per_hour) {
+                const lineData = {
+                    labels: data.detections_per_hour.labels || [],
+                    datasets: [{
+                        label: 'Total Detecções',
+                        data: data.detections_per_hour.totals || [],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                };
+                updateChart('trend-chart', 'line', lineData);
+            }
+
+            // Preencher tabela de histórico
+            if (data.history && Array.isArray(data.history)) {
+                const tbody = document.getElementById('eventHistoryTableBody') || document.getElementById('history-tbody');
+                if (tbody) {
+                    tbody.innerHTML = data.history.length > 0 ?
+                        data.history.slice(0, 50).map(item => `
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${new Date(item.timestamp).toLocaleString()}</td>
+                            <td class="px-4 py-2"><span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">${item.type}</span></td>
+                            <td class="px-4 py-2 text-gray-900 dark:text-gray-300">${(item.confidence * 100).toFixed(1)}%</td>
+                            <td class="px-4 py-2 text-gray-900 dark:text-gray-300 text-xs">${item.details || '--'}</td>
+                        </tr>
+                    `).join('') :
+                        '<tr class="bg-gray-50 dark:bg-gray-800"><td colspan="4" class="px-4 py-4 text-center text-gray-500 dark:text-gray-400">Sem dados</td></tr>';
+                }
+            }
+
+        } catch (error) {
+            console.error('Erro ao carregar analytics:', error);
+        }
+    }
+
+    // Event listeners
+    const periodSelect = document.getElementById('period-select');
+    if (periodSelect) {
+        periodSelect.addEventListener('change', loadAnalytics);
+    }
+
+    const exportBtn = document.getElementById('export-btn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', async () => {
+            try {
+                const period = document.getElementById('period-select').value || 'week';
+                const response = await fetch(`/api/export_analytics?period=${period}`);
+
+                // Criar download do arquivo
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `analytics_${new Date().getTime()}.csv`;
+                a.click();
+            } catch (error) {
+                console.error('Erro ao exportar:', error);
+            }
+        });
+    }
+
+    const refreshBtn = document.getElementById('refresh-btn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', loadAnalytics);
+    }
+
+    // Listener para atualizar gráficos quando mudar idioma
+    document.addEventListener('translationsApplied', async () => {
+        await loadAnalytics();
+    });
+
+    // Carregar ao iniciar
+    document.addEventListener('DOMContentLoaded', () => {
+        loadAnalytics();
+        
+        // Tentar inicializar o analytics.js se disponível
+        if (typeof initializeAnalyticsPage === 'function') {
+            console.log('[Analytics] Inicializando Analytics Page via analytics.js...');
+            initializeAnalyticsPage();
+        }
+    });
+</script>
+{% endblock %}
