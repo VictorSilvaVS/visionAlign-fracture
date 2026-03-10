@@ -420,6 +420,8 @@
                             class="tab-button {% if request.endpoint == 'settings_page' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Configurações</a>
                         <a href="{{ url_for('users') }}"
                             class="tab-button {% if request.endpoint == 'users' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">users</a>
+                        <a href="{{ url_for('retrain_page') }}"
+                            class="tab-button {% if request.endpoint == 'retrain_page' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Retreinamento</a>
                         {% endif %}
                     </nav>
                 </div>

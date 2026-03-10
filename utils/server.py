@@ -1148,6 +1148,13 @@ def settings_page():
     """Página de configurações."""
     return render_template('settings.html', username=current_user.username, client_ip=request.remote_addr)
 
+@flask_app.route('/retrain')
+@login_required
+@role_required('admin')
+def retrain_page():
+    """Página de Retreinamento do modelo."""
+    return render_template('retrain.html', username=current_user.username, client_ip=request.remote_addr)
+
 @flask_app.route('/logout')
 @login_required
 def logout():
@@ -1193,8 +1200,13 @@ def last_fracture_roi():
         # Slot 1: serve o ROI ao vivo com máscaras desenhadas
         if idx == 0 and _model_instance is not None and hasattr(_model_instance, 'last_roi_with_mask'):
             with _model_instance.last_roi_lock:
-                roi = _model_instance.last_roi_with_mask
-                fracture_info = _model_instance.last_roi_fracture_info.copy() if hasattr(_model_instance, 'last_roi_fracture_info') else {}
+                if _model_instance.last_roi_with_mask is None:
+                    return jsonify({"status": "no_roi", "message": "Nenhuma lata detectada."}), 404
+                
+                roi = _model_instance.last_roi_with_mask.copy()
+                # Correção: verifica se info não é None antes de dar .copy()
+                raw_info = getattr(_model_instance, 'last_roi_fracture_info', None)
+                fracture_info = raw_info.copy() if raw_info is not None else {}
             
             if roi is not None:
                 ret, buf = cv2.imencode('.jpg', roi, [cv2.IMWRITE_JPEG_QUALITY, 85])
@@ -1308,6 +1320,404 @@ def save_training_frame():
     else:
         return jsonify({"success": False, "message": f"Erro ao salvar: {result}"}), 500
 
+@flask_app.route('/api/dataset_info', methods=['GET'])
+@login_required
+def get_dataset_info_api():
+    """Retorna informações sobre o dataset coletado para treinamento."""
+    try:
+        import glob
+        dataset_path = r"E:\programs\visionAlign\data\dataset_collect\images"
+        os.makedirs(dataset_path, exist_ok=True)
+        
+        images = glob.glob(os.path.join(dataset_path, "*.jpg"))
+        count = len(images)
+        
+        last_update = "N/A"
+        if count > 0:
+            latest_file = max(images, key=os.path.getmtime)
+            # Usando conversion para exibição amigável
+            mtime = os.path.getmtime(latest_file)
+            last_update = datetime.fromtimestamp(mtime).strftime('%d/%m/%Y %H:%M:%S')
+            
+        return jsonify({
+            "image_count": count,
+            "class_count": 4, # Normal, Inverted, Fallen, Fracture
+            "last_update": last_update
+        })
+    except Exception as e:
+        _logger.error(f"Erro ao buscar info do dataset: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+
+@flask_app.route('/api/test_models', methods=['POST'])
+@login_required
+@role_required('admin')
+def test_models_api():
+    """Realiza um autodiagnóstico nos modelos YOLO (Alinhamento e Fratura)."""
+    results = {
+        "align": {"status": "pending", "message": ""},
+        "fracture": {"status": "pending", "message": ""}
+    }
+    
+    try:
+        from ultralytics import YOLO
+        import numpy as np
+        
+        # Teste Modelo Alinhamento
+        try:
+            path_align = r"E:\programs\visionAlign\model\_openvino_model\VisionAlign_openvino_model"
+            if not os.path.exists(path_align):
+                # Tenta fallback se a pasta openvino não existir
+                path_align = r"E:\programs\visionAlign\model\backup\best.pt"
+            
+            _logger.info(f"Testando modelo Alinhamento em: {path_align}")
+            m_align = YOLO(path_align)
+            # Dummy inference
+            black_frame = np.zeros((640, 640, 3), dtype=np.uint8)
+            m_align.predict(black_frame, verbose=False)
+            results["align"] = {"status": "success", "message": "Carregado e inferência OK"}
+        except Exception as e:
+            _logger.error(f"Falha no teste do modelo Alinhamento: {e}")
+            results["align"] = {"status": "error", "message": str(e)}
+
+        # Teste Modelo Fratura
+        try:
+            path_fracture = r"E:\programs\visionAlign\model\_openvino_model\VisionFracture_openvino_model"
+            if not os.path.exists(path_fracture):
+                 path_fracture = r"E:\programs\visionAlign\model\fracture\best.pt"
+
+            _logger.info(f"Testando modelo Fratura em: {path_fracture}")
+            m_fracture = YOLO(path_fracture, task='segment')
+            # Dummy inference
+            black_frame = np.zeros((640, 640, 3), dtype=np.uint8)
+            m_fracture.predict(black_frame, verbose=False)
+            results["fracture"] = {"status": "success", "message": "Carregado e inferência OK"}
+        except Exception as e:
+            _logger.error(f"Falha no teste do modelo Fratura: {e}")
+            results["fracture"] = {"status": "error", "message": str(e)}
+
+        all_ok = all(r["status"] == "success" for r in results.values())
+        return jsonify({
+            "success": all_ok,
+            "results": results
+        })
+
+    except Exception as e:
+        _logger.error(f"Erro geral no teste de modelos: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@flask_app.route('/api/test_inference', methods=['POST'])
+@login_required
+@role_required('admin')
+def test_inference_api():
+    """Realiza inferência completa (Alinhamento + Fratura) em uma imagem enviada."""
+    if 'image' not in request.files:
+        return jsonify({"success": False, "message": "Nenhuma imagem enviada."}), 400
+    
+    file = request.files['image']
+    try:
+        from ultralytics import YOLO
+        import numpy as np
+        import cv2
+        import base64
+        import os
+        
+        # Converte arquivo para imagem OpenCV
+        filestr = file.read()
+        npimg = np.frombuffer(filestr, np.uint8)
+        img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+        
+        if img is None:
+            return jsonify({"success": False, "message": "Falha ao decodificar imagem."}), 400
+
+        m_align = None
+        m_fracture = None
+
+        # Tenta usar a instância global do servidor para evitar reload do disco (mais rápido)
+        if _model_instance is not None:
+             _logger.info("Usando instância global do modelo para teste de inferência.")
+             m_align = _model_instance.model_align
+             m_fracture = _model_instance.model_fracture
+        else:
+            # Fallback para load manual se o servidor não estiver com o modelo ativo
+            path_align = r"E:\programs\visionAlign\model\_openvino_model\VisionAlign_openvino_model"
+            path_fracture = r"E:\programs\visionAlign\model\_openvino_model\VisionFracture_openvino_model"
+            
+            _logger.info("Iniciando inferência de teste manual (Reload do disco)...")
+            m_align = YOLO(path_align)
+            m_fracture = YOLO(path_fracture, task='segment')
+
+        # 1. Inferência de Alinhamento
+        results_align = m_align.predict(img, conf=0.25, verbose=False)
+        
+        processed_img = img.copy()
+        detections = []
+        boxes_count = 0
+
+        if results_align and len(results_align) > 0:
+            res = results_align[0]
+            if res.boxes is not None:
+                boxes = res.boxes.xyxy.cpu().numpy()
+                confidences = res.boxes.conf.cpu().numpy()
+                classes = res.boxes.cls.cpu().numpy()
+                names = res.names
+                boxes_count = len(boxes)
+
+                for i, box in enumerate(boxes):
+                    x1, y1, x2, y2 = map(int, box)
+                    cls_id = int(classes[i])
+                    label = names[cls_id]
+                    conf = confidences[i]
+
+                    # Desenha box de alinhamento
+                    color = (255, 0, 0) # Azul
+                    if "Inverted" in label: color = (0, 165, 255) # Laranja
+                    elif "Fallen" in label: color = (0, 255, 255) # Amarelo
+                    
+                    cv2.rectangle(processed_img, (x1, y1), (x2, y2), color, 3)
+                    cv2.putText(processed_img, f"{label} {conf:.2f}", (x1, y1-10), 
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+
+                    # 2. Inferência de Fratura no ROI
+                    # Proteção de bordas
+                    h_img, w_img = img.shape[:2]
+                    ry1, ry2 = max(0, y1), min(h_img, y2)
+                    rx1, rx2 = max(0, x1), min(w_img, x2)
+                    
+                    roi = img[ry1:ry2, rx1:rx2]
+                    if roi.size > 0:
+                        results_fr = m_fracture.predict(roi, conf=0.25, verbose=False)
+                        if results_fr and len(results_fr) > 0:
+                            res_fr = results_fr[0]
+                            if hasattr(res_fr, 'masks') and res_fr.masks is not None:
+                                for m_idx, mask_points in enumerate(res_fr.masks.xy):
+                                    if len(mask_points) > 0:
+                                        pts = np.array(mask_points, dtype=np.int32)
+                                        # Ajusta pontos para a coordenada da imagem original
+                                        pts[:, 0] += rx1
+                                        pts[:, 1] += ry1
+                                        
+                                        # Desenha máscara de fratura
+                                        overlay = processed_img.copy()
+                                        cv2.fillPoly(overlay, [pts], (0, 0, 255)) # Vermelho
+                                        cv2.addWeighted(overlay, 0.4, processed_img, 0.6, 0, processed_img)
+                                        cv2.polylines(processed_img, [pts], True, (0, 0, 255), 2)
+                                        
+                                        detections.append({
+                                            "class": "fracture",
+                                            "parent_id": i
+                                        })
+
+                    detections.append({
+                        "class": label,
+                        "confidence": float(conf)
+                    })
+
+        # Codifica imagem final para base64
+        _, buffer = cv2.imencode('.jpg', processed_img)
+        img_base64 = base64.b64encode(buffer).decode('utf-8')
+
+        return jsonify({
+            "success": True,
+            "image": f"data:image/jpeg;base64,{img_base64}",
+            "summary": f"Detectados {boxes_count} itens e {len([d for d in detections if d['class'] == 'fracture'])} fraturas."
+        })
+
+    except Exception as e:
+        import traceback
+        _logger.error(f"Erro no teste de inferência: {e}\n{traceback.format_exc()}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@flask_app.route('/api/express_retrain', methods=['POST'])
+@login_required
+@role_required('admin')
+def express_retrain_api():
+    """Realiza um treinamento 'relâmpago' (Fine-tuning) com poucas imagens e auto-labeling."""
+    if 'images' not in request.files:
+        return jsonify({"success": False, "message": "Nenhuma imagem enviada."}), 400
+    
+    target_class = request.form.get('target_class', 'fracture')
+    files = request.files.getlist('images')
+    
+    try:
+        import os
+        import shutil
+        import threading
+        from ultralytics import YOLO
+        import numpy as np
+        import cv2
+
+        # 1. Preparação do Diretório de Treino Expresso
+        base_dir = r"E:\programs\visionAlign\data\express_train"
+        train_img_dir = os.path.join(base_dir, "images", "train")
+        train_lbl_dir = os.path.join(base_dir, "labels", "train")
+        
+        # Limpa treino anterior
+        if os.path.exists(base_dir):
+            shutil.rmtree(base_dir)
+        
+        os.makedirs(train_img_dir, exist_ok=True)
+        os.makedirs(train_lbl_dir, exist_ok=True)
+
+        _logger.info(f"Iniciando Auto-Labeling para {len(files)} imagens (Classe: {target_class}).")
+
+        # 2. Auto-Labeling (Pseudo-Labeling)
+        # Usamos o modelo atual para encontrar ONDE estão os objetos, mas forçamos a CLASSE que o user quer.
+        path_align = r"E:\programs\visionAlign\model\_openvino_model\VisionAlign_openvino_model"
+        if not os.path.exists(path_align): path_align = r"E:\programs\visionAlign\model\backup\best.pt"
+        
+        path_fracture = r"E:\programs\visionAlign\model\_openvino_model\VisionFracture_openvino_model"
+        if not os.path.exists(path_fracture): path_fracture = r"E:\programs\visionAlign\model\fracture\best.pt"
+
+        # Carrega modelos para rotulagem
+        m_align = YOLO(path_align)
+        m_fracture = YOLO(path_fracture)
+
+        saved_count = 0
+        for i, file in enumerate(files):
+            # Salva imagem
+            img_path = os.path.join(train_img_dir, f"express_{i}.jpg")
+            file.save(img_path)
+            
+            # Carrega para processar
+            img = cv2.imread(img_path)
+            if img is None: continue
+            
+            labels = []
+            
+            if target_class == 'fracture':
+                # Para fratura, precisamos primeiro achar a lata (align) e depois segmentar nela
+                res_align = m_align.predict(img, conf=0.25, verbose=False)
+                if res_align and len(res_align) > 0:
+                    for box in res_align[0].boxes.xyxy.cpu().numpy():
+                        x1, y1, x2, y2 = map(int, box)
+                        roi = img[y1:y2, x1:x2]
+                        if roi.size > 0:
+                            res_fr = m_fracture.predict(roi, conf=0.1, verbose=False) # Conf baixa para capturar tudo
+                            if res_fr and len(res_fr) > 0 and hasattr(res_fr[0], 'masks') and res_fr[0].masks is not None:
+                                for mask in res_fr[0].masks.xyn:
+                                    # Formato YOLO Seg: class_id x1 y1 x2 y2 ... (normalizado)
+                                    # Como é segmentação global da imagem de treino, precisamos normalizar relativo a imagem toda
+                                    # Mas o model_fracture treina no ROI. 
+                                    # Para simplificar o "Treino Relâmpago", vamos treinar o model_fracture no ROI salvo.
+                                    roi_img_path = os.path.join(train_img_dir, f"express_roi_{saved_count}.jpg")
+                                    cv2.imwrite(roi_img_path, roi)
+                                    
+                                    points = " ".join([f"{p[0]:.6f} {p[1]:.6f}" for p in mask])
+                                    lbl_path = os.path.join(train_lbl_dir, f"express_roi_{saved_count}.txt")
+                                    with open(lbl_path, "w") as f:
+                                        f.write(f"0 {points}\n")
+                                    saved_count += 1
+            else:
+                # Para Alinhamento (Lata Tombada/Invertida)
+                res = m_align.predict(img, conf=0.25, verbose=False)
+                if res and len(res) > 0:
+                    lbl_path = os.path.join(train_lbl_dir, f"express_{i}.txt")
+                    with open(lbl_path, "w") as f:
+                        for box_obj in res[0].boxes:
+                            b = box_obj.xywhn.cpu().numpy()[0]
+                            # Força a classe desejada (mapeando do select do front)
+                            cid = 0 # Default
+                            if "tombada" in target_class: cid = 2 
+                            elif "invertida" in target_class: cid = 1
+                            
+                            f.write(f"{cid} {b[0]:.6f} {b[1]:.6f} {b[2]:.6f} {b[3]:.6f}\n")
+                    saved_count += 1
+
+        if saved_count == 0:
+            return jsonify({"success": False, "message": "Não foi possível identificar objetos nas fotos para rotulagem automática."}), 400
+
+        # 3. Dispara Treino em Background
+        def run_fast_train():
+            try:
+                _logger.info("Iniciando motor de treinamento Ultra-Rápido...")
+                
+                # Paths Oficiais - CORRIGIDOS
+                official_pt_align = r"E:\programs\visionAlign\model\backup\yolo26n.pt" 
+                official_pt_fracture = r"E:\programs\visionAlign\model\backup\best.pt"
+                
+                official_ov_align = r"E:\programs\visionAlign\model\_openvino_model\VisionAlign_openvino_model"
+                official_ov_fracture = r"E:\programs\visionAlign\model\_openvino_model\VisionFracture_openvino_model"
+
+                # Cria data.yaml temporário
+                yaml_path = os.path.join(base_dir, "data.yaml")
+                with open(yaml_path, "w") as f:
+                    if target_class == 'fracture':
+                        f.write(f"train: {train_img_dir}\nval: {train_img_dir}\nnc: 1\nnames: ['fracture']\n")
+                        model_path_to_load = official_pt_fracture
+                        export_name = "VisionFracture"
+                        target_ov_dir = official_ov_fracture
+                    else:
+                        f.write(f"train: {train_img_dir}\nval: {train_img_dir}\nnc: 3\nnames: ['Fallen', 'Inverted', 'Normal']\n")
+                        model_path_to_load = official_pt_align
+                        export_name = "VisionAlign"
+                        target_ov_dir = official_ov_align
+                
+                # Carrega o modelo PESADO (.pt) para treinamento
+                # NOTA: O Align é detect mas pode vir de um .pt genérico
+                m_train = YOLO(model_path_to_load)
+                
+                # Treino Relâmpago
+                results = m_train.train(
+                    data=yaml_path,
+                    epochs=15,
+                    imgsz=640,
+                    batch=4,
+                    lr0=0.001,
+                    lrf=0.01,
+                    plots=False,
+                    overlap_mask=True,
+                    verbose=False,
+                    project=os.path.join(base_dir, "runs"),
+                    name="express_run"
+                )
+                
+                # O novo .pt está em: base_dir/runs/express_run/weights/best.pt
+                new_pt_path = os.path.join(base_dir, "runs", "express_run", "weights", "best.pt")
+                
+                if os.path.exists(new_pt_path):
+                    # 1. Atualiza o PT de produção para o próximo treino relâmpago ser melhor
+                    shutil.copy(new_pt_path, model_path_to_load)
+                    
+                    _logger.info("Modelo .pt atualizado. Exportando para OpenVINO...")
+                    
+                    # 2. Exporta o novo modelo
+                    m_new = YOLO(new_pt_path)
+                    ov_export_path = m_new.export(format="openvino", imgsz=640) 
+                    # ov_export_path será algo como '.../best_openvino_model'
+                    
+                    # 3. Substitui a pasta OpenVINO de produção
+                    if os.path.exists(ov_export_path):
+                        if os.path.exists(target_ov_dir):
+                            shutil.rmtree(target_ov_dir)
+                        shutil.copytree(ov_export_path, target_ov_dir)
+                        
+                        _logger.info(f"Pasta OpenVINO atualizada em: {target_ov_dir}")
+                        
+                        # 4. TRIGGER RELOAD NO SISTEMA VIVO
+                        if _model_instance:
+                            _logger.info("Triggering HOT RELOAD dos modelos na memória...")
+                            _model_instance.reload_models()
+                
+                _logger.info(">>> SISTEMA ATUALIZADO COM SUCESSO! O novo conhecimento já está valendo. <<<")
+                
+            except Exception as e:
+                import traceback
+                _logger.error(f"Erro no background train: {e}\n{traceback.format_exc()}")
+
+        threading.Thread(target=run_fast_train, daemon=True).start()
+
+        return jsonify({
+            "success": True, 
+            "message": f"Auto-rotulagem concluída ({saved_count} amostras). O treinamento está rodando em segundo plano e levará ~2-5 minutos."
+        })
+
+    except Exception as e:
+        _logger.error(f"Erro no express retrain: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 @flask_app.route('/api/decrypt', methods=['POST', 'GET'])

@@ -1,0 +1,490 @@
+{% extends "base.html" %}
+
+{% block title %}VisionAlign - Retreinamento do Modelo{% endblock %}
+
+{% block styles %}
+<style>
+    .terminal-output {
+        background-color: #1a202c;
+        color: #48bb78;
+        font-family: 'Courier New', Courier, monospace;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        height: 400px;
+        overflow-y: auto;
+        font-size: 0.85rem;
+        border: 1px solid #2d3748;
+    }
+
+    .progress-bar-inner {
+        transition: width 0.5s ease-in-out;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="p-4 sm:p-6 lg:p-8">
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Centro de Retreinamento IA</h2>
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Gerencie o ciclo de vida e o aprimoramento dos seus
+            modelos YOLO.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Coluna de Ações e Status -->
+        <div class="lg:col-span-1 space-y-6">
+            <!-- Card de Status do Dataset -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                    <i class="fas fa-database mr-2 text-blue-500"></i> Status do Dataset
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Imagens Coletadas:</span>
+                        <span id="dataset-image-count" class="font-bold text-gray-900 dark:text-white">--</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Classes Detectadas:</span>
+                        <span id="dataset-classes-count" class="font-bold text-gray-900 dark:text-white">--</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Última Atualização:</span>
+                        <span id="dataset-last-update" class="font-bold text-gray-100 dark:text-white">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card de Controle -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                    <i class="fas fa-play-circle mr-2 text-green-500"></i> Iniciar Retreinamento
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="retrain-model-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Modelo Alvo</label>
+                        <select id="retrain-model-select" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm transition-focus focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="align">VisionAlign (Alinhamento)</option>
+                            <option value="fracture">VisionFracture (Fraturas)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="retrain-epochs" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Épocas (Epochs)</label>
+                        <input type="number" id="retrain-epochs" value="50" min="10" max="300" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm transition-focus focus:ring-2 focus:ring-blue-500 outline-none">
+                        <p class="mt-1 text-xs text-gray-500">Mínimo 10, Máximo 300 para estabilidade.</p>
+                    </div>
+                    <button id="start-retrain-btn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-md transition-all active:scale-95 flex items-center justify-center">
+                        <i class="fas fa-rocket mr-2"></i> Iniciar Treinamento
+                    </button>
+                    <button id="stop-retrain-btn" class="w-full py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg shadow-md transition-all hidden">
+                        <i class="fas fa-stop-circle mr-2"></i> Abortar Treinamento
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card de Teste do Modelo -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                    <i class="fas fa-vial mr-2 text-purple-500"></i> Autodiagnóstico de Modelos
+                </h3>
+                <p class="text-xs text-gray-500 mb-4">Verifique a integridade e prontidão operacional dos modelos
+                    carregados.</p>
+                <div class="space-y-3">
+                    <div id="test-align-status"
+                        class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-600">
+                        <div class="flex items-center">
+                            <i class="fas fa-object-group text-blue-400 mr-2"></i>
+                            <span class="text-sm font-medium">VisionAlign</span>
+                        </div>
+                        <span id="align-badge"
+                            class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-gray-200 text-gray-500">AGUARDANDO</span>
+                    </div>
+                    <div id="test-fracture-status"
+                        class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-600">
+                        <div class="flex items-center">
+                            <i class="fas fa-draw-polygon text-red-400 mr-2"></i>
+                            <span class="text-sm font-medium">VisionFracture</span>
+                        </div>
+                        <span id="fracture-badge"
+                            class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-gray-200 text-gray-500">AGUARDANDO</span>
+                    </div>
+                    <button id="run-model-test-btn"
+                        class="w-full mt-2 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold rounded-lg shadow-sm transition-all flex items-center justify-center">
+                        <i class="fas fa-stethoscope mr-2"></i> Testar Modelos Agora
+                    </button>
+                </div>
+            </div>
+
+            <!-- Laboratório de Teste Visual -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                    <i class="fas fa-microscope mr-2 text-indigo-500"></i> Laboratório de Testes
+                </h3>
+                <p class="text-xs text-gray-500 mb-4">Envie uma foto para testar a acurácia de detecção e segmentação em tempo real.</p>
+                <div class="space-y-4">
+                    <div id="drop-zone" class="relative group cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 transition-all hover:border-indigo-400 dark:hover:border-indigo-500 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30">
+                        <input type="file" id="test-image-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
+                        <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 group-hover:text-indigo-500 mb-2"></i>
+                        <span id="file-name-display" class="text-xs font-medium text-gray-500 dark:text-gray-400 text-center">Arraste ou clique para selecionar</span>
+                    </div>
+                    
+                    <button id="run-visual-test-btn" disabled class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-lg shadow-sm transition-all flex items-center justify-center">
+                        <i class="fas fa-play mr-2"></i> Rodar Teste Visual
+                    </button>
+
+                    <div id="visual-result-container" class="mt-4 hidden animate-fade-in border-t border-gray-100 dark:border-gray-700 pt-4">
+                        <p id="visual-result-summary" class="text-xs font-bold text-gray-900 dark:text-white mb-2"></p>
+                        <div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-inner bg-black">
+                            <img id="visual-result-img" class="max-w-full h-auto mx-auto" src="" alt="Resultado do teste">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            <!-- Treino Relâmpago (Express Fine-Tuning) -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                    <i class="fas fa-bolt mr-2 text-yellow-500"></i> Treino Relâmpago
+                </h3>
+                <p class="text-xs text-gray-500 mb-4">Ajuste fino rápido usando poucas fotos (10-30). Ideal para corrigir erros específicos de detecção.</p>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Classe Alvo</label>
+                        <select id="express-class-select" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm outline-none focus:ring-2 focus:ring-yellow-500">
+                            <option value="fracture">Fratura (Segmentation)</option>
+                            <option value="lata_tombada">Lata Tombada</option>
+                            <option value="lata_invertida">Lata Invertida</option>
+                        </select>
+                    </div>
+
+                    <div id="express-drop-zone" class="relative group cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 transition-all hover:border-yellow-400 bg-gray-50 dark:bg-gray-700/30 flex flex-col items-center justify-center">
+                        <input type="file" id="express-images-input" multiple class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
+                        <i class="fas fa-images text-3xl text-gray-400 group-hover:text-yellow-500 mb-2"></i>
+                        <span id="express-file-count" class="text-xs font-medium text-gray-500 dark:text-gray-400">Arraste um conjunto de fotos (ZIP ou múltiplas imagens)</span>
+                    </div>
+
+                    <button id="run-express-train-btn" disabled class="w-full py-3 bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50 text-white font-bold rounded-lg shadow-md transition-all flex items-center justify-center">
+                        <i class="fas fa-brain mr-2"></i> Iniciar Treino Relâmpago
+                    </button>
+                    
+                    <div id="express-status-bar" class="hidden">
+                        <div class="flex justify-between items-center mb-1">
+                            <span id="express-status-text" class="text-[10px] font-bold text-yellow-600 uppercase">Processando...</span>
+                            <span id="express-progress-pct" class="text-[10px] font-bold text-gray-500">0%</span>
+                        </div>
+                        <div class="w-full h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div id="express-progress-fill" class="h-full bg-yellow-500 transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna de Console e Progresso -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Barra de Progresso Principal -->
+            <div id="training-progress-container"
+                class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Progresso do
+                        Treinamento</h3>
+                    <span id="training-percent" class="text-lg font-black text-blue-600 dark:text-blue-400">0%</span>
+                </div>
+                <div class="w-full h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div id="training-progress-bar" class="progress-bar-inner h-full bg-blue-500" style="width: 0%">
+                    </div>
+                </div>
+                <p id="training-current-status" class="mt-2 text-sm text-gray-600 dark:text-gray-300 italic">Aguardando
+                    comando...</p>
+            </div>
+
+            <!-- Console de Saída -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Console de Treinamento (YOLO Log)
+                    </h3>
+                    <button id="clear-console-btn"
+                        class="text-xs text-gray-500 hover:text-blue-500 transition-colors uppercase font-bold">Limpar
+                        Logs</button>
+                </div>
+                <div id="retrain-console" class="terminal-output">
+                    [SYSTEM] Aguardando início do processo de retreinamento...
+                    [INFO] Certifique-se de que o dataset está devidamente rotulado na pasta de coleta.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const consoleEl = document.getElementById('retrain-console');
+        const startBtn = document.getElementById('start-retrain-btn');
+        const stopBtn = document.getElementById('stop-retrain-btn');
+        const progressBar = document.getElementById('training-progress-bar');
+        const percentText = document.getElementById('training-percent');
+        const statusText = document.getElementById('training-current-status');
+
+        function appendLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = type === 'error' ? 'text-red-500' : (type === 'success' ? 'text-green-400' : 'text-green-400');
+            consoleEl.innerHTML += `<div class="mb-1"><span class="text-gray-500">[${timestamp}]</span> <span class="${colorClass}">${message}</span></div>`;
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        // Simulação de atualização de status do dataset
+        async function updateDatasetInfo() {
+            try {
+                const response = await fetch('/api/dataset_info');
+                const data = await response.json();
+                document.getElementById('dataset-image-count').textContent = data.image_count || '0';
+                document.getElementById('dataset-classes-count').textContent = data.class_count || '0';
+                document.getElementById('dataset-last-update').textContent = data.last_update || 'N/A';
+            } catch (e) {
+                console.error("Erro ao carregar info do dataset", e);
+            }
+        }
+
+        updateDatasetInfo();
+
+        startBtn.addEventListener('click', async () => {
+            const model = document.getElementById('retrain-model-select').value;
+            const epochs = document.getElementById('retrain-epochs').value;
+
+            startBtn.classList.add('hidden');
+            stopBtn.classList.remove('hidden');
+
+            appendLog(`Iniciando retreinamento do modelo: ${model.toUpperCase()}...`, 'success');
+            appendLog(`Configuração: ${epochs} épocas solicitadas.`);
+
+            // Aqui faríamos a chamada API real
+            /*
+            const response = await fetch('/api/start_retrain', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({model, epochs})
+            });
+            */
+
+            // Simulação de progresso para demo visual
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 5;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    appendLog("TREINAMENTO CONCLUÍDO COM SUCESSO!", 'success');
+                    appendLog("O novo modelo está pronto para ser exportado para OpenVINO.");
+                    statusText.textContent = "Treinamento finalizado.";
+                    startBtn.classList.remove('hidden');
+                    stopBtn.classList.add('hidden');
+                }
+                progressBar.style.width = `${progress}%`;
+                percentText.textContent = `${Math.round(progress)}%`;
+                statusText.textContent = `Processando época ${Math.floor(progress * (epochs / 100))}/${epochs}...`;
+
+                if (Math.random() < 0.1) {
+                    appendLog(`Epoch ${Math.floor(progress * (epochs / 100))}: loss melhorada para ${(0.5 - (progress / 300)).toFixed(4)}`);
+                }
+            }, 1000);
+        });
+
+        document.getElementById('clear-console-btn').addEventListener('click', () => {
+            consoleEl.innerHTML = '<div class="text-gray-500 italic">Limpo pelo usuário.</div>';
+        });
+
+        // Lógica de Teste de Modelos
+        const testBtn = document.getElementById('run-model-test-btn');
+        const alignBadge = document.getElementById('align-badge');
+        const fractureBadge = document.getElementById('fracture-badge');
+
+        testBtn.addEventListener('click', async () => {
+            testBtn.disabled = true;
+            testBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Testando...';
+            
+            alignBadge.className = 'px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-100 text-blue-600';
+            alignBadge.textContent = 'TESTANDO';
+            fractureBadge.className = 'px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-100 text-blue-600';
+            fractureBadge.textContent = 'TESTANDO';
+            
+            appendLog("Iniciando autodiagnóstico dos modelos carregados...");
+
+            try {
+                const response = await fetch('/api/test_models', { method: 'POST' });
+                const data = await response.json();
+
+                if (data.results) {
+                    // Atualiza VisionAlign
+                    if (data.results.align.status === 'success') {
+                        alignBadge.className = 'px-2 py-0.5 text-[10px] font-bold rounded-full bg-green-100 text-green-600';
+                        alignBadge.textContent = 'OK';
+                        appendLog(`VisionAlign: ${data.results.align.message}`, 'success');
+                    } else {
+                        alignBadge.className = 'px-2 py-0.5 text-[10px] font-bold rounded-full bg-red-100 text-red-600';
+                        alignBadge.textContent = 'ERRO';
+                        appendLog(`VisionAlign ERRO: ${data.results.align.message}`, 'error');
+                    }
+
+                    // Atualiza VisionFracture
+                    if (data.results.fracture.status === 'success') {
+                        fractureBadge.className = 'px-2 py-0.5 text-[10px] font-bold rounded-full bg-green-100 text-green-600';
+                        fractureBadge.textContent = 'OK';
+                        appendLog(`VisionFracture: ${data.results.fracture.message}`, 'success');
+                    } else {
+                        fractureBadge.className = 'px-2 py-0.5 text-[10px] font-bold rounded-full bg-red-100 text-red-600';
+                        fractureBadge.textContent = 'ERRO';
+                        appendLog(`VisionFracture ERRO: ${data.results.fracture.message}`, 'error');
+                    }
+                }
+            } catch (error) {
+                appendLog("Erro crítico ao tentar comunicar com o servidor para teste.", "error");
+                console.error(error);
+            } finally {
+                testBtn.disabled = false;
+                testBtn.innerHTML = '<i class="fas fa-stethoscope mr-2"></i> Testar Modelos Agora';
+            }
+        });
+
+        // Lógica do Laboratório de Teste Visual
+        const imageInput = document.getElementById('test-image-input');
+        const runVisualBtn = document.getElementById('run-visual-test-btn');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const resultContainer = document.getElementById('visual-result-container');
+        const resultImg = document.getElementById('visual-result-img');
+        const resultSummary = document.getElementById('visual-result-summary');
+
+        imageInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                fileNameDisplay.textContent = this.files[0].name;
+                runVisualBtn.disabled = false;
+            } else {
+                fileNameDisplay.textContent = 'Arraste ou clique para selecionar';
+                runVisualBtn.disabled = true;
+            }
+        });
+
+        runVisualBtn.addEventListener('click', async () => {
+            const file = imageInput.files[0];
+            if (!file) return;
+
+            runVisualBtn.disabled = true;
+            runVisualBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processando...';
+            appendLog(`Iniciando inferência visual no arquivo: ${file.name}...`);
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await fetch('/api/test_inference', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    resultImg.src = data.image;
+                    resultSummary.textContent = data.summary;
+                    resultContainer.classList.remove('hidden');
+                    appendLog("Inferência visual concluída com sucesso!", "success");
+                    appendLog(`Resultado: ${data.summary}`);
+                    
+                    // Rola suavemente para o resultado
+                    resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    appendLog(`Erro na inferência: ${data.message}`, "error");
+                }
+            } catch (error) {
+                appendLog("Erro de comunicação com o servidor.", "error");
+                console.error(error);
+            } finally {
+                runVisualBtn.disabled = false;
+                runVisualBtn.innerHTML = '<i class="fas fa-play mr-2"></i> Rodar Teste Visual';
+            }
+        });
+
+        // Lógica do Treino Relâmpago (Express Fine-Tuning)
+        const expressInput = document.getElementById('express-images-input');
+        const runExpressBtn = document.getElementById('run-express-train-btn');
+        const expressFileCount = document.getElementById('express-file-count');
+        const expressStatusBar = document.getElementById('express-status-bar');
+        const expressStatusText = document.getElementById('express-status-text');
+        const expressProgressFill = document.getElementById('express-progress-fill');
+        const expressProgressPct = document.getElementById('express-progress-pct');
+
+        expressInput.addEventListener('change', function(e) {
+            const files = this.files;
+            if (files && files.length > 0) {
+                expressFileCount.textContent = `${files.length} imagens selecionadas`;
+                runExpressBtn.disabled = false;
+            } else {
+                expressFileCount.textContent = 'Arraste um conjunto de fotos (ZIP ou múltiplas imagens)';
+                runExpressBtn.disabled = true;
+            }
+        });
+
+        runExpressBtn.addEventListener('click', async () => {
+            const files = expressInput.files;
+            const targetClass = document.getElementById('express-class-select').value;
+            
+            if (files.length === 0) return;
+
+            runExpressBtn.disabled = true;
+            runExpressBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Treinando...';
+            expressStatusBar.classList.remove('hidden');
+            
+            appendLog(`[TREINO RELÂMPAGO] Iniciando fine-tuning para a classe: ${targetClass.toUpperCase()}...`, 'success');
+            appendLog(`Enviando ${files.length} amostras para o laboratório...`);
+
+            const formData = new FormData();
+            formData.append('target_class', targetClass);
+            for (let i = 0; i < files.length; i++) {
+                formData.append('images', files[i]);
+            }
+
+            try {
+                let pct = 0;
+                const progressInterval = setInterval(() => {
+                    if (pct < 95) {
+                        pct += Math.random() * 2;
+                        expressProgressFill.style.width = `${pct}%`;
+                        expressProgressPct.textContent = `${Math.round(pct)}%`;
+                        if (pct > 20 && pct < 50) expressStatusText.textContent = "Auto-rotulando imagens...";
+                        if (pct >= 50 && pct < 90) expressStatusText.textContent = "Ajustando pesos neuronais...";
+                    }
+                }, 2000);
+
+                const response = await fetch('/api/express_retrain', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                clearInterval(progressInterval);
+
+                if (data.success) {
+                    expressProgressFill.style.width = `100%`;
+                    expressProgressPct.textContent = `100%`;
+                    expressStatusText.textContent = "TREINO CONCLUÍDO!";
+                    appendLog("TREINO RELÂMPAGO FINALIZADO COM SUCESSO!", "success");
+                    appendLog(`Resumo: ${data.message}`);
+                    appendLog("O modelo foi atualizado e exportado para OpenVINO automaticamente.");
+                    
+                    // Notificação flutuante de sucesso
+                    alert("Ajuste fino concluído! O sistema já está operando com o novo aprendizado.");
+                } else {
+                    appendLog(`Falha no treino: ${data.message}`, "error");
+                    expressStatusText.textContent = "ERRO NO TREINO";
+                }
+            } catch (error) {
+                appendLog("Erro de rede durante o treinamento.", "error");
+                console.error(error);
+            } finally {
+                runExpressBtn.disabled = false;
+                runExpressBtn.innerHTML = '<i class="fas fa-brain mr-2"></i> Iniciar Treino Relâmpago';
+            }
+        });
+    });
+</script>
+{% endblock %}

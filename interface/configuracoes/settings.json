@@ -8,7 +8,7 @@
     },
     "AI_PARAMS": {
         "conf_default": 0.1,
-        "iou_default": 0.5,
+        "iou_default": 0.2,
         "max_queue_size": 30,
         "advanced": {
             "exclusion_zones": [],
@@ -25,10 +25,10 @@
             }
         },
         "thresholds": {
-            "lata_normal": 0.5,
-            "lata_tombada": 0.85,
-            "lata_invertida": 0.95,
-            "fracture": 0.5
+            "lata_normal": 0.1,
+            "lata_tombada": 0.25,
+            "lata_invertida": 0.23,
+            "fracture": 0.95
         },
         "dataset_collection": {
             "enabled": true,
@@ -65,7 +65,7 @@
             60
         ],
         "source_type": "stream",
-        "source_param": "rtsp://admin:Abc123456@10.81.50.64/Streaming/Channels/101",
+        "source_param": "rtsp://admin:Abc123456@10.81.50.64:554/Streaming/Channels/101?transportmode=unicast&p=tcp",
         "resolution": "",
         "fps": "15"
     },
