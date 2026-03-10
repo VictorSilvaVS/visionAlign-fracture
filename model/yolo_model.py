@@ -2,21 +2,25 @@ import logging
 import cv2
 import numpy as np
 import time
-import threading
 import os
+import threading
+import subprocess
 from threading import Event, RLock
+from concurrent.futures import ThreadPoolExecutor
 from ultralytics import YOLO
 from .detection_drawer import DetectionDrawer
 from utils.email_utils import send_fracture_alert_email
 from utils.database import Database
-
-# **OTIMIZAÇÃO XEON GOLD**: Config de threads e OpenCV
-os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'rtsp_transport;tcp|buffer_size;102400|max_delay;0|timeout;5000000'
+# Parametros de ambiente para otimização do OpenCV e OpenVINO no Windows
+os.environ['OPENCV_CORE_OPTIMIZATION'] = '1'
+os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'rtsp_transport;tcp|buffer_size;2048000|fifo_size;100000|max_delay;0|timeout;5000000|reorder_queue_size;0|flags;nobuffer'
 os.environ["OMP_NUM_THREADS"] = "8"
 os.environ["MKL_NUM_THREADS"] = "8"
 os.environ["OPENCV_NUM_THREADS"] = "8"
 os.environ["NUMEXPR_NUM_THREADS"] = "8"
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
+os.environ['OV_CPU_BACKEND'] = 'ONEDNN'
+
 
 class YOLOModel:
     def __init__(self, model_path, settings, shared_frame_container=None, shared_frame_lock=None):
@@ -25,11 +29,10 @@ class YOLOModel:
         try:
             path_align = r"E:\programs\visionAlign\model\_openvino_model\VisionAlign_openvino_model"
             path_fracture = r"E:\programs\visionAlign\model\_openvino_model\VisionFracture_openvino_model"
+            self.model_align = YOLO(path_align)
+            self.model_fracture = YOLO(path_fracture)
             
-            self.model_align = YOLO(path_align, task='detect')
-            self.model_fracture = YOLO(path_fracture, task='detect')
-            
-            self.logger.info("Modelos OpenVINO carregados com sucesso.")
+            self.logger.info("Modelos OpenVINO carregados com sucesso (Alinhamento: detecção | Fratura: segmentação).")
         except Exception as e:
             self.logger.error(f"Erro crítico no carregamento: {e}")
             raise
@@ -45,6 +48,7 @@ class YOLOModel:
         }
         self.exclusion_zones = ai_params.get('advanced', {}).get('exclusion_zones', [])
         self.gamma = float(ai_params.get('advanced', {}).get('gamma', 0.8))
+        self._update_gamma_table() # Precalcula a tabela LUT do Gamma
         self.clahe_enabled = ai_params.get('advanced', {}).get('clahe_enabled', True)
         self.clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
         self.device = 'cpu' 
@@ -53,10 +57,20 @@ class YOLOModel:
         self.track_fracture_status = {}
         self.fracture_roi_buffer = {}
         self.track_last_check = {}
-        self.fracture_check_interval = settings.get('AI_PARAMS', {}).get('advanced', {}).get('roi_check_interval', 2.0)
+        self.fracture_check_interval = settings.get('AI_PARAMS', {}).get('advanced', {}).get('roi_check_interval', 3.0)
         self.target_fps = settings.get('AI_PARAMS', {}).get('advanced', {}).get('fps_cap', 15.0)
         self.last_roi_frame = None
-        self.last_roi_lock = RLock()  # **OTIMIZAÇÃO: RLock para melhor concorrência**
+        self.last_roi_with_mask = None  # ROI com máscaras desenhadas para visualização ao vivo
+        self.last_roi_fracture_info = {}  # Informações sobre fratura detectada
+        self.last_roi_lock = RLock()  # RLock para melhor concorrência no ROI
+        self.track_lock = RLock()      # RLock para proteger estados de votação
+        
+        # POLÍTICA DE VOTAÇÃO (3/5) - Excelência Operacional
+        self.vote_policy = {
+            'min_votes': 3,      # Mínimo de confirmações para gerar alerta
+            'max_attempts': 5,   # Janela máxima de frames para análise
+            'decay_factor': 0.5  # Penalidade para frames negativos (futuro)
+        }
         self.frame_duration = 1.0 / self.target_fps
         self.video_source = None
         self.current_source_type = None
@@ -69,7 +83,11 @@ class YOLOModel:
             'fracture': 'fracture'
         }
         self.detection_stats = {'lata_normal': 0, 'lata_invertida': 0, 'lata_tombada': 0, 'fracture': 0}
-        self.counted_track_ids = set()
+        self.counted_track_ids = {} # Mudado de set para dict para timestamping
+        self.max_cache_size = 10000
+        # Pipeline Assíncrono Triple-Tier
+        self.io_executor = ThreadPoolExecutor(max_workers=4) # Imagens e DB
+        self.email_executor = ThreadPoolExecutor(max_workers=1) # E-mail (isolado pois é lento)
         self.frame_callback = None
         detection_colors = settings.get('COLORS', {}).get('detection', {}).copy()
         self.drawer = DetectionDrawer(detection_colors)
@@ -115,6 +133,7 @@ class YOLOModel:
             self.exclusion_zones = advanced_settings['exclusion_zones']
             self.logger.info(f"Zonas de exclusão atualizadas: {len(self.exclusion_zones)} zonas.")
         self.gamma = float(advanced_settings.get('gamma', self.gamma))
+        self._update_gamma_table()
         self.clahe_enabled = advanced_settings.get('clahe_enabled', self.clahe_enabled)
         self.logger.info(f"Filtros: Gamma={self.gamma}, CLAHE={'Ativo' if self.clahe_enabled else 'Inativo'}")
         if 'dataset_collection' in advanced_settings:
@@ -127,6 +146,9 @@ class YOLOModel:
         if 'drawing' in advanced_settings:
             self.drawer.set_params(advanced_settings['drawing'])
             self.logger.info("Configurações visuais de detecção atualizadas.")
+        if 'colors' in advanced_settings:
+            self.drawer.colors = {k: tuple(map(int, v)) for k, v in advanced_settings['colors'].items()}
+            self.logger.info("Cores de detecção atualizadas em tempo real.")
         video_config = advanced_settings.get('video_source', {})
         if video_config:
             source_type = video_config.get('type')
@@ -144,6 +166,7 @@ class YOLOModel:
             # Se a fonte mudou, reiniciamos o processamento
             self.logger.info(f"Reiniciando captura para nova fonte: {new_url if source_type == 'stream' else source_type} ({res}, {fps} FPS)")
             self.stop_processing()
+            self.reset_state() # <<< NOVO: Reseta estados e limpa fotos antigas
             
             if source_type == 'stream':
                 self.load_stream(new_url, resolution=res, fps=fps)
@@ -152,23 +175,168 @@ class YOLOModel:
                 
             self.start_processing()
 
+    def _extract_safe_roi(self, frame, results_align, track_id, padding=0.15):
+        """Extração de ROI baseada na SEMÂNTICA DA MÁSCARA, ou BBOX se não houver máscara.
+        Usa os pontos da máscara de segmentação para pegar toda a lata com precisão.
+        """
+        h_img, w_img = frame.shape[:2]
+        
+        try:
+            # Encontra índice correspondente ao track_id
+            if results_align.boxes is None or results_align.boxes.id is None:
+                return None
+            
+            track_ids = results_align.boxes.id.int().cpu().numpy()
+            target_idx = None
+            for idx, tid in enumerate(track_ids):
+                if tid == track_id:
+                    target_idx = idx
+                    break
+            
+            if target_idx is None:
+                return None
+            
+            # Tenta extrair pontos da máscara (Segmentação)
+            x_min, y_min, x_max, y_max = 0, 0, 0, 0
+            has_mask = False
+            
+            if hasattr(results_align, 'masks') and results_align.masks is not None:
+                mask_xy = results_align.masks.xy[target_idx]
+                if len(mask_xy) > 0:
+                    pts = np.array(mask_xy, dtype=np.float32)
+                    x_min = np.min(pts[:, 0])
+                    y_min = np.min(pts[:, 1])
+                    x_max = np.max(pts[:, 0])
+                    y_max = np.max(pts[:, 1])
+                    has_mask = True
+            if not has_mask:
+                box_xyxy = results_align.boxes.xyxy[target_idx].cpu().numpy()
+                x_min, y_min, x_max, y_max = box_xyxy[0], box_xyxy[1], box_xyxy[2], box_xyxy[3]
+            mask_width = x_max - x_min
+            mask_height = y_max - y_min
+            
+            pad_x = int(mask_width * padding)
+            pad_y = int(mask_height * padding)
+            rx1 = max(0, int(x_min - pad_x))
+            ry1 = max(0, int(y_min - pad_y))
+            rx2 = min(w_img, int(x_max + pad_x))
+            ry2 = min(h_img, int(y_max + pad_y))
+            roi_width = rx2 - rx1
+            roi_height = ry2 - ry1
+            
+            if roi_width < 256 or roi_height < 256:
+                center_x = (rx1 + rx2) // 2
+                center_y = (ry1 + ry2) // 2
+                size = max(256, roi_width, roi_height)
+                
+                rx1 = max(0, center_x - size // 2)
+                rx2 = min(w_img, rx1 + size)
+                ry1 = max(0, center_y - size // 2)
+                ry2 = min(h_img, ry1 + size)
+            if rx1 >= rx2 or ry1 >= ry2:
+                return None
+            
+            roi = frame[ry1:ry2, rx1:rx2].copy()
+            return roi if roi.size > 0 else None
+            
+        except Exception as e:
+            self.logger.debug(f"Erro ao extrair ROI: {e}")
+            return None
+
+    def _has_valid_fracture(self, results_fracture):
+        """Verifica se existem segmentações válidas de fratura nos resultados."""
+        if not results_fracture or len(results_fracture) == 0:
+            return False
+        r_fr = results_fracture[0]
+        if not hasattr(r_fr, 'masks') or r_fr.masks is None or len(r_fr.masks) == 0:
+            return False
+        if r_fr.boxes is not None and len(r_fr.boxes) > 0:
+            for c_idx, f_conf in zip(r_fr.boxes.cls.int().tolist(), r_fr.boxes.conf.tolist()):
+                f_name = self.class_name_map.get(self.names_fracture[c_idx], "fracture")
+                if f_conf >= self.thresholds.get(f_name, self.conf):
+                    return True
+        return False
+
+    def _get_mask_bounding_rect(self, mask_xy_points):
+        """Extrai o bounding rect de uma máscara de segmentação.
+        Retorna (x1, y1, x2, y2) do retângulo envolvente completo da máscara.
+        """
+        if not mask_xy_points or len(mask_xy_points) == 0:
+            return None
+        try:
+            pts = np.array(mask_xy_points, dtype=np.int32)
+            x_coords = pts[:, 0]
+            y_coords = pts[:, 1]
+            x1 = int(np.min(x_coords))
+            y1 = int(np.min(y_coords))
+            x2 = int(np.max(x_coords))
+            y2 = int(np.max(y_coords))
+            return (x1, y1, x2, y2)
+        except Exception as e:
+            self.logger.error(f"Erro ao processar máscara: {e}")
+            return None
+
+    def _update_gamma_table(self):
+        """Precalcula a tabela LUT para correção de Gamma (mais rápido que calcular no loop)."""
+        if abs(self.gamma - 1.0) > 0.01:
+            invGamma = 1.0 / self.gamma
+            self.gamma_table = np.array([((i / 255.0) ** invGamma) * 255 
+                                        for i in np.arange(0, 256)]).astype("uint8")
+        else:
+            self.gamma_table = None
+
     # --- MÉTODOS DE CARREGAMENTO ---
 
     def load_stream(self, url, resolution=None, fps=None):
         """Carrega stream RTSP usando OpenCV + FFMPEG."""
         self.current_source_type = 'stream'
         self.current_source_param = url
-        if self.video_source: self.video_source.release()
+        if self.video_source: 
+            try:
+                self.video_source.kill()
+            except:
+                pass
+            self.video_source = None
         
-        self.logger.info(f"Abrindo stream RTSP: {url}")
-        self.video_source = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
+        self.logger.info(f"Abrindo stream FFmpeg Pipe: {url}")
         
-        if not self.video_source.isOpened():
-            self.logger.error(f"Falha ao abrir stream: {url}")
+        # FFmpeg Pipe Comando (Windows) - Extraindo frame bruto a 1080p ou 4k
+        w, h = 3840, 2160
+        if resolution and 'x' in resolution:
+            w, h = map(int, resolution.split('x'))
+
+        import shutil
+        ffmpeg_cmd = shutil.which('ffmpeg') or 'ffmpeg.exe'
+        
+        if not url:
+            self.logger.warning("Carregamento do stream cancelado: URL está vazia.")
             return False
+
+        command = [
+            ffmpeg_cmd,
+            '-rtsp_transport', 'tcp', 
+            '-max_delay', '500000',
+            '-flags', 'low_delay',
+            '-fflags', 'nobuffer',
+            '-i', url,
+            '-f', 'rawvideo',
+            '-pix_fmt', 'bgr24',
+            '-s', f'{w}x{h}',
+            '-an', # Sem áudio
+            '-sn', # Sem subtítulo
+            '-v', 'error',
+            '-' # Output para pipe (stdout)
+        ]
         
-        self._apply_cam_settings(resolution, fps)
-        return True
+        try:
+            self.video_source = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=w*h*3)
+            self._stream_w = w
+            self._stream_h = h
+            self.logger.info("Pipe FFmpeg aberto com sucesso.")
+            return True
+        except Exception as e:
+            self.logger.error(f"Erro gigante ao criar Pipe FFmpeg: {e}")
+            return False
 
     def load_camera(self, index, resolution=None, fps=None):
         """Carrega câmera local usando OpenCV."""
@@ -217,48 +385,75 @@ class YOLOModel:
     def _process_loop(self):
         frame_count = 0
         while self.processing_event.is_set():
-            if not self.video_source or not self.video_source.isOpened():
+            if not self.video_source:
                 time.sleep(0.1)
                 continue
 
-            ret, frame = self.video_source.read()
-            if not ret:
-                self.logger.warning("Falha na leitura do frame. Tentando reconectar...")
-                if self.video_source: self.video_source.release()
-                time.sleep(2)
-                # Reconectar à fonte atual
-                if self.current_source_type == 'stream': self.load_stream(self.current_source_param)
-                elif self.current_source_type == 'camera': self.load_camera(self.current_source_param)
-                elif self.current_source_type == 'video': self.load_video(self.current_source_param)
-                continue
+            cycle_start = time.time()
+            frame = None
 
-            self.last_frame_clean = frame.copy()
+            if self.current_source_type == 'stream':
+                try:
+                    frame_bytes = self.video_source.stdout.read(self._stream_w * self._stream_h * 3)
+                    if not frame_bytes or len(frame_bytes) != self._stream_w * self._stream_h * 3:
+                        self.logger.warning("FFmpeg Pipe: Falha no frame. Tentando reconectar...")
+                        if self.video_source:
+                            try:
+                                self.video_source.kill()
+                            except:
+                                pass
+                        time.sleep(1)
+                        self.load_stream(self.current_source_param)
+                        continue
+                    frame = np.frombuffer(frame_bytes, np.uint8).copy().reshape((self._stream_h, self._stream_w, 3))
+                except Exception as e:
+                    self.logger.error(f"Erro ao ler pipe: {e}")
+                    time.sleep(1)
+                    continue
+            else:
+                if not self.video_source.isOpened():
+                    time.sleep(0.1)
+                    continue
+                if not self.video_source.grab():
+                    self.logger.warning("Falha no grab do frame. Tentando reconectar...")
+                    if self.video_source: self.video_source.release()
+                    time.sleep(1)
+                    if self.current_source_type == 'camera': self.load_camera(self.current_source_param)
+                    elif self.current_source_type == 'video': self.load_video(self.current_source_param)
+                    continue
+                ret, frame = self.video_source.retrieve()
+                if not ret or frame is None:
+                    continue
+
+            # MEMORY OPTIMIZATION: Evitando cópia desnecessária no Alienware
+            self.last_frame_clean = frame 
             cycle_start = time.time()
 
             frame_count += 1
+            # Otimização: GC Periódico para não travar o loop
+            if frame_count % 300 == 0:
+                self.io_executor.submit(self._cleanup_memory)
+
             if self.frame_skip > 0 and frame_count % (self.frame_skip + 1) != 0:
                 continue
 
-            # --- PRE-PROCESSAMENTO GLOBAL ---
-            frame_processed = self._preprocess_frame(frame)
-
-            # 1. Detecção e Tracking VisionAlign (Full Frame)
+            # 1. Inferência de Alinhamento (Frame Puro)
             results_align = self.model_align.track(
-                frame_processed,
-                persist=True,
-                conf=self.conf,
-                iou=self.iou,
-                device=self.device,
-                verbose=False,
-                tracker="bytetrack.yaml"
+                frame, persist=True, conf=self.conf, iou=self.iou,
+                verbose=False, tracker="bytetrack.yaml"
             )
+
             if results_align and len(results_align) > 0:
                 r_align = results_align[0]
-                
-                if r_align.boxes is not None:
-                    # Filtro de confiança por classe
+                if r_align.boxes is not None and r_align.boxes.id is not None:
+                    # Vetorização: Convertendo tensores para NumPy antes do loop (Otimização Intel)
+                    cls_arr = r_align.boxes.cls.int().cpu().numpy()
+                    conf_arr = r_align.boxes.conf.cpu().numpy()
+                    
                     keep_idx = []
-                    for k, (c_idx, conf) in enumerate(zip(r_align.boxes.cls.int().tolist(), r_align.boxes.conf.tolist())):
+                    for k in range(len(cls_arr)):
+                        c_idx = cls_arr[k]
+                        conf = conf_arr[k]
                         raw_name = self.names_align[c_idx]
                         name = self.class_name_map.get(raw_name, raw_name)
                         if conf >= self.thresholds.get(name, self.conf):
@@ -267,64 +462,72 @@ class YOLOModel:
                     if keep_idx:
                         r_align.boxes = r_align.boxes[keep_idx]
                         boxes_xyxy = r_align.boxes.xyxy.int().cpu().numpy()
-                        track_ids = r_align.boxes.id.int().cpu().numpy() if r_align.boxes.id is not None else range(len(boxes_xyxy))
+                        track_ids = r_align.boxes.id.int().cpu().numpy()
                         now = time.time()
 
-                        for box, tid in zip(boxes_xyxy, track_ids):
-                            x1, y1, x2, y2 = box
-
-                            # Só dispara a detecção de fratura no intervalo configurado
-                            if tid not in self.track_last_check or (now - self.track_last_check[tid] > self.fracture_check_interval):
-                                h_img, w_img = frame.shape[:2]
-                                
-                                # --- RECORTE QUADRADO (Garante que a IA não distorça a lata) ---
-                                cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
-                                side = int(max(x2 - x1, y2 - y1) * 1.30) # 30% de margem
-                                
-                                rx1, ry1 = max(0, cx - side // 2), max(0, cy - side // 2)
-                                rx2, ry2 = min(w_img, cx + side // 2), min(h_img, cy + side // 2)
-
-                                roi = frame[ry1:ry2, rx1:rx2].copy()
-                                if roi.size == 0: continue
-
+                        # --- ATUALIZAÇÃO DO ROI "AO VIVO" (Slot 1) em Tempo Real ---
+                        # Seleciona a lata que está mais central na imagem para o preview constante
+                        if len(track_ids) > 0:
+                            img_center_x = frame.shape[1] // 2
+                            best_tid = track_ids[0]
+                            min_dist = float('inf')
+                            for b, t in zip(boxes_xyxy, track_ids):
+                                dist = abs((b[0] + b[2]) / 2 - img_center_x)
+                                if dist < min_dist:
+                                    min_dist = dist
+                                    best_tid = t
+                            
+                            roi_live_raw = self._extract_safe_roi(frame, r_align, best_tid)
+                            if roi_live_raw is not None:
+                                # Aplicamos preprocessamento (Gamma/CLAHE) para mostrar exatamente o que a IA vê
+                                roi_live_processed = self._preprocess_roi(roi_live_raw.copy())
                                 with self.last_roi_lock:
-                                    self.last_roi_frame = roi.copy()
+                                    self.last_roi_frame = roi_live_processed
 
-                                # 2. Inferência de Fratura no ROI (sem pós-processamento)
-                                results_fracture = self.model_fracture.predict(
-                                    roi, conf=self.conf, iou=self.iou, device=self.device, verbose=False
-                                )
+                        for box, tid in zip(boxes_xyxy, track_ids):
+                            # ID Tracking / Stats (Assíncrono)
+                            self.io_executor.submit(self._process_single_result, int(tid), r_align, box.copy())
+                            
+                            with self.track_lock:
+                                # 1. Inicialização Atômica de Votação
+                                if tid not in self.track_fracture_status or isinstance(self.track_fracture_status[tid], bool):
+                                    self.track_fracture_status[tid] = {
+                                        'pos_votes': 0, 'attempts': 0, 'confirmed': False, 'alert_sent': False, 'last_seen': now
+                                    }
+                                
+                                status = self.track_fracture_status[tid]
+                                status['last_seen'] = now
 
-                                has_fracture = False
-                                if results_fracture and len(results_fracture) > 0:
-                                    r_fr = results_fracture[0]
-                                    if r_fr.boxes is not None and len(r_fr.boxes) > 0:
-                                        # Verifica se algum objeto detectado no ROI passa no threshold de fratura
-                                        for c_idx, f_conf in zip(r_fr.boxes.cls.int().tolist(), r_fr.boxes.conf.tolist()):
-                                            f_name = self.class_name_map.get(self.names_fracture[c_idx], "fracture")
-                                            if f_conf >= self.thresholds.get(f_name, self.conf):
-                                                has_fracture = True
-                                                break
+                                # Curto-circuito: Se já decidiu (confirmou ou atingiu max attempts s/ sucesso)
+                                # e o intervalo mínimo não passou, podemos pular a inferência.
+                                if status['attempts'] >= self.vote_policy['max_attempts'] and not status['confirmed']:
+                                    # Se falhou na janela de votos, ainda marcamos o ID para desenho negativo se necessário
+                                    pass 
+                                elif not status['alert_sent']:
+                                    if tid not in self.track_last_check or (now - self.track_last_check[tid] > self.fracture_check_interval):
+                                        self.track_last_check[tid] = now
                                         
-                                        if has_fracture:
-                                            # Salva o alerta e ROI se confirmado
-                                            self._save_inspection_result(frame, roi, tid, box, is_fracture=True, results_fracture=results_fracture)
+                                        # ROI extraído baseado na MÁSCARA de segmentação
+                                        roi_raw = self._extract_safe_roi(frame, r_align, tid)
+                                        if roi_raw is not None:
+                                            # Otimização: Redimensionar APENAS para enviar para thread async
+                                            frame_small = frame.copy()
+                                            h_f, w_f = frame_small.shape[:2]
+                                            if w_f > 1920:
+                                                scale = 1920 / w_f
+                                                new_w, new_h = int(w_f * scale), int(h_f * scale)
+                                                frame_small = cv2.resize(frame_small, (new_w, new_h), interpolation=cv2.INTER_AREA)
+                                            self.io_executor.submit(
+                                                self._run_async_fracture_logic, 
+                                                int(tid), roi_raw.copy(), box.copy(), frame_small
+                                            )
+                            if status.get('confirmed'):
+                                cx, cy = (box[0] + box[2]) // 2, (box[1] + box[3]) // 2
+                                cv2.rectangle(frame, (box[0], box[1]), (box[2], box[3]), (0, 0, 255), 4)
+                                cv2.putText(frame, f"!!! FRATURA CONFIRMADA ({tid}) !!!", (box[0], box[1] - 20), 
+                                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 3)
 
-                                self.track_fracture_status[tid] = has_fracture
-                                self.track_last_check[tid] = now
-
-                            # --- DESENHO DE RESULTADOS NO FRAME PRINCIPAL ---
-                            if self.track_fracture_status.get(tid, False):
-                                # Alerta de Fratura (Círculo vermelho e texto)
-                                cv2.circle(frame, (cx, cy), (x2 - x1) // 2 + 10, (0, 0, 255), 2)
-                                cv2.putText(frame, "!!! FRATURA !!!", (x1, y1 - 10), 
-                                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
-
-                    # Desenha as caixas do VisionAlign
                     self.drawer.draw_detections(frame, r_align, self.names_align, show_track_id=True)
-                    self._process_results(r_align, self.names_align, model_type="align")
-
-            # Cálculo de FPS e Callback da Interface
             actual_duration = time.time() - cycle_start
             self.fps = 1.0 / max(actual_duration, self.frame_duration)
             if self.frame_callback:
@@ -332,68 +535,180 @@ class YOLOModel:
                     'frame': frame,
                     'stats': {**self.detection_stats, 'fps': round(self.fps, 1), 'processamento': 'OpenVINO CPU'}
                 })
-
             time_to_sleep = self.frame_duration - actual_duration
             time.sleep(max(0.001, time_to_sleep))
 
         if self.video_source:
-            self.video_source.release()
+            if self.current_source_type == 'stream':
+                try:
+                    self.video_source.terminate()
+                except:
+                    pass
+            else:
+                self.video_source.release()
+
+    def _cleanup_memory(self):
+        now = time.time()
+        if len(self.counted_track_ids) > self.max_cache_size:
+            cutoff = now - 3600
+            self.counted_track_ids = {k: v for k, v in self.counted_track_ids.items() if v > cutoff}
+            if len(self.counted_track_ids) > self.max_cache_size:
+                self.counted_track_ids.clear()
+        if len(self.track_fracture_status) > 1000:
+            with self.track_lock:
+                cutoff = now - 600 # 10 minutos
+                keys_to_delete = [
+                    k for k, v in self.track_fracture_status.items() 
+                    if isinstance(v, dict) and v.get('last_seen', 0) < cutoff
+                ]
+                for k in keys_to_delete:
+                    del self.track_fracture_status[k]
+
+    def _run_async_fracture_logic(self, tid, roi_raw, box, frame):
+        """Desacopla a IA de fratura do loop RTSP."""
+        try:
+            if roi_raw is None or roi_raw.size == 0:
+                self.logger.debug(f"ROI inválido para ID {tid}")
+                return
+            
+            with self.last_roi_lock:
+                self.last_roi_frame = roi_raw.copy()
+            
+            roi_processed = self._preprocess_roi(roi_raw)
+            if roi_processed is None or roi_processed.size == 0:
+                self.logger.debug(f"ROI processado inválido para ID {tid}")
+                return
+            import gc
+            gc.collect()
+            results_fracture = self.model_fracture.predict(
+                roi_processed, conf=self.conf, iou=self.iou, device=self.device, verbose=False
+            )
+            is_fracture_now = self._has_valid_fracture(results_fracture)
+            
+            # Desenha máscaras no ROI para visualização ao vivo (sempre)
+            roi_with_mask = roi_raw.copy()
+            fracture_info = {
+                'detected': False,
+                'mask_count': 0,
+                'total_area_px': 0.0,
+                'timestamp': time.time()
+            }
+            
+            if results_fracture and len(results_fracture) > 0:
+                r_fr = results_fracture[0]
+                if hasattr(r_fr, 'masks') and r_fr.masks is not None and len(r_fr.masks) > 0:
+                    try:
+                        for mask_idx, mask_xy in enumerate(r_fr.masks.xy):
+                            if len(mask_xy) > 0:
+                                pts = np.array(mask_xy, dtype=np.int32)
+                                # Desenha sobreposição semi-transparente vermelha
+                                overlay = roi_with_mask.copy()
+                                cv2.fillPoly(overlay, [pts], (0, 0, 255))  # Vermelho para fratura
+                                cv2.addWeighted(overlay, 0.3, roi_with_mask, 0.7, 0, roi_with_mask)
+                                # Contorno vermelho com espessura
+                                cv2.polylines(roi_with_mask, [pts], isClosed=True, color=(0, 0, 255), thickness=2)
+                                # Calcula área do mask
+                                area = cv2.contourArea(pts.astype(np.float32))
+                                fracture_info['mask_count'] += 1
+                                fracture_info['total_area_px'] += area
+                    except Exception as mask_err:
+                        self.logger.debug(f"Erro ao desenhar mask: {mask_err}")
+            
+            fracture_info['detected'] = is_fracture_now
+            
+            # Armazena ROI com máscara para transmissão ao vivo
+            with self.last_roi_lock:
+                self.last_roi_with_mask = roi_with_mask.copy()
+                self.last_roi_fracture_info = fracture_info.copy()
+            with self.track_lock:
+                if tid not in self.track_fracture_status:
+                    return
+                status = self.track_fracture_status[tid]
+                status['attempts'] += 1
+                if is_fracture_now:
+                    status['pos_votes'] += 1
+                
+                # Decisão: 3 confirmações em até 5 tentativas
+                if status['pos_votes'] >= self.vote_policy['min_votes'] and not status['confirmed']:
+                    status['confirmed'] = True
+                    status['alert_sent'] = True
+                    self.logger.warning(f"SISTEMA DE VOTAÇÃO: Fratura CONFIRMADA ID {tid} ({status['pos_votes']} votos)")
+                    
+                    # Otimização: Redimensionar frame APENAS para enviar para thread
+                    frame_small = frame.copy()
+                    h_f, w_f = frame_small.shape[:2]
+                    if w_f > 1920:
+                        scale = 1920 / w_f
+                        new_w, new_h = int(w_f * scale), int(h_f * scale)
+                        frame_small = cv2.resize(frame_small, (new_w, new_h), interpolation=cv2.INTER_AREA)
+                    
+                    self.io_executor.submit(
+                        self._save_inspection_result, 
+                        frame_small, roi_processed.copy(), int(tid), box.copy(), True, results_fracture
+                    )
+        except Exception as e:
+            self.logger.error(f"Erro na inferência assíncrona de fratura: {e}")
+
+    def _process_single_result(self, tid, r_align, box):
+        """Processa um único tracking ID, atualizando estatísticas se for novo."""
+        now = time.time()
+        unique_tid = f"align_{tid}"
+        if unique_tid not in self.counted_track_ids:
+            self.counted_track_ids[unique_tid] = now
+            try:
+                ids = r_align.boxes.id.int().cpu().numpy().tolist()
+                if tid in ids:
+                    idx = ids.index(tid)
+                    c = int(r_align.boxes.cls[idx])
+                    raw_name = self.names_align[c]
+                    name = self.class_name_map.get(raw_name, raw_name)
+                    if name in self.detection_stats:
+                        self.detection_stats[name] += 1
+            except Exception:
+                pass
+
     def _process_results(self, r, names, model_type="align"):
-        """Contabiliza detecções DO MODELO DE ALINHAMENTO (requer tracking ID único)."""
-        if r.boxes is None or r.boxes.id is None:
-            return
+        """Legado: Mantido por compatibilidade mas redireciona para a nova lógica se necessário."""
+        pass
 
-        cls_list = r.boxes.cls.int().tolist()
-        id_list = r.boxes.id.int().tolist()
-        conf_list = r.boxes.conf.tolist()
-
-        for c, tid, conf in zip(cls_list, id_list, conf_list):
-            raw_name = names[c]
-            name = self.class_name_map.get(raw_name, raw_name)
-            if name == 'fracture':
-                continue  # Fraturas são contabilizadas por _count_fracture_detections
-            if conf >= self.thresholds.get(name, self.conf):
-                unique_tid = f"{model_type}_{tid}"
-                if unique_tid not in self.counted_track_ids:
-                    self.counted_track_ids.add(unique_tid)
+    def _count_fracture_detections(self, r_fracture, names):
+        """Contabiliza fraturas segmentadas pelo VisionFracture (sem tracking ID)."""
+        if hasattr(r_fracture, 'masks') and r_fracture.masks is not None and len(r_fracture.masks) > 0:
+            if r_fracture.boxes is not None:
+                cls_list = r_fracture.boxes.cls.int().tolist()
+                conf_list = r_fracture.boxes.conf.tolist()
+                for c, conf in zip(cls_list, conf_list):
+                    raw_name = names[c]
+                    name = self.class_name_map.get(raw_name, raw_name)
+                    if conf >= self.thresholds.get(name, self.conf):
+                        if name in self.detection_stats:
+                            self.detection_stats[name] += 1
+        elif r_fracture.boxes is not None:
+            cls_list = r_fracture.boxes.cls.int().tolist()
+            conf_list = r_fracture.boxes.conf.tolist()
+            for c, conf in zip(cls_list, conf_list):
+                raw_name = names[c]
+                name = self.class_name_map.get(raw_name, raw_name)
+                if conf >= self.thresholds.get(name, self.conf):
                     if name in self.detection_stats:
                         self.detection_stats[name] += 1
 
-    def _count_fracture_detections(self, r_fracture, names):
-        """Contabiliza fraturas detectadas pelo VisionFracture (sem tracking ID)."""
-        if r_fracture.boxes is None:
-            return
-        cls_list = r_fracture.boxes.cls.int().tolist()
-        conf_list = r_fracture.boxes.conf.tolist()
-        for c, conf in zip(cls_list, conf_list):
-            raw_name = names[c]
-            name = self.class_name_map.get(raw_name, raw_name)
-            if conf >= self.thresholds.get(name, self.conf):
-                if name in self.detection_stats:
-                    self.detection_stats[name] += 1
-
-    def _preprocess_frame(self, frame):
-        """Aplica filtros CLAHE e correção de Gamma para melhorar detecção."""
+    def _preprocess_roi(self, img):
+        """Aplica filtros apenas no ROI (ex: 640x640) economizando CPU vs full frame 8MP."""
         try:
-            if abs(self.gamma - 1.0) > 0.01:
-                invGamma = 1.0 / self.gamma
-                table = np.array([((i / 255.0) ** invGamma) * 255 
-                                 for i in np.arange(0, 256)]).astype("uint8")
-                frame = cv2.LUT(frame, table)
-
-            # 2. CLAHE (Equalização de contraste adaptativa)
+            if self.gamma_table is not None:
+                img = cv2.LUT(img, self.gamma_table)
             if self.clahe_enabled:
-                # Converte para LAB (mais eficiente para CLAHE sem distorcer cores)
-                lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
+                lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
                 l, a, b = cv2.split(lab)
                 cl = self.clahe.apply(l)
                 limg = cv2.merge((cl, a, b))
-                frame = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
+                img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
                 
-            return frame
+            return img
         except Exception as e:
-            self.logger.error(f"Erro no pré-processamento: {e}")
-            return frame
+            self.logger.error(f"Erro no pré-processamento do ROI: {e}")
+            return img
 
     def save_for_dataset(self, prefix="manual"):
         """Salva o frame atual (limpo) na pasta de dataset."""
@@ -422,13 +737,12 @@ class YOLOModel:
             self.last_event_save_times[reason] = now
         if force or (now - self.last_auto_save > self.save_interval):
             self.save_for_dataset(prefix=f"auto_{reason}")
-            if not force: # Apenas atualiza o timer de intervalo se for um save por tempo
+            if not force:
                 self.last_auto_save = now
 
     def _save_inspection_result(self, full_frame, roi, tid, box, is_fracture, results_fracture=None):
         if not is_fracture:
-            return  # Não salva ROIs sem fratura
-
+            return
         now = time.time()
         cooldown_time = 5
         if now - self.last_event_save_times.get('fracture_alert', 0) < cooldown_time:
@@ -439,33 +753,40 @@ class YOLOModel:
             timestamp = time.strftime("%Y%m%d_%H%M%S")
             alerts_dir = r"E:\programs\visionAlign\data\alerts"
             os.makedirs(alerts_dir, exist_ok=True)
-            
-            # **NOVO: Salvar ROI COM as marcações APENAS nas fraturas detectadas**
             roi_marked = roi.copy()
             h_roi, w_roi = roi_marked.shape[:2]
-            
-            # Desenha retângulos APENAS ao redor das fraturas detectadas
             fracture_count = 0
             if results_fracture and len(results_fracture) > 0:
                 r_fr = results_fracture[0]
-                if r_fr.boxes is not None and len(r_fr.boxes) > 0:
+                if hasattr(r_fr, 'masks') and r_fr.masks is not None and len(r_fr.masks) > 0:
+                    try:
+                        for mask_idx, mask_xy in enumerate(r_fr.masks.xy):
+                            if len(mask_xy) > 0:
+                                pts = np.array(mask_xy, dtype=np.int32)
+                                overlay = roi_marked.copy()
+                                cv2.fillPoly(overlay, [pts], (0, 0, 255))  # Vermelho para fratura
+                                cv2.addWeighted(overlay, 0.4, roi_marked, 0.6, 0, roi_marked)
+                                cv2.polylines(roi_marked, [pts], isClosed=True, color=(0, 0, 255), thickness=3)
+                                fracture_count += 1
+                    except Exception as mask_err:
+                        self.logger.warning(f"Erro ao desenhar mask: {mask_err}")
+                        if r_fr.boxes is not None and len(r_fr.boxes) > 0:
+                            boxes_xyxy = r_fr.boxes.xyxy.int().cpu().numpy()
+                            for box_fr in boxes_xyxy:
+                                x1_fr, y1_fr, x2_fr, y2_fr = box_fr
+                                cv2.rectangle(roi_marked, (int(x1_fr), int(y1_fr)), (int(x2_fr), int(y2_fr)), (0, 0, 255), 3)
+                                fracture_count += 1
+                elif r_fr.boxes is not None and len(r_fr.boxes) > 0:
                     boxes_xyxy = r_fr.boxes.xyxy.int().cpu().numpy()
                     for box_fr in boxes_xyxy:
                         x1_fr, y1_fr, x2_fr, y2_fr = box_fr
-                        # Desenha retângulo vermelho apenas ao redor da fratura
                         cv2.rectangle(roi_marked, (int(x1_fr), int(y1_fr)), (int(x2_fr), int(y2_fr)), (0, 0, 255), 3)
                         fracture_count += 1
-            
-            # Desenha texto de alerta com a quantidade de fraturas detectadas
-            cv2.putText(roi_marked, f"FRATURA DETECTADA! ({fracture_count}x)", (10, 30),
+            cv2.putText(roi_marked, f"FRATURA SEGMENTADA! ({fracture_count}x)", (10, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
-            
-            # Salva o ROI marcado com o label
             roi_filename = f"ROI_insp_FR_{tid}_{timestamp}.jpg"
             roi_path = os.path.join(alerts_dir, roi_filename)
-            cv2.imwrite(roi_path, roi_marked)  # roi_marked contém as marcações de fratura
-            
-            # Salva o frame completo com circle na área da fratura
+            cv2.imwrite(roi_path, roi_marked)
             marked_frame = full_frame.copy()
             x1, y1, x2, y2 = box
             center = (int((x1 + x2) / 2), int((y1 + y2) / 2))
@@ -473,52 +794,91 @@ class YOLOModel:
             cv2.circle(marked_frame, center, radius, (0, 0, 255), 3)
             cv2.putText(marked_frame, f"FRATURA DETECTADA - ID:{tid}", (x1, max(y1 - 20, 20)),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+
             full_filename = f"Alert_insp_FR_{tid}_{timestamp}.jpg"
             full_path = os.path.join(alerts_dir, full_filename)
             cv2.imwrite(full_path, marked_frame)
             self.logger.info(f"ALERTA DE FRATURA GERADO: {full_path}")
-            
-            # --- Lógica de Alerta e Email ---
-            # 1. Sempre registrar o alerta no banco de dados
-            db = Database()
-            alert_timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-            db.log_alert(
-                timestamp=alert_timestamp,
-                alert_type="fracture",
-                lata_id=str(tid),
-                details=f"Fratura detectada - ROI: {roi_filename} (com marcações)"
-            )
-            
-            # 2. Enviar e-mail apenas se o cooldown tiver passado
-            if now - self.last_email_alert_time > self.email_alert_cooldown:
-                self.last_email_alert_time = now
-                recipients = db.get_users_for_email_notification()
-                if recipients:
-                    self.logger.info(f"Iniciando envio de e-mail de alerta de fratura para {recipients}")
-                    subject = f"Fratura ID {tid}"
-                    body_text = (f"Detecção realizada pelo VisionFracture.\n"
-                                 f"Lata ID: {tid}\nHorário: {time.ctime()}")
-                    threading.Thread(
-                        target=send_fracture_alert_email,
-                        args=(recipients, subject, body_text, full_path, roi_path),
-                        daemon=True
-                    ).start()
-            db.close()
+            try:
+                with Database() as db:
+                    alert_timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+                    db.log_alert(
+                        timestamp=alert_timestamp,
+                        alert_type="fracture",
+                        lata_id=str(tid),
+                        details=f"Fratura detectada - ROI: {roi_filename} (com marcações)"
+                    )
+                    
+                    # 2. Enviar e-mail isolado (offloading para email_executor)
+                    if now - self.last_email_alert_time > self.email_alert_cooldown:
+                        self.last_email_alert_time = now
+                        recipients = db.get_users_for_email_notification()
+                        if recipients:
+                            subject = f"Fratura ID {tid}"
+                            body_text = (f"Detecção realizada pelo VisionFracture.\n"
+                                         f"Lata ID: {tid}\nHorário: {time.ctime()}")
+                            
+                            # Disparo isolado: não trava o io_executor nem o loop de frames
+                            self.email_executor.submit(
+                                send_fracture_alert_email,
+                                recipients, subject, body_text, full_path, roi_path
+                            )
+            except Exception as db_err:
+                self.logger.error(f"Erro ao registrar no Banco de Dados: {db_err}")
 
         except Exception as e:
             self.logger.error(f"Erro ao salvar resultado de inspeção: {e}")
 
+    def reset_state(self):
+        """Reseta contadores e limpa arquivos de inspeção (fotos salvas)."""
+        self.logger.info("Resetando estado do sistema e limpando fotos de inspeção...")
+        
+        # 1. Zerar estatísticas de detecção
+        for key in self.detection_stats:
+            self.detection_stats[key] = 0
+            
+        # 2. Limpar cache de IDs e estados de votação
+        with self.track_lock:
+            self.counted_track_ids.clear()
+            self.track_fracture_status.clear()
+            self.track_last_check.clear()
+            self.fracture_roi_buffer.clear()
+            
+        # 3. Limpar arquivos de ROI e Alerta do disco (Resetar fotos salvas)
+        alerts_dir = r"E:\programs\visionAlign\data\alerts"
+        if os.path.exists(alerts_dir):
+            try:
+                import glob
+                # Busca todos os JPGs na pasta de alertas
+                files = glob.glob(os.path.join(alerts_dir, "*.jpg"))
+                for f in files:
+                    try:
+                        if os.path.isfile(f):
+                            os.remove(f)
+                    except Exception as e:
+                        self.logger.warning(f"Erro ao remover foto antiga {f}: {e}")
+                self.logger.info(f"Limpeza concluída: {len(files)} fotos removidas do diretório de alertas.")
+            except Exception as e:
+                self.logger.error(f"Erro crítico ao limpar diretório de fotos: {e}")
+
     def start_processing(self):
         if not self.processing:
             self.processing = True
+            
+            # Recriando os executores de threads de forma limpa caso o serviço tenha sido parado (ex: settings reload)
+            self.io_executor = ThreadPoolExecutor(max_workers=4)
+            self.email_executor = ThreadPoolExecutor(max_workers=1)
+            
             self.processing_event.set()
             self.thread = threading.Thread(target=self._process_loop, daemon=True)
             self.thread.start()
-            self.logger.info("Processamento iniciado.")
+            self.logger.info("Processamento iniciado e executores ativados.")
 
     def stop_processing(self):
         self.processing = False
         self.processing_event.clear()
         if hasattr(self, 'thread'):
             self.thread.join(timeout=1.0)
-        self.logger.info("Processamento parado.")
+        self.io_executor.shutdown(wait=False)
+        self.email_executor.shutdown(wait=False)
+        self.logger.info("Processamento parado e executores de I/O e E-mail encerrados.")

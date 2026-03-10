@@ -137,7 +137,7 @@ def generate_video_frames():
     """Generator function para o stream MJPEG."""
     global _web_stream_paused, _web_stream_lock 
     last_frame_time = time.time()
-    target_fps = 20  
+    target_fps = 12  
     while True:
         frame_copy = None 
         if _frame_lock is None or _frame_container is None:
@@ -162,10 +162,18 @@ def generate_video_frames():
 
         if frame_copy is not None:
             
+            # --- OTIMIZAÇÃO: Diminui a resolução para WEB (evitando o envio de 8MP/4K) ---
+            try:
+                h, w = frame_copy.shape[:2]
+                if w > 1280:
+                    scale = 1280 / w
+                    frame_copy = cv2.resize(frame_copy, (1280, int(h * scale)), interpolation=cv2.INTER_AREA)
+            except Exception as e:
+                _logger.error(f"Erro ao redimensionar frame web: {e}")
 
             try:
 
-                ret, buffer = cv2.imencode('.jpg', frame_copy, [cv2.IMWRITE_JPEG_QUALITY, 80]) 
+                ret, buffer = cv2.imencode('.jpg', frame_copy, [cv2.IMWRITE_JPEG_QUALITY, 70]) 
                 if ret:
                     frame_bytes = buffer.tobytes()
                     
@@ -575,6 +583,10 @@ def update_settings_api():
                                 'fps': video_params.get('fps', '')
                             }
                             consolidated_settings['video_source'] = video_source_config
+                            
+                        # Add COLORS if present
+                        if 'COLORS' in current_settings and 'detection' in current_settings['COLORS']:
+                            consolidated_settings['colors'] = current_settings['COLORS']['detection']
                         
                         # Single call with all settings
                         _logger.info(f"Modelo: Atualizando configurações consolidadas...")
@@ -1171,14 +1183,33 @@ def analytics_page():
 @flask_app.route('/api/last_fracture_roi')
 def last_fracture_roi():
     """Retorna o ROI que o VisionFracture esta analisando.
-    Slot 1 = frame ao vivo da RAM do modelo (sem caixas de inspecao).
+    Slot 1 = frame ao vivo da RAM do modelo com máscaras desenhadas.
     Slots 2-4 = ultimas fraturas salvas em disco.
     """
     slot = request.args.get('slot', '1')
     try:
         idx = int(slot) - 1
-
-        # Slot 1: serve o ROI ao vivo que o modelo esta avaliando no momento
+        
+        # Slot 1: serve o ROI ao vivo com máscaras desenhadas
+        if idx == 0 and _model_instance is not None and hasattr(_model_instance, 'last_roi_with_mask'):
+            with _model_instance.last_roi_lock:
+                roi = _model_instance.last_roi_with_mask
+                fracture_info = _model_instance.last_roi_fracture_info.copy() if hasattr(_model_instance, 'last_roi_fracture_info') else {}
+            
+            if roi is not None:
+                ret, buf = cv2.imencode('.jpg', roi, [cv2.IMWRITE_JPEG_QUALITY, 85])
+                if ret:
+                    response = Response(buf.tobytes(), mimetype='image/jpeg')
+                    response.headers['X-Inspection-Status'] = 'LIVE'
+                    response.headers['X-Fracture-Detected'] = 'true' if fracture_info.get('detected', False) else 'false'
+                    response.headers['X-Fracture-Count'] = str(fracture_info.get('mask_count', 0))
+                    response.headers['X-Fracture-Area-Px'] = str(int(fracture_info.get('total_area_px', 0)))
+                    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                    response.headers['Pragma'] = 'no-cache'
+                    response.headers['Expires'] = '0'
+                    return response
+        
+        # Fallback para last_roi_frame se last_roi_with_mask não estiver disponível (compatibilidade)
         if idx == 0 and _model_instance is not None and hasattr(_model_instance, 'last_roi_frame'):
             with _model_instance.last_roi_lock:
                 roi = _model_instance.last_roi_frame
@@ -1187,7 +1218,13 @@ def last_fracture_roi():
                 if ret:
                     response = Response(buf.tobytes(), mimetype='image/jpeg')
                     response.headers['X-Inspection-Status'] = 'LIVE'
+                    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                    response.headers['Pragma'] = 'no-cache'
+                    response.headers['Expires'] = '0'
                     return response
+        
+        if idx == 0:
+            return jsonify({"success": False, "message": "ROI ao vivo indisponivel."}), 404
 
         # Slots 2-4: ler apenas arquivos de fratura (FR) do disco
         import glob

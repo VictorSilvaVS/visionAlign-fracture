@@ -136,14 +136,12 @@ class Database:
     def log_detection_counts(self, normal_count, inverted_count, fallen_count, fracture_count=0):
         """Registra as contagens atuais de detecção no histórico."""
         try:
-            # <<< CORRIGIDO: Usar self.conn.execute em vez de self.cursor >>>
             current_ts_str = get_current_timestamp_for_storage() # Obter timestamp UTC formatado
             with self.conn: # Usar 'with' para commit/rollback automático
                 self.conn.execute('''  
                     INSERT INTO detection_log (timestamp, normal_count, inverted_count, fallen_count, fracture_count)
                     VALUES (?, ?, ?, ?, ?)
                 ''', (current_ts_str, normal_count, inverted_count, fallen_count, fracture_count))
-            # self.conn.commit() # <<< REMOVIDO: 'with self.conn' já faz commit/rollback
             self.logger.debug(f"Contagens de detecção registradas: N={normal_count}, I={inverted_count}, F={fallen_count}, FR={fracture_count}")
             return True
         except sqlite3.Error as e:

@@ -8,32 +8,33 @@
     },
     "AI_PARAMS": {
         "conf_default": 0.1,
-        "iou_default": 0.1,
+        "iou_default": 0.5,
         "max_queue_size": 30,
         "advanced": {
             "exclusion_zones": [],
             "gamma": 1.5,
             "clahe_enabled": true,
             "drawing": {
-                "box_thickness": 8,
-                "font_scale": 0.6,
+                "box_thickness": 7,
+                "font_scale": 0.7,
                 "font_thickness": 2,
                 "show_label": true,
-                "show_conf": false,
-                "show_bg": false
+                "show_conf": true,
+                "show_bg": true,
+                "show_mask": true
             }
         },
         "thresholds": {
             "lata_normal": 0.5,
-            "lata_tombada": 0.75,
-            "lata_invertida": 0.75,
-            "fracture": 0.84
+            "lata_tombada": 0.85,
+            "lata_invertida": 0.95,
+            "fracture": 0.5
         },
         "dataset_collection": {
-            "enabled": false,
+            "enabled": true,
             "save_on_event": true,
-            "save_interval": 1300,
-            "retention_days": 2,
+            "save_interval": 10,
+            "retention_days": 30,
             "distrust_range": [
                 0.3,
                 0.6
@@ -64,7 +65,7 @@
             60
         ],
         "source_type": "stream",
-        "source_param": "rtsp://admin:Abc123456@10.81.50.64/Streaming/Channels/101?tcp=1&buffer=100",
+        "source_param": "rtsp://admin:Abc123456@10.81.50.64/Streaming/Channels/101",
         "resolution": "",
         "fps": "15"
     },

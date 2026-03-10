@@ -198,23 +198,43 @@ async function updateFractureRoi() {
 
     if (liveImg && livePh) {
         const liveUrl = `/api/last_fracture_roi?v=${timestamp}&slot=1`;
-        const probe = new Image();
-        probe.onload = function () {
-            liveImg.src = liveUrl;
-            liveImg.classList.remove('hidden');
-            livePh.classList.add('hidden');
-            if (liveBadge) {
-                liveBadge.textContent = 'LIVE';
-                liveBadge.style.backgroundColor = '#3B82F6'; // azul
-                liveBadge.style.opacity = '1';
+        try {
+            const response = await fetch(liveUrl);
+            if (response.ok) {
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                liveImg.src = blobUrl;
+                liveImg.classList.remove('hidden');
+                livePh.classList.add('hidden');
+                
+                // Captura informações de fratura dos headers
+                const detected = response.headers.get('X-Fracture-Detected') === 'true';
+                const count = response.headers.get('X-Fracture-Count') || '0';
+                const area = response.headers.get('X-Fracture-Area-Px') || '0';
+                
+                if (liveBadge) {
+                    if (detected) {
+                        liveBadge.textContent = '🔴 FRATURA';
+                        liveBadge.style.backgroundColor = '#EF4444'; // vermelho
+                        liveBadge.title = `${count} máscaras, ${area}px`;
+                    } else {
+                        liveBadge.textContent = '✓ LIVE';
+                        liveBadge.style.backgroundColor = '#3B82F6'; // azul
+                        liveBadge.title = 'Analisando...';
+                    }
+                    liveBadge.style.opacity = '1';
+                }
+            } else {
+                liveImg.classList.add('hidden');
+                livePh.classList.remove('hidden');
+                if (liveBadge) liveBadge.style.opacity = '0';
             }
-        };
-        probe.onerror = function () {
+        } catch (e) {
+            console.error('Erro ao atualizar ROI ao vivo:', e);
             liveImg.classList.add('hidden');
             livePh.classList.remove('hidden');
             if (liveBadge) liveBadge.style.opacity = '0';
-        };
-        probe.src = liveUrl;
+        }
     }
 
     // --- SLOTS 2-4: Ultimas fraturas salvas em disco ---

@@ -360,6 +360,7 @@ function populateStructuredSettingsForm(settings) {
     const drawShowLabelCheckbox = document.getElementById('setting-draw-show-label');
     const drawShowConfCheckbox = document.getElementById('setting-draw-show-conf');
     const drawShowBgCheckbox = document.getElementById('setting-draw-show-bg');
+    const drawShowMaskCheckbox = document.getElementById('setting-draw-show-mask');
 
     if (drawThicknessInput) drawThicknessInput.value = settings?.AI_PARAMS?.advanced?.drawing?.box_thickness ?? 2;
     if (drawFontScaleInput) drawFontScaleInput.value = settings?.AI_PARAMS?.advanced?.drawing?.font_scale ?? 0.5;
@@ -367,6 +368,7 @@ function populateStructuredSettingsForm(settings) {
     if (drawShowLabelCheckbox) drawShowLabelCheckbox.checked = settings?.AI_PARAMS?.advanced?.drawing?.show_label ?? true;
     if (drawShowConfCheckbox) drawShowConfCheckbox.checked = settings?.AI_PARAMS?.advanced?.drawing?.show_conf ?? true;
     if (drawShowBgCheckbox) drawShowBgCheckbox.checked = settings?.AI_PARAMS?.advanced?.drawing?.show_bg ?? true;
+    if (drawShowMaskCheckbox) drawShowMaskCheckbox.checked = settings?.AI_PARAMS?.advanced?.drawing?.show_mask ?? false;
 
     // <<<< NOVO: Cores de Detecção >>>>
     const colorLataNormalPicker = document.getElementById('color-lata-normal');
@@ -687,7 +689,8 @@ function readStructuredSettingsForm() {
                     font_thickness: document.getElementById('setting-draw-font-thickness') ? parseInt(document.getElementById('setting-draw-font-thickness').value) : 1,
                     show_label: document.getElementById('setting-draw-show-label') ? document.getElementById('setting-draw-show-label').checked : true,
                     show_conf: document.getElementById('setting-draw-show-conf') ? document.getElementById('setting-draw-show-conf').checked : true,
-                    show_bg: document.getElementById('setting-draw-show-bg') ? document.getElementById('setting-draw-show-bg').checked : true
+                    show_bg: document.getElementById('setting-draw-show-bg') ? document.getElementById('setting-draw-show-bg').checked : true,
+                    show_mask: document.getElementById('setting-draw-show-mask') ? document.getElementById('setting-draw-show-mask').checked : false
                 }
             },
             dataset_collection: {
