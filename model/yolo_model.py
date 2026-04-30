@@ -7,7 +7,7 @@ import threading
 import subprocess
 from threading import Event, RLock
 from concurrent.futures import ThreadPoolExecutor
-from ultralytics import YOLO
+from .ov_wrapper import OVModel
 from .detection_drawer import DetectionDrawer
 from utils.email_utils import send_fracture_alert_email
 from utils.database import Database
@@ -32,8 +32,8 @@ class YOLOModel:
             
             # FORÇA task=segment APENAS para o modelo de Fratura (se ele for realmente segmentação)
             # Para o Align, deixamos ele detectar automaticamente (é detecção na maioria das vezes)
-            self.model_align = YOLO(path_align)
-            self.model_fracture = YOLO(path_fracture, task='segment')
+            self.model_align = OVModel(path_align)
+            self.model_fracture = OVModel(path_fracture, task='segment')
             
             self.logger.info(f"Modelos carregados (Align Task: {self.model_align.task} | Fracture Task: {self.model_fracture.task})")
         except Exception as e:
@@ -132,8 +132,8 @@ class YOLOModel:
             path_align   = r"E:\programs\visionAlign\model\_openvino_model\VisionAlign_openvino_model"
             path_fracture = r"E:\programs\visionAlign\model\_openvino_model\VisionFracture_openvino_model"
 
-            self.model_align    = YOLO(path_align)
-            self.model_fracture = YOLO(path_fracture, task='segment')  # ← corrigido
+            self.model_align    = OVModel(path_align)
+            self.model_fracture = OVModel(path_fracture, task='segment')
 
             self.names_align    = self.model_align.names
             self.names_fracture = self.model_fracture.names
@@ -321,7 +321,6 @@ class YOLOModel:
             return None
 
     def _update_gamma_table(self):
-        """Precalcula a tabela LUT para correção de Gamma (mais rápido que calcular no loop)."""
         if abs(self.gamma - 1.0) > 0.01:
             invGamma = 1.0 / self.gamma
             self.gamma_table = np.array([((i / 255.0) ** invGamma) * 255 
