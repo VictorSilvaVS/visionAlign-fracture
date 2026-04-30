@@ -65,23 +65,31 @@ def main():
     }
     
     user_info = default_user
-    login_dialog = LoginDialog(database)
+    current_host = settings.get('SERVER_CONFIG', {}).get('remote_host', '127.0.0.1')
+    login_dialog = LoginDialog(database, current_server_ip=current_host)
     result = login_dialog.exec_()
     if result == QDialog.Accepted:
-        raw_user_info = login_dialog.user_info 
-        if raw_user_info.get('is_guest', False):
-            user_info = raw_user_info 
+        user_info = login_dialog.user_info 
+        # Atualiza o IP do servidor nas configurações se mudou
+        new_server_ip = login_dialog.server_ip
+        if new_server_ip != current_host:
+            logger.info(f"Alterando IP do servidor para: {new_server_ip}")
+            settings_manager.update_setting('SERVER_CONFIG', 'remote_host', new_server_ip)
+            # Recarrega configurações locais para garantir consistência
+            settings = settings_manager.get_all()
+        
+        if user_info.get('is_guest', False):
             logger.info(f"Login realizado como visitante. IP: {socket.gethostbyname(socket.gethostname())}")
         else:
-            is_admin_flag = raw_user_info.get('is_admin', False)
+            is_admin_flag = user_info.get('is_admin', False)
             normalized_role = 'admin' if is_admin_flag else 'user'
-            user_info = raw_user_info.copy() 
             user_info['role'] = normalized_role 
-            logger.info(f"Usuário '{user_info['username']}' logado. Role normalizada para: '{user_info['role']}'.")
+            logger.info(f"Usuário '{user_info['username']}' logado. Role normalizada para: '{normalized_role}'.")
     else: 
         logger.info("Login cancelado pelo usuário. Encerrando.")
         sys.exit(0) 
-    server_host = settings.get('SERVER_CONFIG', {}).get('remote_host', '127.0.0.1')
+    # Usa o IP inserido no login (o mais confiável, independente do settings.json)
+    server_host = login_dialog.server_ip if hasattr(login_dialog, 'server_ip') else settings.get('SERVER_CONFIG', {}).get('remote_host', '127.0.0.1')
     server_port = settings.get('SERVER_CONFIG', {}).get('remote_port', 7586)
     server_address = f"http://{server_host}:{server_port}"
     logger.info(f"Aplicação principal configurada para usar servidor em: {server_address}")

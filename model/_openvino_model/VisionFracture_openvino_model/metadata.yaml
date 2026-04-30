@@ -1,7 +1,7 @@
-description: Ultralytics YOLO26s-seg model trained on /content/fracture-1/data.yaml
+description: Ultralytics YOLO26m-seg model trained on /content/fracture-4/data.yaml
 author: Ultralytics
-date: '2026-03-10T09:09:39.989533'
-version: 8.4.21
+date: '2026-03-17T16:02:07.322681'
+version: 8.4.23
 license: AGPL-3.0 License (https://ultralytics.com/license)
 docs: https://docs.ultralytics.com
 stride: 32
@@ -11,12 +11,12 @@ imgsz:
 - 640
 - 640
 names:
-  0: fracture
+  0: item
 args:
   batch: 1
   fraction: 1.0
-  half: true
-  int8: false
+  half: false
+  int8: true
   dynamic: false
   nms: false
 channels: 3

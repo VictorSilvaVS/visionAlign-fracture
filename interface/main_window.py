@@ -191,6 +191,13 @@ class MainWindow(QMainWindow):
         extract_frame_btn = QPushButton("🖼️ Extrair Frame")
         extract_frame_btn.clicked.connect(self._request_and_save_frame)
         self.side_panel_layout.insertWidget(self.side_panel_layout.count() - 1, extract_frame_btn) # Insere antes do stretch
+
+        # Botão Tela Cheia (Ideal para PC de Fábrica)
+        self.fullscreen_btn = QPushButton("📺 Tela Cheia")
+        self.fullscreen_btn.clicked.connect(self.toggle_fullscreen)
+        self.fullscreen_btn.setToolTip("Alternar modo tela cheia (F11)")
+        self.side_panel_layout.insertWidget(self.side_panel_layout.count() - 1, self.fullscreen_btn)
+
         # O timer _setup_frame_extraction_check() e o método _check_and_save_frame()
         # foram removidos pois a extração agora é direta pelo Flask.
 
@@ -240,23 +247,25 @@ class MainWindow(QMainWindow):
             settings_button.setToolTip("Abrir configurações (Admin)") # Tooltip correto
 
         # 2. Iniciar Thread de Captura do Stream Remoto
-        if self.remote_server_address and not is_guest: # <<< CONDIÇÃO ADICIONADA
+        if is_guest:
+            self.logger.info("Usuário visitante: stream remoto não iniciado.")
+            self.update_default_message("Conectado como Visitante")
+        elif self.remote_server_address:
             stream_url = f"{self.remote_server_address}/video_feed"
             self.stream_thread = StreamClientThread(stream_url, self)
             self.stream_thread.new_frame_signal.connect(self._handle_remote_frame)
             self.stream_thread.connection_error_signal.connect(self._handle_stream_error)
             self.stream_thread.start()
-            self.logger.info("Polling de estatísticas iniciado (usuário não é visitante).")
-
+            self.logger.info("Polling de estatísticas iniciado (usuário autenticado).")
         else:
             self.logger.error("Endereço do servidor remoto não fornecido para o modo cliente.")
             self.update_default_message("Erro: Servidor não configurado")
 
         # 3. Iniciar Timer para Buscar Estatísticas Remotas
-        if self.remote_server_address and not is_guest: # <<< Não buscar stats para guest
+        if self.remote_server_address and not is_guest:  # Não buscar stats para guest
             self.stats_poll_timer = QTimer(self)
             self.stats_poll_timer.timeout.connect(self._fetch_remote_stats)
-            self.stats_poll_timer.start(1000) # Busca stats a cada 1 segundo
+            self.stats_poll_timer.start(1000)  # Busca stats a cada 1 segundo
 
         # 4. Timer para Reconexão (inicia parado)
         self.reconnect_timer = QTimer(self)
@@ -2238,3 +2247,19 @@ class MainWindow(QMainWindow):
         except Exception as e:
             self.logger.error(f"Erro inesperado ao processar frame extraído: {e}", exc_info=True)
             QMessageBox.critical(self, "Erro Inesperado", f"Ocorreu um erro ao processar o frame:\n{e}")
+
+    def toggle_fullscreen(self):
+        """Alterna entre o modo janela e tela cheia."""
+        if self.isFullScreen():
+            self.showNormal()
+            self.fullscreen_btn.setText("📺 Tela Cheia")
+        else:
+            self.showFullScreen()
+            self.fullscreen_btn.setText("🪟 Sair da Tela Cheia")
+            
+    def keyPressEvent(self, event):
+        """Atalhos de teclado globais."""
+        if event.key() == Qt.Key_F11:
+            self.toggle_fullscreen()
+        else:
+            super().keyPressEvent(event)

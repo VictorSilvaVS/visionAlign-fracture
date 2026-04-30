@@ -319,11 +319,45 @@
                                 <i class="fas fa-pencil-alt mr-1"></i> Desenhar
                             </button>
                             <button id="add-exclusion-zone-btn" type="button" class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm">
-                                <i class="fas fa-plus mr-1"></i> Adicionar
+                                <i class="fas fa-plus mr-1"></i> Adicionar Manual
                             </button>
                         </div>
                     </div>
                     <div id="exclusion-zones-container" class="space-y-2"></div>
+                </div>
+
+                <div id="roi-settings-section" class="border border-blue-200 rounded-lg p-4 bg-blue-50 mt-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <h5 class="text-sm font-medium text-blue-900"><i class="fas fa-crosshairs mr-2"></i>Calibração de ROI (AOI 51mm)</h5>
+                        <div class="flex space-x-2">
+                            <button id="btn-open-roi-modal" type="button" class="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm shadow-sm transition-colors cursor-pointer">
+                                <i class="fas fa-camera mr-1"></i> Capturar Frame & Marcar
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-xs text-blue-700 mb-4">Define a área central exata de inspeção (Region of Interest) a ser isolada para o modelo de fratura, permitindo garantir proporções reais (ex: fixar círculo de 51mm de inspeção do domo).</p>
+                    <div class="grid grid-cols-5 gap-4">
+                        <div class="col-span-1">
+                            <label class="block text-xs font-medium text-gray-700">Modelo AI</label>
+                            <input type="number" id="setting-roi-size" value="640" class="mt-1 w-full border border-gray-300 rounded-md py-1 px-2 text-sm bg-gray-100" readonly>
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-xs font-medium text-gray-700 text-indigo-700"><i class="fas fa-ruler-combined mr-1"></i> Crop Motor</label>
+                            <input type="number" id="setting-roi-real-size" value="0" class="mt-1 w-full border border-indigo-300 rounded-md py-1 px-2 text-sm bg-indigo-50 font-mono font-bold text-indigo-700" readonly>
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-xs font-medium text-gray-700">Zoom AOI</label>
+                            <input type="number" id="setting-roi-radius" value="320" class="mt-1 w-full border border-gray-300 rounded-md py-1 px-2 text-sm bg-gray-100" readonly>
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-xs font-medium text-gray-700">Offset X</label>
+                            <input type="number" id="setting-roi-offset-x" value="0" class="mt-1 w-full border border-gray-300 rounded-md py-1 px-2 text-sm" placeholder="Ex: -50">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-xs font-medium text-gray-700">Offset Y</label>
+                            <input type="number" id="setting-roi-offset-y" value="0" class="mt-1 w-full border border-gray-300 rounded-md py-1 px-2 text-sm" placeholder="Ex: 30">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="pt-6 border-t border-gray-200">
@@ -395,6 +429,42 @@
             <div class="space-x-3">
                 <button id="draw-zones-cancel-btn" type="button" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm">Cancelar</button>
                 <button id="draw-zones-save-btn" type="button" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Aplicar Zonas</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Calibração de ROI -->
+<div id="draw-roi-modal" class="fixed z-50 inset-0 hidden bg-black bg-opacity-75 items-center justify-center p-4">
+    <div class="bg-gray-900 rounded-lg p-6 shadow-2xl w-full max-w-5xl flex flex-col border border-indigo-500" style="max-height: 90vh;">
+        <h3 class="text-xl font-bold mb-1 text-white"><i class="fas fa-crosshairs text-indigo-400 mr-2"></i>Calibrador de Aspecto / AOI</h3>
+        <p class="text-sm text-gray-400 mb-4">Ajuste o círculo mestre e o bounding box sobre uma lata real do stream para informar ao sistema suas proporções precisas e margens de corte (640x640 base).</p>
+
+        <div class="relative w-full flex-grow mx-auto overflow-hidden bg-black border-2 border-indigo-900 rounded flex justify-center items-center" id="roi-canvas-wrapper" style="min-height: 400px;">
+            <div id="draw-roi-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 bg-opacity-80 z-10">
+                <i class="fas fa-camera fa-fade text-4xl text-indigo-500 mb-3"></i>
+                <span class="text-indigo-200 font-medium">Extraindo frame RTSP do motor VisionAlign...</span>
+            </div>
+            <img id="draw-roi-img" src="" alt="ROI Frame RTSP" class="max-w-full max-h-[60vh] object-contain opacity-0 pointer-events-none">
+            <canvas id="draw-roi-canvas" class="absolute cursor-move z-20"></canvas>
+            <!-- O Canvas agora vai governar os visuais interativos. O guidelines HTML engessado foi removido -->
+        </div>
+
+        <div class="mt-6 flex justify-between items-center w-full">
+            <div class="flex items-center space-x-4">
+                <div class="flex flex-col">
+                    <label class="text-xs text-gray-400 uppercase font-bold">Escala do Círculo (AOI)</label>
+                    <input type="range" id="roi-scale-slider" min="30" max="95" value="75" class="w-32 accent-cyan-400">
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs text-gray-400 uppercase font-bold">Margem da Caixa (Padding)</label>
+                    <input type="range" id="roi-padding-slider" min="0" max="50" value="10" class="w-32 accent-indigo-500">
+                </div>
+            </div>
+            
+            <div class="space-x-3">
+                <button id="draw-roi-cancel-btn" type="button" class="px-5 py-2.5 bg-gray-700 text-gray-200 rounded hover:bg-gray-600 text-sm font-medium transition-colors">Cancelar</button>
+                <button id="draw-roi-save-btn" type="button" class="px-5 py-2.5 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm font-bold shadow-lg shadow-indigo-500/30 transition-colors"><i class="fas fa-check-circle mr-2"></i> Confirmar Sincronia</button>
             </div>
         </div>
     </div>

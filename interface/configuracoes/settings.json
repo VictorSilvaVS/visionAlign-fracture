@@ -8,12 +8,16 @@
     },
     "AI_PARAMS": {
         "conf_default": 0.1,
-        "iou_default": 0.2,
+        "iou_default": 0.12,
         "max_queue_size": 30,
         "advanced": {
             "exclusion_zones": [],
-            "gamma": 1.5,
+            "gamma": 1.1,
             "clahe_enabled": true,
+            "roi_fixed_size": 437,
+            "roi_radius": 250,
+            "roi_offset_x": 0,
+            "roi_offset_y": 0,
             "drawing": {
                 "box_thickness": 7,
                 "font_scale": 0.7,
@@ -25,14 +29,14 @@
             }
         },
         "thresholds": {
-            "lata_normal": 0.1,
+            "lata_normal": 0.22,
             "lata_tombada": 0.25,
             "lata_invertida": 0.23,
-            "fracture": 0.95
+            "fracture": 0.6
         },
         "dataset_collection": {
-            "enabled": true,
-            "save_on_event": true,
+            "enabled": false,
+            "save_on_event": false,
             "save_interval": 10,
             "retention_days": 30,
             "distrust_range": [
@@ -67,7 +71,7 @@
         "source_type": "stream",
         "source_param": "rtsp://admin:Abc123456@10.81.50.64:554/Streaming/Channels/101?transportmode=unicast&p=tcp",
         "resolution": "",
-        "fps": "15"
+        "fps": ""
     },
     "UI_PARAMS": {
         "update_interval": 30,

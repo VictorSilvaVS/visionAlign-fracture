@@ -6,10 +6,11 @@ from PyQt5.QtGui import QPixmap
 import os
 
 class LoginDialog(QDialog):
-    def __init__(self, database, parent=None):
+    def __init__(self, database, current_server_ip="127.0.0.1", parent=None):
         super().__init__(parent)
         self.database = database
         self.user_info = None  # Store user info on successful login
+        self.server_ip = current_server_ip
 
         self.setWindowTitle("Login - VisionAlign")
         self.setModal(True)
@@ -53,6 +54,10 @@ class LoginDialog(QDialog):
         self.password_input = QLineEdit()
         self.password_input.setPlaceholderText("Digite sua senha")
         self.password_input.setEchoMode(QLineEdit.Password) # Mask password
+        
+        self.server_input = QLineEdit()
+        self.server_input.setPlaceholderText("IP do Servidor (ex: 192.168.1.10)")
+        self.server_input.setText(self.server_ip)
 
         self.error_label = QLabel("") # To display login errors
         self.error_label.setObjectName("errorLabel") # Para estilizar via QSS
@@ -74,8 +79,10 @@ class LoginDialog(QDialog):
         # --- Setup Form Layout ---
         user_label = QLabel("Usuário:")
         pass_label = QLabel("Senha:")
+        server_label = QLabel("Servidor IP:")
         form_layout.addRow(user_label, self.username_input)
         form_layout.addRow(pass_label, self.password_input)
+        form_layout.addRow(server_label, self.server_input)
 
         # --- Setup Button Layout ---
         button_layout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
@@ -107,6 +114,8 @@ class LoginDialog(QDialog):
     def attempt_login(self):
         self.error_label.clear() # Limpa erros anteriores
 
+        self.server_ip = self.server_input.text().strip() or "127.0.0.1"
+        
         if self.guest_checkbox.isChecked():
             self.user_info = {'username': 'guest', 'role': 'guest', 'permissions': ['view'], 'is_guest': True}
             self.accept()

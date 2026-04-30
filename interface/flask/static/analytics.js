@@ -27,7 +27,6 @@ async function fetchAnalyticsChartData(period) {
 }
 
 /**
- * Prepara o container e o canvas para um gráfico.
  * @param {string} containerId - ID do div container do gráfico.
  * @param {string} canvasId - ID que será dado ao elemento canvas.
  * @param {string} placeholderId - ID do div placeholder a ser removido.

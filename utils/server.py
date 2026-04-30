@@ -155,21 +155,20 @@ def generate_video_frames():
         with _frame_lock:
             current_frame = _frame_container[0]
             if current_frame is not None:
-                
-                frame_copy = current_frame.copy() 
+                try:
+                    h, w = current_frame.shape[:2]
+                    if w > 1280:
+                        scale = 1280 / w
+                        frame_copy = cv2.resize(current_frame, (1280, int(h * scale)), interpolation=cv2.INTER_AREA)
+                    else:
+                        frame_copy = current_frame.copy()
+                except Exception as e:
+                    _logger.error(f"Erro ao redimensionar frame web: {e}")
+                    frame_copy = current_frame.copy()
             else:
                 pass 
 
         if frame_copy is not None:
-            
-            # --- OTIMIZAÇÃO: Diminui a resolução para WEB (evitando o envio de 8MP/4K) ---
-            try:
-                h, w = frame_copy.shape[:2]
-                if w > 1280:
-                    scale = 1280 / w
-                    frame_copy = cv2.resize(frame_copy, (1280, int(h * scale)), interpolation=cv2.INTER_AREA)
-            except Exception as e:
-                _logger.error(f"Erro ao redimensionar frame web: {e}")
 
             try:
 

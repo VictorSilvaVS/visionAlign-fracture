@@ -74,7 +74,7 @@ class Settings:
         # Nova seção para configuração do cliente/servidor
         'SERVER_CONFIG': {
             'remote_host': '127.0.0.1',  # IP ou hostname do servidor principal
-            'remote_port': 5555  # Porta do servidor principal
+            'remote_port': 7586  # Porta do servidor principal
         }
     }
 

@@ -426,6 +426,18 @@ function populateStructuredSettingsForm(settings) {
     if (collectDistrustMinInput) collectDistrustMinInput.value = settings?.AI_PARAMS?.dataset_collection?.distrust_range?.[0] ?? 0.3;
     if (collectDistrustMaxInput) collectDistrustMaxInput.value = settings?.AI_PARAMS?.dataset_collection?.distrust_range?.[1] ?? 0.6;
 
+    const inputRealSize = document.getElementById('setting-roi-real-size');
+    if (inputRealSize) inputRealSize.value = settings?.AI_PARAMS?.advanced?.roi_fixed_size ?? 0;
+
+    const inputRadius = document.getElementById('setting-roi-radius');
+    if (inputRadius) inputRadius.value = settings?.AI_PARAMS?.advanced?.roi_radius ?? 320;
+
+    const inputOffsetX = document.getElementById('setting-roi-offset-x');
+    if (inputOffsetX) inputOffsetX.value = settings?.AI_PARAMS?.advanced?.roi_offset_x ?? 0;
+
+    const inputOffsetY = document.getElementById('setting-roi-offset-y');
+    if (inputOffsetY) inputOffsetY.value = settings?.AI_PARAMS?.advanced?.roi_offset_y ?? 0;
+
     // O listener do botão "Adicionar Zona" agora é tratado em initializeAppForSettingsPage
     // para evitar duplicidade ou conflitos com populateStructuredSettingsForm.
 }
@@ -683,6 +695,10 @@ function readStructuredSettingsForm() {
                 exclusion_zones: exclusionZones,
                 gamma: document.getElementById('setting-gamma') ? parseFloat(document.getElementById('setting-gamma').value) : 0.8,
                 clahe_enabled: document.getElementById('setting-clahe') ? document.getElementById('setting-clahe').checked : true,
+                roi_fixed_size: document.getElementById('setting-roi-real-size') ? parseInt(document.getElementById('setting-roi-real-size').value) : 0,
+                roi_radius: document.getElementById('setting-roi-radius') ? parseInt(document.getElementById('setting-roi-radius').value) : 320,
+                roi_offset_x: document.getElementById('setting-roi-offset-x') ? parseInt(document.getElementById('setting-roi-offset-x').value) : 0,
+                roi_offset_y: document.getElementById('setting-roi-offset-y') ? parseInt(document.getElementById('setting-roi-offset-y').value) : 0,
                 drawing: {
                     box_thickness: document.getElementById('setting-draw-thickness') ? parseInt(document.getElementById('setting-draw-thickness').value) : 2,
                     font_scale: document.getElementById('setting-draw-font-scale') ? parseFloat(document.getElementById('setting-draw-font-scale').value) : 0.5,
@@ -1649,6 +1665,245 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             tempZone = null;
             redrawCanvas();
+        }
+    };
+});
+
+// <<< LÓGICA DO MODAL DE CALIBRAÇÃO DE ROI (AOI 51mm) >>>
+document.addEventListener('DOMContentLoaded', () => {
+    const btnOpenRoi = document.getElementById('btn-open-roi-modal');
+    if (!btnOpenRoi) return; // Só existe em configurações
+
+    const roiModal = document.getElementById('draw-roi-modal');
+    const roiImg = document.getElementById('draw-roi-img');
+    const roiCanvas = document.getElementById('draw-roi-canvas');
+    const roiLoading = document.getElementById('draw-roi-loading');
+    const btnCancelRoi = document.getElementById('draw-roi-cancel-btn');
+    const btnSaveRoi = document.getElementById('draw-roi-save-btn');
+    const ctxRoi = roiCanvas ? roiCanvas.getContext('2d') : null;
+    
+    // Sliders de controle na Modal
+    const scaleSlider = document.getElementById('roi-scale-slider');
+    const paddingSlider = document.getElementById('roi-padding-slider'); // Apenas para debug/visual ou metadados futuros
+    
+    // Displays no Card principal
+    const displaySize = document.getElementById('setting-roi-size');
+    const displayRadius = document.getElementById('setting-roi-radius');
+    
+    // Estado interativo do ROI Box
+    let roiBox = { x: 0, y: 0, size: 0 };
+    let imgScaleX = 1, imgScaleY = 1;
+    let isDraggingRoi = false;
+    let isResizingRoi = false;
+    let dragOffsetX = 0, dragOffsetY = 0;
+    
+    function redrawRoiCanvas() {
+        if (!ctxRoi || !roiCanvas) return;
+        ctxRoi.clearRect(0, 0, roiCanvas.width, roiCanvas.height);
+        
+        // Fundo escurecido
+        ctxRoi.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctxRoi.fillRect(0, 0, roiCanvas.width, roiCanvas.height);
+        
+        // Se a box for válida, nós "limpamos" o fundo dentro dela para ver a lata real
+        if (roiBox.size > 0) {
+            ctxRoi.clearRect(roiBox.x, roiBox.y, roiBox.size, roiBox.size);
+            
+            // Caixa de Bounding Box (quadrada)
+            ctxRoi.strokeStyle = 'rgba(99, 102, 241, 0.8)';
+            ctxRoi.lineWidth = 2;
+            ctxRoi.setLineDash([5, 5]);
+            ctxRoi.strokeRect(roiBox.x, roiBox.y, roiBox.size, roiBox.size);
+            ctxRoi.setLineDash([]);
+            
+            // Círculo AOI Interno
+            const scalePct = scaleSlider ? parseInt(scaleSlider.value) : 75;
+            const radius = (roiBox.size / 2) * (scalePct / 100);
+            const cx = roiBox.x + roiBox.size / 2;
+            const cy = roiBox.y + roiBox.size / 2;
+            
+            ctxRoi.beginPath();
+            ctxRoi.arc(cx, cy, radius, 0, 2 * Math.PI);
+            ctxRoi.strokeStyle = 'rgba(0, 255, 255, 0.9)';
+            ctxRoi.lineWidth = 3;
+            ctxRoi.stroke();
+            
+            // Texto do Círculo
+            ctxRoi.fillStyle = 'rgba(0, 255, 255, 1)';
+            ctxRoi.font = 'bold 12px monospace';
+            ctxRoi.textAlign = 'center';
+            ctxRoi.fillText('AOI 51mm', cx, cy - radius - 8);
+            
+            // Grips de Redimensionamento Canto Inferior Direito
+            ctxRoi.fillStyle = '#ef4444';
+            ctxRoi.fillRect(roiBox.x + roiBox.size - 8, roiBox.y + roiBox.size - 8, 16, 16);
+        }
+    }
+    
+    if (roiCanvas) {
+        roiCanvas.addEventListener('mousedown', (e) => {
+            const rect = roiCanvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            // Se clicar no grip (canto infor direito) -> Resize
+            const gripDist = Math.max(
+                Math.abs(mouseX - (roiBox.x + roiBox.size)),
+                Math.abs(mouseY - (roiBox.y + roiBox.size))
+            );
+            
+            if (roiBox.size > 0 && gripDist <= 15) {
+                isResizingRoi = true;
+                return;
+            }
+            
+            // Se clicar dentro -> arrasta
+            if (roiBox.size > 0 && mouseX >= roiBox.x && mouseX <= roiBox.x + roiBox.size &&
+                mouseY >= roiBox.y && mouseY <= roiBox.y + roiBox.size) {
+                isDraggingRoi = true;
+                dragOffsetX = mouseX - roiBox.x;
+                dragOffsetY = mouseY - roiBox.y;
+                return;
+            }
+            
+            // Se clicar fora -> inicia novo quadrado (resize imediato)
+            roiBox.x = mouseX;
+            roiBox.y = mouseY;
+            roiBox.size = 0;
+            isResizingRoi = true;
+        });
+        
+        roiCanvas.addEventListener('mousemove', (e) => {
+            const rect = roiCanvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            if (isDraggingRoi) {
+                roiBox.x = mouseX - dragOffsetX;
+                roiBox.y = mouseY - dragOffsetY;
+                redrawRoiCanvas();
+            } else if (isResizingRoi) {
+                // Sempre um quadrado perfeito baseado na direção travada pelo X para não ficar torto
+                const dx = mouseX - roiBox.x;
+                const dy = mouseY - roiBox.y;
+                // Tamanho será o maior delta, forçando ele a expandir para baixo/direita
+                roiBox.size = Math.max(dx, dy, 20); // Mínimo 20px
+                redrawRoiCanvas();
+            } else {
+                // Modifica o cursor on hover
+                const gripDist = Math.max(
+                    Math.abs(mouseX - (roiBox.x + roiBox.size)),
+                    Math.abs(mouseY - (roiBox.y + roiBox.size))
+                );
+                
+                if (roiBox.size > 0 && gripDist <= 15) {
+                    roiCanvas.style.cursor = 'nwse-resize';
+                } else if (roiBox.size > 0 && mouseX >= roiBox.x && mouseX <= roiBox.x + roiBox.size &&
+                    mouseY >= roiBox.y && mouseY <= roiBox.y + roiBox.size) {
+                    roiCanvas.style.cursor = 'move';
+                } else {
+                    roiCanvas.style.cursor = 'crosshair';
+                }
+            }
+        });
+        
+        roiCanvas.addEventListener('mouseup', () => {
+            isDraggingRoi = false;
+            isResizingRoi = false;
+        });
+        
+        roiCanvas.addEventListener('mouseleave', () => {
+            isDraggingRoi = false;
+            isResizingRoi = false;
+            roiCanvas.style.cursor = 'default';
+        });
+    }
+    
+    function updateDisplayStatus() {
+        if(displayRadius && scaleSlider && displaySize) {
+            const scalePct = parseInt(scaleSlider.value);
+            displaySize.value = 640; // Por design de rede, output é fixo
+            displayRadius.value = Math.round((640 * (scalePct / 100)) / 2);
+        }
+        redrawRoiCanvas();
+    }
+    
+    if (scaleSlider) scaleSlider.addEventListener('input', updateDisplayStatus);
+
+    async function fetchFrameForRoi() {
+        try {
+            const extractResponse = await fetch('/api/extract_frame', { method: 'POST' });
+            if (!extractResponse.ok) throw new Error("Erro na extração de frame.");
+
+            const contentType = extractResponse.headers.get("content-type");
+            if (contentType && contentType.includes("application/octet-stream")) {
+                const encryptedBlob = await extractResponse.blob();
+                const decryptResponse = await fetch('/api/decrypt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/octet-stream' },
+                    body: encryptedBlob
+                });
+                if (!decryptResponse.ok) throw new Error("Erro de descriptografia");
+                const decryptedJpegBlob = await decryptResponse.blob();
+                const url = window.URL.createObjectURL(decryptedJpegBlob);
+
+                roiImg.onload = () => {
+                    if (roiCanvas) {
+                        roiCanvas.width = roiImg.clientWidth;
+                        roiCanvas.height = roiImg.clientHeight;
+                        imgScaleX = roiImg.naturalWidth / roiImg.clientWidth;
+                        imgScaleY = roiImg.naturalHeight / roiImg.clientHeight;
+                     
+                        // Gera quadrado central padrão se iniciar torto
+                        const s = Math.min(roiCanvas.width, roiCanvas.height) * 0.4;
+                        roiBox.size = s;
+                        roiBox.x = (roiCanvas.width - s) / 2;
+                        roiBox.y = (roiCanvas.height - s) / 2;
+                    }
+
+                    roiLoading.classList.add('hidden');
+                    roiImg.classList.remove('opacity-0');
+                    if (paddingSlider) paddingSlider.value = 10;
+                    updateDisplayStatus();
+                };
+                roiImg.src = url;
+            } else {
+                roiLoading.innerHTML = '<span class="text-red-500 font-bold">Erro: Stream inativo ou frame inválido.</span>';
+            }
+        } catch (err) {
+            console.error('Erro ao buscar frame para ROI:', err);
+            roiLoading.innerHTML = '<span class="text-red-500 font-bold">Falha ao obter imagem da máquina.</span>';
+        }
+    }
+
+    btnOpenRoi.onclick = () => {
+        roiModal.classList.remove('hidden');
+        roiModal.classList.add('flex');
+        roiLoading.classList.remove('hidden');
+        roiImg.src = '';
+        roiImg.classList.add('opacity-0');
+        fetchFrameForRoi();
+    };
+
+    btnCancelRoi.onclick = () => {
+        roiModal.classList.add('hidden');
+        roiModal.classList.remove('flex');
+    };
+
+    btnSaveRoi.onclick = () => {
+        const realCrop = Math.round(roiBox.size * imgScaleX);
+        const inputRealSize = document.getElementById('setting-roi-real-size');
+        if (inputRealSize) inputRealSize.value = realCrop;
+
+        roiModal.classList.add('hidden');
+        roiModal.classList.remove('flex');
+
+        showMessage('settings-status-message', `Calibração Fixada Visualmente (${realCrop}px real)! Clique Salvar Configurações p/ gravar margens permanentes.`);
+        
+        const saveSettingsBtn = document.getElementById('save-settings-btn');
+        if (saveSettingsBtn) {
+            saveSettingsBtn.classList.add('animate-pulse');
+            setTimeout(() => saveSettingsBtn.classList.remove('animate-pulse'), 3000);
         }
     };
 });

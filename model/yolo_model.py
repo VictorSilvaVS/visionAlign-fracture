@@ -61,6 +61,7 @@ class YOLOModel:
         self.fracture_roi_buffer = {}
         self.track_last_check = {}
         self.fracture_check_interval = settings.get('AI_PARAMS', {}).get('advanced', {}).get('roi_check_interval', 0.2)
+        self.roi_fixed_size = settings.get('AI_PARAMS', {}).get('advanced', {}).get('roi_fixed_size', 0)
         self.target_fps = settings.get('AI_PARAMS', {}).get('advanced', {}).get('fps_cap', 15.0)
         self.last_roi_frame = None
         self.last_roi_with_mask = None  # ROI com máscaras desenhadas para visualização ao vivo
@@ -126,20 +127,18 @@ class YOLOModel:
         self.iou = float(new_iou)
         self.logger.info(f"IOU ajustado para: {self.iou}")
     def reload_models(self):
-        """Recarrega os modelos do disco para a memória."""
         try:
             self.logger.info("Recarregando modelos YOLO...")
-            path_align = r"E:\programs\visionAlign\model\_openvino_model\VisionAlign_openvino_model"
+            path_align   = r"E:\programs\visionAlign\model\_openvino_model\VisionAlign_openvino_model"
             path_fracture = r"E:\programs\visionAlign\model\_openvino_model\VisionFracture_openvino_model"
-            
-            # Recarga atômica
-            self.model_align = YOLO(path_align)
-            self.model_fracture = YOLO(path_fracture, task='segment')
-            
-            self.names_align = self.model_align.names
+
+            self.model_align    = YOLO(path_align)
+            self.model_fracture = YOLO(path_fracture, task='segment')  # ← corrigido
+
+            self.names_align    = self.model_align.names
             self.names_fracture = self.model_fracture.names
-            
-            self.logger.info("Modelos recarregados com sucesso.")
+
+            self.logger.info(f"Modelos recarregados (Align: {self.model_align.task} | Fracture: {self.model_fracture.task})")
             return True
         except Exception as e:
             self.logger.error(f"Erro ao recarregar modelos: {e}")
@@ -158,6 +157,10 @@ class YOLOModel:
         self.gamma = float(advanced_settings.get('gamma', self.gamma))
         self._update_gamma_table()
         self.clahe_enabled = advanced_settings.get('clahe_enabled', self.clahe_enabled)
+        self.roi_fixed_size = advanced_settings.get('roi_fixed_size', self.roi_fixed_size)
+        self.roi_offset_x = int(advanced_settings.get('roi_offset_x', getattr(self, 'roi_offset_x', 0)))
+        self.roi_offset_y = int(advanced_settings.get('roi_offset_y', getattr(self, 'roi_offset_y', 0)))
+        self.roi_radius = int(advanced_settings.get('roi_radius', getattr(self, 'roi_radius', 0)))
         self.logger.info(f"Filtros: Gamma={self.gamma}, CLAHE={'Ativo' if self.clahe_enabled else 'Inativo'}")
         if 'dataset_collection' in advanced_settings:
             coll = advanced_settings['dataset_collection']
@@ -176,8 +179,10 @@ class YOLOModel:
         if video_config:
             source_type = video_config.get('type')
             new_url = video_config.get('stream_url')
+            cam_id = video_config.get('camera_id', 0)
             res = video_config.get('resolution')
             fps = video_config.get('fps')
+            
             if fps:
                 try:
                     self.target_fps = int(fps)
@@ -185,27 +190,37 @@ class YOLOModel:
                     self.logger.info(f"Target FPS do processamento atualizado para: {self.target_fps}")
                 except Exception as e:
                     self.logger.error(f"Erro ao converter FPS: {e}")
-            
-            # Se a fonte mudou, reiniciamos o processamento
-            self.logger.info(f"Reiniciando captura para nova fonte: {new_url if source_type == 'stream' else source_type} ({res}, {fps} FPS)")
-            self.stop_processing()
-            self.reset_state() # <<< NOVO: Reseta estados e limpa fotos antigas
-            
-            if source_type == 'stream':
-                self.load_stream(new_url, resolution=res, fps=fps)
-            elif source_type == 'camera':
-                self.load_camera(video_config.get('camera_id', 0), resolution=res, fps=fps)
+            is_new_source = False
+            if source_type == 'stream' and str(new_url) != str(self.current_source_param):
+                is_new_source = True
+            elif source_type == 'camera' and str(cam_id) != str(self.current_source_param):
+                is_new_source = True
+            elif source_type != self.current_source_type:
+                is_new_source = True
                 
-            self.start_processing()
+            if is_new_source:
+                self.logger.info(f"Reiniciando captura para nova fonte: {new_url if source_type == 'stream' else source_type} ({res}, {fps} FPS)")
+                self.stop_processing()
+                self.reset_state()
+                
+                if source_type == 'stream':
+                    self.load_stream(new_url, resolution=res, fps=fps)
+                elif source_type == 'camera':
+                    self.load_camera(cam_id, resolution=res, fps=fps)
+                    
+                self.start_processing()
+            else:
+                self.logger.debug("Fonte de vídeo inalterada. Pulando reconexão de streaming.")
 
-    def _extract_safe_roi(self, frame, results_align, track_id, padding=0.15):
-        """Extração de ROI baseada na SEMÂNTICA DA MÁSCARA, ou BBOX se não houver máscara.
-        Usa os pontos da máscara de segmentação para pegar toda a lata com precisão.
+    def _extract_safe_roi(self, frame, results_align, track_id, padding=0.05):
+        """Extrai ROI quadrado perfeitamente centrado baseado ESTRITAMENTE na Bounding Box.
+        Garante sincronia total com o que o usuário vê na tela (caixa verde real) e resolve 
+        distorções causadas por máscaras de segmentação com anomalias de escala.
         """
         h_img, w_img = frame.shape[:2]
+        ROI_SIZE = 640
         
         try:
-            # Encontra índice correspondente ao track_id
             if results_align.boxes is None or results_align.boxes.id is None:
                 return None
             
@@ -218,78 +233,71 @@ class YOLOModel:
             
             if target_idx is None:
                 return None
+            box_xyxy = results_align.boxes.xyxy[target_idx].cpu().numpy()
+            x_min, y_min, x_max, y_max = box_xyxy
             
-            # Tenta extrair pontos da máscara (Segmentação)
-            x_min, y_min, x_max, y_max = 0, 0, 0, 0
-            has_mask = False
+            width = x_max - x_min
+            height = y_max - y_min
+            roi_fixed_size = getattr(self, "roi_fixed_size", 0)
+            if isinstance(roi_fixed_size, (int, float)) and roi_fixed_size > 50:
+                side = int(roi_fixed_size)
+            else:
+                side = int(max(width, height) + 10) # Fallback de quadrado perfeito dinâmico
             
-            # ATENÇÃO: Se as boxes foram filtradas anteriormente, os índices podem estar desalinhados 
-            # se não usarmos o Results[.index] corretamente.
-            if hasattr(results_align, 'masks') and results_align.masks is not None:
-                # Verificamos se o comprimento das máscaras bate com as boxes para evitar Crashes
-                if len(results_align.masks) > target_idx:
-                    mask_xy = results_align.masks.xy[target_idx]
-                    if len(mask_xy) > 0:
-                        pts = np.array(mask_xy, dtype=np.float32)
-                        x_min = np.min(pts[:, 0])
-                        y_min = np.min(pts[:, 1])
-                        x_max = np.max(pts[:, 0])
-                        y_max = np.max(pts[:, 1])
-                        has_mask = True
+            center_x = (x_min + x_max) / 2
+            center_y = (y_min + y_max) / 2
             
-            if not has_mask:
-                # Fallback para Bounding Box se não houver Segmentação
-                box_xyxy = results_align.boxes.xyxy[target_idx].cpu().numpy()
-                x_min, y_min, x_max, y_max = box_xyxy[0], box_xyxy[1], box_xyxy[2], box_xyxy[3]
-            mask_width = x_max - x_min
-            mask_height = y_max - y_min
+            # Aplica os offsets controlados pelo usuário no painel caso o domo da câmera esteja de lado
+            offset_x = getattr(self, "roi_offset_x", 0)
+            offset_y = getattr(self, "roi_offset_y", 0)
             
-            pad_x = int(mask_width * padding)
-            pad_y = int(mask_height * padding)
-            rx1 = max(0, int(x_min - pad_x))
-            ry1 = max(0, int(y_min - pad_y))
-            rx2 = min(w_img, int(x_max + pad_x))
-            ry2 = min(h_img, int(y_max + pad_y))
-            roi_width = rx2 - rx1
-            roi_height = ry2 - ry1
+            center_x += offset_x
+            center_y += offset_y
             
-            if roi_width < 256 or roi_height < 256:
-                center_x = (rx1 + rx2) // 2
-                center_y = (ry1 + ry2) // 2
-                size = max(256, roi_width, roi_height)
-                
-                rx1 = max(0, center_x - size // 2)
-                rx2 = min(w_img, rx1 + size)
-                ry1 = max(0, center_y - size // 2)
-                ry2 = min(h_img, ry1 + size)
+            rx1 = int(center_x - side / 2)
+            ry1 = int(center_y - side / 2)
+            rx2 = rx1 + side
+            ry2 = ry1 + side
+
+            # --- DESLOCAMENTO DE BORDA SEGURO ---
+            if rx1 < 0: rx1 = 0; rx2 = side
+            if ry1 < 0: ry1 = 0; ry2 = side
+            if rx2 > w_img: rx2 = w_img; rx1 = max(0, w_img - side)
+            if ry2 > h_img: ry2 = h_img; ry1 = max(0, h_img - side)
+
             if rx1 >= rx2 or ry1 >= ry2:
+                self.logger.warning(f"ROI coordinates invalid: idx={target_idx}, frame={w_img}x{h_img}, box={box_xyxy}, side={side}, coords=({rx1},{ry1},{rx2},{ry2})")
                 return None
-            
+
             roi = frame[ry1:ry2, rx1:rx2].copy()
-            return roi if roi.size > 0 else None
-            
+            if roi.size == 0:
+                self.logger.warning(f"ROI is empty: coords=({rx1},{ry1},{rx2},{ry2})")
+                return None
+            roi_resized = cv2.resize(roi, (ROI_SIZE, ROI_SIZE), interpolation=cv2.INTER_LINEAR)
+            return roi_resized
+
         except Exception as e:
-            self.logger.debug(f"Erro ao extrair ROI: {e}")
+            self.logger.error(f"Erro CRÍTICO ao extrair ROI seguro: {e}")
             return None
 
+
     def _has_valid_fracture(self, results_fracture):
-        """Verifica se existem segmentações válidas de fratura nos resultados."""
         if not results_fracture or len(results_fracture) == 0:
             return False
         r_fr = results_fracture[0]
-        
-        # Log para debug se necessário
-        # self.logger.debug(f"DEBUG Fracture: has_masks={hasattr(r_fr, 'masks') and r_fr.masks is not None}, boxes={len(r_fr.boxes) if r_fr.boxes is not None else 0}")
-        
-        # Prioriza SEGMENTAÇÃO (masks)
+
+        # Prioridade: máscaras de segmentação
         if hasattr(r_fr, 'masks') and r_fr.masks is not None and len(r_fr.masks) > 0:
             return True
-            
-        # Fallback para DETECÇÃO (boxes) se as máscaras não vierem por algum motivo de export
+
+        # Fallback: detecção com threshold correto
         if r_fr.boxes is not None and len(r_fr.boxes) > 0:
+            fracture_threshold = self.thresholds.get('fracture', self.conf)  # ← threshold específico
             for c_idx, f_conf in zip(r_fr.boxes.cls.int().tolist(), r_fr.boxes.conf.tolist()):
-                f_name = self.class_name_map.get(self.names_fracture[c_idx], "fracture")
-                if f_conf >= self.thresholds.get(f_name, self.conf):
+                raw_name = self.names_fracture[c_idx]
+                name = self.class_name_map.get(raw_name, 'fracture')
+                threshold = self.thresholds.get(name, fracture_threshold)
+                if f_conf >= threshold:
                     return True
         return False
 
@@ -336,8 +344,8 @@ class YOLOModel:
         
         self.logger.info(f"Abrindo stream FFmpeg Pipe: {url}")
         
-        # FFmpeg Pipe Comando (Windows) - Extraindo frame bruto a 1080p ou 4k
-        w, h = 1920, 1080
+        # FFmpeg Pipe - Stream 4K para VisionAlign (ROI é redimensionado p/ 640x640 para o modelo de fratura)
+        w, h = 4096, 2160
         if resolution and 'x' in resolution:
             w, h = map(int, resolution.split('x'))
 
@@ -358,10 +366,10 @@ class YOLOModel:
             '-f', 'rawvideo',
             '-pix_fmt', 'bgr24',
             '-s', f'{w}x{h}',
-            '-an', # Sem áudio
-            '-sn', # Sem subtítulo
+            '-an',
+            '-sn',
             '-v', 'error',
-            '-' # Output para pipe (stdout)
+            '-'
         ]
         
         try:
@@ -467,9 +475,16 @@ class YOLOModel:
                 if not ret or frame is None:
                     continue
 
-            # MEMORY: Se você precisar de MUITA memória, pode remover o .copy() abaixo, 
-            # mas aí as imagens salvas para treino terão caixas desenhadas.
-            self.last_frame_clean = frame.copy() 
+            # MEMORY OPTIMIZATION: Evita cópia de 25MB (4K). Reduz para 1080p ou copia direto.
+            try:
+                h_c, w_c = frame.shape[:2]
+                if w_c > 1920:
+                    scale_c = 1920 / w_c
+                    self.last_frame_clean = cv2.resize(frame, (1920, int(h_c * scale_c)), interpolation=cv2.INTER_AREA)
+                else:
+                    self.last_frame_clean = frame.copy()
+            except Exception:
+                self.last_frame_clean = frame.copy()
             cycle_start = time.time()
 
             frame_count += 1
@@ -629,6 +644,22 @@ class YOLOModel:
             if roi_processed is None or roi_processed.size == 0:
                 self.logger.debug(f"ROI processado inválido para ID {tid}")
                 return
+
+            # --- FOCO NA ÁREA DE INTERESSE (AOI) ---
+            h_p, w_p = roi_processed.shape[:2]
+            center_roi = (w_p // 2, h_p // 2)
+            
+            # Utiliza o raio calibrado visualmente pelo painel (suporta override avançado, evita hardcodes antigos)
+            aoi_radius_px = getattr(self, 'roi_radius', 244)
+            if aoi_radius_px <= 0 or aoi_radius_px >= w_p:
+                px_per_mm = (max(h_p, w_p) - 10) / 65.75
+                aoi_radius_px = int((51.0 * px_per_mm) / 2) # Fallback
+
+            # Criamos uma máscara preta para o que está fora do círculo calibrado
+            aoi_mask = np.zeros((h_p, w_p), dtype=np.uint8)
+            cv2.circle(aoi_mask, center_roi, aoi_radius_px, 255, -1)
+            roi_processed = cv2.bitwise_and(roi_processed, roi_processed, mask=aoi_mask)
+
             import gc
             gc.collect()
             results_fracture = self.model_fracture.predict(
@@ -636,8 +667,12 @@ class YOLOModel:
             )
             is_fracture_now = self._has_valid_fracture(results_fracture)
             
-            # Desenha máscaras no ROI para visualização ao vivo (sempre)
+            # Desenha guia da AOI de 51mm no ROI para o Dashboard (azul claro)
             roi_with_mask = roi_raw.copy()
+            cv2.circle(roi_with_mask, center_roi, aoi_radius_px, (255, 255, 0), 1, lineType=cv2.LINE_AA)
+            cv2.putText(roi_with_mask, "AOI 51mm", (center_roi[0] - aoi_radius_px, center_roi[1] - aoi_radius_px - 5),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 0), 1)
+            
             fracture_info = {
                 'detected': False,
                 'mask_count': 0,
@@ -649,25 +684,33 @@ class YOLOModel:
                 r_fr = results_fracture[0]
                 if hasattr(r_fr, 'masks') and r_fr.masks is not None and len(r_fr.masks) > 0:
                     try:
+                        # Lógica requisitada pelo usuário: Seleciona APENAS a maior máscara de fratura (max 1 identificador)
+                        largest_area = -1
+                        best_pts = None
+                        
                         for mask_idx, mask_xy in enumerate(r_fr.masks.xy):
-                            if len(mask_xy) > 0:
-                                pts = np.array(mask_xy, dtype=np.int32)
-                                # Desenha sobreposição semi-transparente vermelha
-                                overlay = roi_with_mask.copy()
-                                cv2.fillPoly(overlay, [pts], (0, 0, 255))  # Vermelho para fratura
-                                cv2.addWeighted(overlay, 0.3, roi_with_mask, 0.7, 0, roi_with_mask)
-                                # Contorno vermelho com espessura
-                                cv2.polylines(roi_with_mask, [pts], isClosed=True, color=(0, 0, 255), thickness=2)
-                                # Calcula área do mask
+                            if len(mask_xy) > 2:
+                                pts = np.array(mask_xy, dtype=np.int32).reshape((-1, 1, 2))
                                 area = cv2.contourArea(pts.astype(np.float32))
-                                fracture_info['mask_count'] += 1
-                                fracture_info['total_area_px'] += area
+                                if area > largest_area:
+                                    largest_area = area
+                                    best_pts = pts
+                                    
+                        if best_pts is not None:
+                            # --- ESTILO LIMPO E PRECISO (Exato contorno da segmentação vs bloco quadrado horrendo) ---
+                            cv2.drawContours(roi_with_mask, [best_pts], -1, (0, 0, 255), 2, lineType=cv2.LINE_AA)
+                            
+                            # Suave Fill Interno Translúcido no poli do contorno original (só 25%)
+                            overlay = roi_with_mask.copy()
+                            cv2.fillPoly(overlay, [best_pts], (0, 0, 255))
+                            cv2.addWeighted(overlay, 0.25, roi_with_mask, 0.75, 0, roi_with_mask)
+                            
+                            fracture_info['mask_count'] = 1
+                            fracture_info['total_area_px'] = largest_area
                     except Exception as mask_err:
-                        self.logger.debug(f"Erro ao desenhar mask: {mask_err}")
+                        self.logger.debug(f"Erro ao desenhar mask para visualização: {mask_err}")
             
             fracture_info['detected'] = is_fracture_now
-            
-            # Armazena ROI com máscara para transmissão ao vivo
             with self.last_roi_lock:
                 self.last_roi_with_mask = roi_with_mask.copy()
                 self.last_roi_fracture_info = fracture_info.copy()
@@ -676,26 +719,23 @@ class YOLOModel:
                     return
                 status = self.track_fracture_status[tid]
                 status['attempts'] += 1
-                
-                # Sistema de Ganho e Perda de Confiança (Votação Dinâmica)
                 if is_fracture_now:
                     status['score'] = min(self.vote_policy['max_score'], status['score'] + self.vote_policy['gain'])
                 else:
                     status['score'] = max(0, status['score'] - self.vote_policy['loss'])
-                
-                # Decisão baseada no score acumulado (Threshold 10)
                 if status['score'] >= self.vote_policy['threshold'] and not status['confirmed']:
                     status['confirmed'] = True
                     status['alert_sent'] = True
                     self.logger.warning(f"SISTEMA DE VOTAÇÃO: Fratura CONFIRMADA ID {tid} (Score: {status['score']})")
                     if 'fracture' in self.detection_stats:
                         self.detection_stats['fracture'] += 1
-                    frame_small = frame.copy()
-                    h_f, w_f = frame_small.shape[:2]
+                    h_f, w_f = frame.shape[:2]
                     if w_f > 1920:
                         scale = 1920 / w_f
                         new_w, new_h = int(w_f * scale), int(h_f * scale)
-                        frame_small = cv2.resize(frame_small, (new_w, new_h), interpolation=cv2.INTER_AREA)
+                        frame_small = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_AREA)
+                    else:
+                        frame_small = frame.copy()
                     
                     self.io_executor.submit(
                         self._save_inspection_result, 
@@ -820,57 +860,43 @@ class YOLOModel:
             timestamp = time.strftime("%Y%m%d_%H%M%S")
             alerts_dir = r"E:\programs\visionAlign\data\alerts"
             os.makedirs(alerts_dir, exist_ok=True)
+            # ROI para inspeção HUMANA (Email/Dashboard) deve conter as marcações (inspeção)
             roi_marked = roi.copy()
             h_roi, w_roi = roi_marked.shape[:2]
             fracture_count = 0
+            label_type = "Inspecionada"
+            
             if results_fracture and len(results_fracture) > 0:
                 r_fr = results_fracture[0]
                 if hasattr(r_fr, 'masks') and r_fr.masks is not None and len(r_fr.masks) > 0:
                     try:
                         for mask_idx, mask_xy in enumerate(r_fr.masks.xy):
-                            if len(mask_xy) > 0:
-                                pts = np.array(mask_xy, dtype=np.int32)
+                            if len(mask_xy) > 2:
+                                pts = np.array(mask_xy, dtype=np.int32).reshape((-1, 1, 2))
+                                # --- ESTILO INSTANCE SEGMENTATION (alerta salvo) ---
+                                # 1. Fill semi-transparente
                                 overlay = roi_marked.copy()
-                                cv2.fillPoly(overlay, [pts], (0, 0, 255))  # Vermelho para fratura
-                                cv2.addWeighted(overlay, 0.4, roi_marked, 0.6, 0, roi_marked)
-                                cv2.polylines(roi_marked, [pts], isClosed=True, color=(0, 0, 255), thickness=3)
+                                cv2.fillPoly(overlay, [pts], (60, 20, 220))
+                                cv2.addWeighted(overlay, 0.45, roi_marked, 0.55, 0, roi_marked)
+                                # Sem linhas externas de contorno ("apenas o interior")
                                 fracture_count += 1
-                        
                         label_type = "SEGMENTADA"
                     except Exception as mask_err:
-                        self.logger.warning(f"Erro ao desenhar mask: {mask_err}")
+                        self.logger.warning(f"Erro ao marcar mask no ROI de alerta: {mask_err}")
                 
-                # Se não desenhou nenhuma máscara (seja por falta delas ou erro), tenta desenhar boxes como FALLBACK
-                if fracture_count == 0 and r_fr.boxes is not None and len(r_fr.boxes) > 0:
-                    boxes_xyxy = r_fr.boxes.xyxy.int().cpu().numpy()
-                    boxes_conf = r_fr.boxes.conf.cpu().numpy()
-                    
-                    # Filtra boxes: Máximo de 2 e ignora boxes gigantes que ocupam mais de 70% do ROI (provável falha)
-                    sorted_indices = np.argsort(boxes_conf)[::-1]
-                    for idx in sorted_indices:
-                        if fracture_count >= 2: break # Limita para não poluir
-                        
-                        box_fr = boxes_xyxy[idx]
-                        x1_fr, y1_fr, x2_fr, y2_fr = box_fr
-                        
-                        # Proteção contra boxes que cobrem a lata toda por engano
-                        box_area = (x2_fr - x1_fr) * (y2_fr - y1_fr)
-                        roi_area = h_roi * w_roi
-                        if box_area > (roi_area * 0.7):
-                            continue
-                            
-                        cv2.rectangle(roi_marked, (int(x1_fr), int(y1_fr)), (int(x2_fr), int(y2_fr)), (0, 0, 255), 3)
-                        fracture_count += 1
-                    
-                    label_type = "DETECTADA (Box)"
-            
-            # Label visual no ROI
-            if fracture_count > 0:
-                cv2.putText(roi_marked, f"FRATURA {label_type}! ({fracture_count}x)", (10, 30),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+                # Sem fallback de box: se não há máscara, não desenha retângulo
+                if fracture_count == 0:
+                    self.logger.debug("Nenhuma máscara de fratura disponível para visualização.")
+
+            # Legenda discreta no canto inferior (sem texto sobre a imagem principal)
+            h_roi_m, w_roi_m = roi_marked.shape[:2]
+            cv2.putText(roi_marked, "FRATURA DETECTADA", (8, h_roi_m - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.45, (80, 40, 255), 1, cv2.LINE_AA)
+
             roi_filename = f"ROI_insp_FR_{tid}_{timestamp}.jpg"
             roi_path = os.path.join(alerts_dir, roi_filename)
-            cv2.imwrite(roi_path, roi_marked)
+            cv2.imwrite(roi_path, roi_marked) 
+            
             marked_frame = full_frame.copy()
             x1, y1, x2, y2 = box
             center = (int((x1 + x2) / 2), int((y1 + y2) / 2))
@@ -890,7 +916,7 @@ class YOLOModel:
                         timestamp=alert_timestamp,
                         alert_type="fracture",
                         lata_id=str(tid),
-                        details=f"Fratura detectada - ROI: {roi_filename} (com marcações)"
+                        details=f"Fratura detectada - ROI: {roi_filename}"
                     )
                     
                     # 2. Enviar e-mail isolado (offloading para email_executor)
