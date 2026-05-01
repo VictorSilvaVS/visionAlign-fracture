@@ -1,31 +1,47 @@
-from ultralytics import YOLO
 import os
-import shutil
+import sys
 
-def export_model(pt_path, target_dir, task):
-    if not os.path.exists(pt_path):
-        print(f"Error: {pt_path} not found.")
+# Adiciona o root ao path
+project_root = os.path.dirname(os.path.abspath(__file__))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from training.otx_manager import OTXManager
+from interface.configuracoes.settings import Settings
+
+def main():
+    print("--- OpenVINO Model Repair/Export Tool (OTX-based) ---")
+    settings_manager = Settings()
+    otx = OTXManager(settings_manager)
+    
+    # Exemplo de uso: Exportar um modelo treinado para OpenVINO
+    # OTX pode exportar modelos treinados por ele mesmo (.pth) para OpenVINO (.xml/.bin)
+    
+    model_dir = os.path.join(project_root, "model", "backup")
+    if not os.path.exists(model_dir):
+        print(f"Diretório de backup não encontrado: {model_dir}")
         return
-    
-    print(f"Exporting {pt_path} ({task})...")
-    model = YOLO(pt_path, task=task)
-    ov_path = model.export(format='openvino', imgsz=640, half=True)
-    
-    if os.path.exists(ov_path):
-        if os.path.exists(target_dir):
-            shutil.rmtree(target_dir)
-        shutil.copytree(ov_path, target_dir)
-        print(f"Successfully exported to {target_dir}")
-    else:
-        print(f"Fail to export {pt_path}")
 
-# Fracture Model (segment)
-export_model(r"e:\programs\visionAlign\model\backup\best.pt", 
-             r"e:\programs\visionAlign\model\_openvino_model\VisionFracture_openvino_model", 
-             'segment')
+    # Procura por modelos .pth (OTX) ou outros formatos suportados
+    models = [f for f in os.listdir(model_dir) if f.endswith('.pth')]
+    
+    if not models:
+        print("Nenhum modelo .pth encontrado em model/backup para exportar via OTX.")
+        print("Se você ainda tem arquivos .pt (Ultralytics), você deve convertê-los ANTES de remover o Ultralytics,")
+        print("ou usar o Model Optimizer (MO) do OpenVINO diretamente.")
+        return
 
-# Align Model (segment - yes, it has masks)
-# Wait, I need a PT for align. I saw yolo26n.pt in backup.
-export_model(r"e:\programs\visionAlign\model\backup\yolo26n.pt", 
-             r"e:\programs\visionAlign\model\_openvino_model\VisionAlign_openvino_model", 
-             'segment')
+    for m in models:
+        pt_path = os.path.join(model_dir, m)
+        target_name = m.replace('.pth', '_openvino_model')
+        target_dir = os.path.join(project_root, "model", "_openvino_model", target_name)
+        
+        print(f"Exportando {m} para OpenVINO...")
+        success = otx.export(pt_path, output_dir=target_dir)
+        if success:
+            print(f"Sucesso! Modelo exportado em: {target_dir}")
+        else:
+            print(f"Falha ao exportar {m}")
+
+if __name__ == "__main__":
+    main()

@@ -25,13 +25,26 @@ os.environ['OV_CPU_BACKEND'] = 'ONEDNN'
 class YOLOModel:
     def __init__(self, model_path, settings, shared_frame_container=None, shared_frame_lock=None):
         self.logger = logging.getLogger("VisionAlign.Model")
+        self.settings = settings
+        model_params = settings.get('MODEL_PARAMS', {})
         
         try:
-            path_align = r"E:\programs\visionAlign\model\_openvino_model\VisionAlign_openvino_model"
-            path_fracture = r"E:\programs\visionAlign\model\_openvino_model\VisionFracture_openvino_model"
+            # Pegamos os paths do settings
+            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             
-            # FORÇA task=segment APENAS para o modelo de Fratura (se ele for realmente segmentação)
-            # Para o Align, deixamos ele detectar automaticamente (é detecção na maioria das vezes)
+            def resolve_path(p):
+                if not p: return None
+                if os.path.isabs(p): return p
+                return os.path.join(project_root, p)
+
+            path_align = resolve_path(model_params.get('align_model_path'))
+            path_fracture = resolve_path(model_params.get('fracture_model_path'))
+            
+            if not path_align or not os.path.exists(path_align):
+                self.logger.warning(f"Path do modelo Align não encontrado ou inválido: {path_align}")
+            if not path_fracture or not os.path.exists(path_fracture):
+                self.logger.warning(f"Path do modelo Fracture não encontrado ou inválido: {path_fracture}")
+
             self.model_align = OVModel(path_align)
             self.model_fracture = OVModel(path_fracture, task='segment')
             
@@ -39,7 +52,6 @@ class YOLOModel:
         except Exception as e:
             self.logger.error(f"Erro crítico no carregamento: {e}")
             raise
-        self.settings = settings
         ai_params = settings.get('AI_PARAMS', {})
         self.conf = float(ai_params.get('conf_default', 0.25))
         self.iou = float(ai_params.get('iou_default', 0.45))
@@ -101,7 +113,15 @@ class YOLOModel:
         self.frame_skip = settings.get('AI_PARAMS', {}).get('advanced', {}).get('frame_skip', 0)
         drawing_params = settings.get('AI_PARAMS', {}).get('advanced', {}).get('drawing', {})
         self.drawer.set_params(drawing_params)
-        self.dataset_path = r"E:\programs\visionAlign\data\dataset_collect\images"
+        
+        # Dataset path do settings
+        raw_dataset_path = model_params.get('dataset_path', 'data/dataset_collect/images')
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        if os.path.isabs(raw_dataset_path):
+            self.dataset_path = raw_dataset_path
+        else:
+            self.dataset_path = os.path.join(project_root, raw_dataset_path)
+
         if not os.path.exists(self.dataset_path):
             os.makedirs(self.dataset_path, exist_ok=True)
             
@@ -128,9 +148,17 @@ class YOLOModel:
         self.logger.info(f"IOU ajustado para: {self.iou}")
     def reload_models(self):
         try:
-            self.logger.info("Recarregando modelos YOLO...")
-            path_align   = r"E:\programs\visionAlign\model\_openvino_model\VisionAlign_openvino_model"
-            path_fracture = r"E:\programs\visionAlign\model\_openvino_model\VisionFracture_openvino_model"
+            self.logger.info("Recarregando modelos YOLO via OpenVINO...")
+            model_params = self.settings.get('MODEL_PARAMS', {})
+            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            
+            def resolve_path(p):
+                if not p: return None
+                if os.path.isabs(p): return p
+                return os.path.join(project_root, p)
+
+            path_align = resolve_path(model_params.get('align_model_path'))
+            path_fracture = resolve_path(model_params.get('fracture_model_path'))
 
             self.model_align    = OVModel(path_align)
             self.model_fracture = OVModel(path_fracture, task='segment')

@@ -6,35 +6,35 @@
 <section id="settings-section">
     <div class="bg-white rounded-lg shadow overflow-hidden">
         <div class="p-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Configurações do Sistema</h3>
+            <h3 class="text-lg font-medium text-gray-900" data-i18n="system_settings">Configurações do Sistema</h3>
         </div>
 
         <!-- NAVEGAÇÃO POR ABAS -->
         <div class="flex border-b border-gray-200 bg-gray-50">
             <button class="settings-tab active px-6 py-3 font-medium text-gray-900 border-b-2 border-blue-600 cursor-pointer" data-tab="ia">
-                <i class="fas fa-brain mr-2"></i> IA & Detecção
+                <i class="fas fa-brain mr-2"></i> <span data-i18n="ia_detection">IA & Detecção</span>
             </button>
             <button class="settings-tab px-6 py-3 font-medium text-gray-700 hover:text-gray-900 cursor-pointer" data-tab="visual">
-                <i class="fas fa-palette mr-2"></i> Cores & Estilos
+                <i class="fas fa-palette mr-2"></i> <span data-i18n="visual_styles">Cores & Estilos</span>
             </button>
             <button class="settings-tab px-6 py-3 font-medium text-gray-700 hover:text-gray-900 cursor-pointer" data-tab="video">
-                <i class="fas fa-video mr-2"></i> Vídeo & Câmera
+                <i class="fas fa-video mr-2"></i> <span data-i18n="video_camera">Vídeo & Câmera</span>
             </button>
             <button class="settings-tab px-6 py-3 font-medium text-gray-700 hover:text-gray-900 cursor-pointer" data-tab="training">
-                <i class="fas fa-database mr-2"></i> Dataset & Treino
+                <i class="fas fa-database mr-2"></i> <span data-i18n="dataset_training">Dataset & Treino</span>
             </button>
             <button class="settings-tab px-6 py-3 font-medium text-gray-700 hover:text-gray-900 cursor-pointer" data-tab="advanced">
-                <i class="fas fa-cog mr-2"></i> Avançado
+                <i class="fas fa-cog mr-2"></i> <span data-i18n="advanced">Avançado</span>
             </button>
         </div>
 
         <div class="p-6">
             <!-- TAB 1: IA & DETECÇÃO -->
             <div id="tab-ia" class="settings-tab-content space-y-6">
-                <h4 class="text-md font-medium text-gray-900 mb-4">Configurações de Classificação (IA)</h4>
+                <h4 class="text-md font-medium text-gray-900 mb-4" data-i18n="classification_settings">Configurações de Classificação (IA)</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="setting-threshold-normal" class="block text-sm font-medium text-gray-700 mb-1">Limiar para Normal</label>
+                        <label for="setting-threshold-normal" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="normal_threshold">Limiar para Normal</label>
                         <input type="range" id="setting-threshold-normal" min="0.1" max="1.0" step="0.01" value="0.90" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider">
                         <div class="flex justify-between text-xs text-gray-500 mt-1">
                             <span>10%</span>
@@ -43,7 +43,7 @@
                         </div>
                     </div>
                     <div>
-                        <label for="setting-threshold-fallen" class="block text-sm font-medium text-gray-700 mb-1">Limiar para Tombada</label>
+                        <label for="setting-threshold-fallen" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="fallen_threshold">Limiar para Tombada</label>
                         <input type="range" id="setting-threshold-fallen" min="0.1" max="1.0" step="0.01" value="0.85" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider">
                         <div class="flex justify-between text-xs text-gray-500 mt-1">
                             <span>10%</span>
@@ -52,7 +52,7 @@
                         </div>
                     </div>
                     <div>
-                        <label for="setting-threshold-inverted" class="block text-sm font-medium text-gray-700 mb-1">Limiar para Invertida</label>
+                        <label for="setting-threshold-inverted" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="inverted_threshold">Limiar para Invertida</label>
                         <input type="range" id="setting-threshold-inverted" min="0.1" max="1.0" step="0.01" value="0.95" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider">
                         <div class="flex justify-between text-xs text-gray-500 mt-1">
                             <span>10%</span>
@@ -61,7 +61,7 @@
                         </div>
                     </div>
                     <div>
-                        <label for="setting-threshold-fracture" class="block text-sm font-medium text-gray-700 mb-1">Limiar para Fratura</label>
+                        <label for="setting-threshold-fracture" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="fracture_threshold">Limiar para Fratura</label>
                         <input type="range" id="setting-threshold-fracture" min="0.1" max="1.0" step="0.01" value="0.80" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider">
                         <div class="flex justify-between text-xs text-gray-500 mt-1">
                             <span>10%</span>
@@ -70,7 +70,7 @@
                         </div>
                     </div>
                     <div>
-                        <label for="setting-iou" class="block text-sm font-medium text-gray-700 mb-1">IOU (Overlap)</label>
+                        <label for="setting-iou" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="iou_overlap">IOU (Overlap)</label>
                         <input type="range" id="setting-iou" min="0.1" max="0.9" step="0.01" value="0.5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider">
                         <div class="flex justify-between text-xs text-gray-500 mt-1">
                             <span>10%</span>
@@ -81,10 +81,10 @@
                 </div>
 
                 <div class="pt-6 border-t border-gray-200">
-                    <h4 class="text-sm font-medium text-gray-900 mb-4">Ajustes de Imagem (Filtros IA)</h4>
+                    <h4 class="text-sm font-medium text-gray-900 mb-4" data-i18n="image_adjustments">Ajustes de Imagem (Filtros IA)</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label for="setting-gamma" class="block text-sm font-medium text-gray-700 mb-1">Correção de Gamma (Brilho)</label>
+                            <label for="setting-gamma" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="gamma_correction">Correção de Gamma (Brilho)</label>
                             <input type="range" id="setting-gamma" min="0.5" max="1.5" step="0.05" value="0.8" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider">
                             <div class="flex justify-between text-xs text-gray-500 mt-1">
                                 <span>0.5 (Escuro)</span>
@@ -96,7 +96,7 @@
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="setting-clahe" class="sr-only peer" checked>
                                 <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                <span class="ml-3 text-sm font-medium text-gray-700">Filtro CLAHE (Equalização Adaptativa)</span>
+                                <span class="ml-3 text-sm font-medium text-gray-700" data-i18n="clahe_filter">Filtro CLAHE (Equalização Adaptativa)</span>
                             </label>
                         </div>
                     </div>
@@ -105,11 +105,11 @@
 
             <!-- TAB 2: CORES & ESTILOS -->
             <div id="tab-visual" class="settings-tab-content hidden space-y-6">
-                <h4 class="text-md font-medium text-gray-900 mb-4">Customização Visual</h4>
+                <h4 class="text-md font-medium text-gray-900 mb-4" data-i18n="visual_customization">Customização Visual</h4>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Cor - Lata Normal</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="normal_lata_color">Cor - Lata Normal</label>
                         <div class="flex items-center space-x-3">
                             <input type="color" id="color-lata-normal" value="#00ff00" class="w-12 h-12 rounded border border-gray-300 cursor-pointer">
                             <div class="flex-grow">
@@ -118,7 +118,7 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Cor - Lata Invertida</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="inverted_lata_color">Cor - Lata Invertida</label>
                         <div class="flex items-center space-x-3">
                             <input type="color" id="color-lata-invertida" value="#0000ff" class="w-12 h-12 rounded border border-gray-300 cursor-pointer">
                             <div class="flex-grow">
@@ -127,7 +127,7 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Cor - Lata Tombada</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="fallen_lata_color">Cor - Lata Tombada</label>
                         <div class="flex items-center space-x-3">
                             <input type="color" id="color-lata-tombada" value="#ffa500" class="w-12 h-12 rounded border border-gray-300 cursor-pointer">
                             <div class="flex-grow">
@@ -136,7 +136,7 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Cor - Fratura Alert</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="fracture_alert_color">Cor - Fratura Alert</label>
                         <div class="flex items-center space-x-3">
                             <input type="color" id="color-fracture" value="#ff0000" class="w-12 h-12 rounded border border-gray-300 cursor-pointer">
                             <div class="flex-grow">
@@ -147,10 +147,10 @@
                 </div>
 
                 <div class="pt-6 border-t border-gray-200">
-                    <h4 class="text-sm font-medium text-gray-900 mb-4">Formato das Detecções</h4>
+                    <h4 class="text-sm font-medium text-gray-900 mb-4" data-i18n="detection_format">Formato das Detecções</h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <label for="setting-draw-thickness" class="block text-sm font-medium text-gray-700 mb-1">Espessura da Borda</label>
+                            <label for="setting-draw-thickness" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="border_thickness">Espessura da Borda</label>
                             <input type="range" id="setting-draw-thickness" min="1" max="10" step="1" value="2" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider">
                             <div class="flex justify-between text-xs text-gray-500 mt-1">
                                 <span>1px</span>
@@ -159,7 +159,7 @@
                             </div>
                         </div>
                         <div>
-                            <label for="setting-draw-font-scale" class="block text-sm font-medium text-gray-700 mb-1">Tamanho da Fonte</label>
+                            <label for="setting-draw-font-scale" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="font_size">Tamanho da Fonte</label>
                             <input type="range" id="setting-draw-font-scale" min="0.3" max="1.5" step="0.1" value="0.5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider">
                             <div class="flex justify-between text-xs text-gray-500 mt-1">
                                 <span>Pequeno</span>
@@ -168,7 +168,7 @@
                             </div>
                         </div>
                         <div>
-                            <label for="setting-draw-font-thickness" class="block text-sm font-medium text-gray-700 mb-1">Espessura da Fonte</label>
+                            <label for="setting-draw-font-thickness" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="font_thickness">Espessura da Fonte</label>
                             <input type="range" id="setting-draw-font-thickness" min="1" max="5" step="1" value="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider">
                             <div class="flex justify-between text-xs text-gray-500 mt-1">
                                 <span>Fina</span>
@@ -181,22 +181,22 @@
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="setting-draw-show-label" class="sr-only peer" checked>
                             <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
-                            <span class="ml-3 text-sm font-medium text-gray-700">Mostrar Rótulo</span>
+                            <span class="ml-3 text-sm font-medium text-gray-700" data-i18n="show_label">Mostrar Rótulo</span>
                         </label>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="setting-draw-show-conf" class="sr-only peer">
                             <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
-                            <span class="ml-3 text-sm font-medium text-gray-700">Mostrar Confiança</span>
+                            <span class="ml-3 text-sm font-medium text-gray-700" data-i18n="show_confidence">Mostrar Confiança</span>
                         </label>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="setting-draw-show-bg" class="sr-only peer">
                             <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
-                            <span class="ml-3 text-sm font-medium text-gray-700">Fundo no Texto</span>
+                            <span class="ml-3 text-sm font-medium text-gray-700" data-i18n="text_background">Fundo no Texto</span>
                         </label>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="setting-draw-show-mask" class="sr-only peer">
                             <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
-                            <span class="ml-3 text-sm font-medium text-gray-700">Máscara de Segmentação</span>
+                            <span class="ml-3 text-sm font-medium text-gray-700" data-i18n="segmentation_mask">Máscara de Segmentação</span>
                         </label>
                     </div>
                 </div>
@@ -204,10 +204,10 @@
 
             <!-- TAB 3: VÍDEO & CÂMERA -->
             <div id="tab-video" class="settings-tab-content hidden space-y-6">
-                <h4 class="text-md font-medium text-gray-900 mb-4">Configurações de Fonte de Vídeo</h4>
+                <h4 class="text-md font-medium text-gray-900 mb-4" data-i18n="video_source_settings">Configurações de Fonte de Vídeo</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="setting-source-type" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Fonte</label>
+                        <label for="setting-source-type" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="source_type">Tipo de Fonte</label>
                         <select id="setting-source-type" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
                             <option value="stream">Stream (URL)</option>
                             <option value="camera">Camera (ID)</option>
@@ -215,22 +215,22 @@
                         </select>
                     </div>
                     <div>
-                        <label for="setting-source-param" class="block text-sm font-medium text-gray-700 mb-1">Parâmetro da Fonte</label>
+                        <label for="setting-source-param" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="source_param">Parâmetro da Fonte</label>
                         <input type="text" id="setting-source-param" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Ex: rtsp://... ou 0 ou /path/to/video.mp4">
                     </div>
                     <div>
-                        <label for="setting-camera-resolution" class="block text-sm font-medium text-gray-700 mb-1">Resolução</label>
+                        <label for="setting-camera-resolution" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="resolution">Resolução</label>
                         <select id="setting-camera-resolution" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-                            <option value="">Automático</option>
+                            <option value="" data-i18n="automatic">Automático</option>
                             <option value="640x480">640x480</option>
                             <option value="1280x720">1280x720 (720p)</option>
                             <option value="1920x1080">1920x1080 (1080p)</option>
                         </select>
                     </div>
                     <div>
-                        <label for="setting-camera-fps" class="block text-sm font-medium text-gray-700 mb-1">Taxa de Quadros (FPS)</label>
+                        <label for="setting-camera-fps" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="fps">Taxa de Quadros (FPS)</label>
                         <select id="setting-camera-fps" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-                            <option value="">Automático</option>
+                            <option value="" data-i18n="automatic">Automático</option>
                             <option value="15">15 FPS</option>
                             <option value="30">30 FPS</option>
                             <option value="60">60 FPS</option>
@@ -241,12 +241,12 @@
 
             <!-- TAB 4: DATASET & TREINO -->
             <div id="tab-training" class="settings-tab-content hidden space-y-4">
-                <h4 class="text-md font-medium text-gray-900 mb-4">Coleta de Dados para Treinamento</h4>
+                <h4 class="text-md font-medium text-gray-900 mb-4" data-i18n="data_collection">Coleta de Dados para Treinamento</h4>
                 
                 <!-- ACCORDION 1: Coleta Automática -->
                 <div class="border border-gray-200 rounded-lg overflow-hidden">
                     <button class="accordion-header w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 flex justify-between items-center text-left font-medium text-gray-900" data-accordion="collect-auto">
-                        <span><i class="fas fa-cogs mr-2"></i> Coleta Automática</span>
+                        <span><i class="fas fa-cogs mr-2"></i> <span data-i18n="automatic_collection">Coleta Automática</span></span>
                         <i class="fas fa-chevron-down transition-transform"></i>
                     </button>
                     <div class="accordion-content hidden px-4 py-4 space-y-4 border-t border-gray-200">
@@ -259,11 +259,11 @@
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label for="setting-collect-interval" class="block text-sm font-medium text-gray-700 mb-1">Intervalo (seg)</label>
+                                <label for="setting-collect-interval" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="collection_interval">Intervalo (seg)</label>
                                 <input type="number" id="setting-collect-interval" min="1" max="3600" value="10" class="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 text-sm">
                             </div>
                             <div>
-                                <label for="setting-collect-retention" class="block text-sm font-medium text-gray-700 mb-1">Retenção (dias)</label>
+                                <label for="setting-collect-retention" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="retention_days">Retenção (dias)</label>
                                 <input type="number" id="setting-collect-retention" min="1" max="365" value="30" class="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 text-sm">
                             </div>
                         </div>
@@ -273,7 +273,7 @@
                 <!-- ACCORDION 2: Coleta por Eventos -->
                 <div class="border border-gray-200 rounded-lg overflow-hidden">
                     <button class="accordion-header w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 flex justify-between items-center text-left font-medium text-gray-900" data-accordion="collect-events">
-                        <span><i class="fas fa-exclamation-triangle mr-2"></i> Coleta por Eventos</span>
+                        <span><i class="fas fa-exclamation-triangle mr-2"></i> <span data-i18n="event_collection">Coleta por Eventos</span></span>
                         <i class="fas fa-chevron-down transition-transform"></i>
                     </button>
                     <div class="accordion-content hidden px-4 py-4 space-y-4 border-t border-gray-200">
@@ -288,7 +288,7 @@
                 <!-- ACCORDION 3: Faixa de Confiança (Dúvida) -->
                 <div class="border border-gray-200 rounded-lg overflow-hidden">
                     <button class="accordion-header w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 flex justify-between items-center text-left font-medium text-gray-900" data-accordion="distrust-range">
-                        <span><i class="fas fa-question-circle mr-2"></i> Detecções com Dúvida</span>
+                        <span><i class="fas fa-question-circle mr-2"></i> <span data-i18n="distrust_detections">Detecções com Dúvida</span></span>
                         <i class="fas fa-chevron-down transition-transform"></i>
                     </button>
                     <div class="accordion-content hidden px-4 py-4 space-y-4 border-t border-gray-200">
@@ -309,17 +309,17 @@
 
             <!-- TAB 5: AVANÇADO -->
             <div id="tab-advanced" class="settings-tab-content hidden space-y-6">
-                <h4 class="text-md font-medium text-gray-900 mb-4">Configurações Avançadas</h4>
+                <h4 class="text-md font-medium text-gray-900 mb-4" data-i18n="advanced_settings">Configurações Avançadas</h4>
                 
                 <div id="exclusion-zones-section" class="border border-gray-200 rounded-lg p-4">
                     <div class="flex justify-between items-center mb-4">
-                        <h5 class="text-sm font-medium text-gray-900">Zonas de Exclusão (Áreas Cegas)</h5>
+                        <h5 class="text-sm font-medium text-gray-900" data-i18n="exclusion_zones">Zonas de Exclusão (Áreas Cegas)</h5>
                         <div class="flex space-x-2">
                             <button id="btn-open-draw-modal" type="button" class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">
-                                <i class="fas fa-pencil-alt mr-1"></i> Desenhar
+                                <i class="fas fa-pencil-alt mr-1"></i> <span data-i18n="draw">Desenhar</span>
                             </button>
                             <button id="add-exclusion-zone-btn" type="button" class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm">
-                                <i class="fas fa-plus mr-1"></i> Adicionar Manual
+                                <i class="fas fa-plus mr-1"></i> <span data-i18n="manual_add">Adicionar Manual</span>
                             </button>
                         </div>
                     </div>
@@ -328,10 +328,10 @@
 
                 <div id="roi-settings-section" class="border border-blue-200 rounded-lg p-4 bg-blue-50 mt-4">
                     <div class="flex justify-between items-center mb-2">
-                        <h5 class="text-sm font-medium text-blue-900"><i class="fas fa-crosshairs mr-2"></i>Calibração de ROI (AOI 51mm)</h5>
+                        <h5 class="text-sm font-medium text-blue-900"><i class="fas fa-crosshairs mr-2"></i><span data-i18n="roi_calibration">Calibração de ROI (AOI 51mm)</span></h5>
                         <div class="flex space-x-2">
                             <button id="btn-open-roi-modal" type="button" class="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm shadow-sm transition-colors cursor-pointer">
-                                <i class="fas fa-camera mr-1"></i> Capturar Frame & Marcar
+                                <i class="fas fa-camera mr-1"></i> <span data-i18n="capture_mark">Capturar Frame & Marcar</span>
                             </button>
                         </div>
                     </div>
@@ -361,16 +361,16 @@
                 </div>
 
                 <div class="pt-6 border-t border-gray-200">
-                    <h5 class="text-sm font-medium text-gray-900 mb-4">Ações do Sistema</h5>
+                    <h5 class="text-sm font-medium text-gray-900 mb-4" data-i18n="system_actions">Ações do Sistema</h5>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <button id="setting-action-restart" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm" disabled>
-                            <i class="fas fa-sync mr-1"></i> Reiniciar Serviço
+                            <i class="fas fa-sync mr-1"></i> <span data-i18n="restart_service">Reiniciar Serviço</span>
                         </button>
                         <button id="setting-action-backup" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm" disabled>
-                            <i class="fas fa-download mr-1"></i> Backup
+                            <i class="fas fa-download mr-1"></i> <span data-i18n="backup">Backup</span>
                         </button>
                         <button id="setting-action-restore" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm" disabled>
-                            <i class="fas fa-undo mr-1"></i> Restaurar
+                            <i class="fas fa-undo mr-1"></i> <span data-i18n="restore">Restaurar</span>
                         </button>
                     </div>
                 </div>
@@ -381,10 +381,10 @@
         <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end items-center space-x-3">
             <div id="settings-status-message" class="status-message text-sm mr-auto" style="display: none;"></div>
             <button id="cancel-settings-btn" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                Cancelar
+                <span data-i18n="cancel">Cancelar</span>
             </button>
             <button id="save-settings-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium">
-                Salvar Configurações
+                <span data-i18n="save_settings">Salvar Configurações</span>
             </button>
         </div>
     </div>

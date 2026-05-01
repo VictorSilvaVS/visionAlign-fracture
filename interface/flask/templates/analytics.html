@@ -103,8 +103,7 @@
         </div>
 
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2" data-i18n="analytics.error_rate">Taxa
-                de Erro</p>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2" data-i18n="error_rate">Taxa de Erro</p>
             <p class="text-3xl font-bold text-red-600 dark:text-red-400" id="metric-error">0%</p>
         </div>
     </div>
@@ -113,14 +112,14 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <!-- KPIs -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-200">KPIs</h3>
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-200" data-i18n="kpis">KPIs</h3>
             <div class="space-y-4">
                 <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Detecções (última hora)</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400" data-i18n="detections_hour">Detecções (última hora)</p>
                     <p class="text-2xl font-bold text-blue-600" id="kpiTotalDetections">--</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Taxa de Erro</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400" data-i18n="error_rate">Taxa de Erro</p>
                     <div class="flex items-center gap-2">
                         <p class="text-2xl font-bold text-red-600" id="kpiErrorRate">--%</p>
                         <div class="w-32 h-2 bg-gray-200 rounded-full">
@@ -129,7 +128,7 @@
                     </div>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Tempo Médio (ms)</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400" data-i18n="avg_time">Tempo Médio (ms)</p>
                     <p class="text-2xl font-bold text-green-600" id="kpiAvgTime">--</p>
                 </div>
             </div>
@@ -137,18 +136,18 @@
 
         <!-- Informações do Modelo -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-200">Informações do Modelo</h3>
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-200" data-i18n="model_info">Informações do Modelo</h3>
             <div class="space-y-4">
                 <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Versão</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400" data-i18n="version">Versão</p>
                     <p class="text-lg font-semibold text-gray-900 dark:text-gray-200" id="modelVersion">--</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Último Treinamento</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400" data-i18n="last_trained">Último Treinamento</p>
                     <p class="text-lg font-semibold text-gray-900 dark:text-gray-200" id="lastTrained">--</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">Tamanho Dataset</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400" data-i18n="dataset_size">Tamanho Dataset</p>
                     <p class="text-lg font-semibold text-gray-900 dark:text-gray-200" id="datasetSize">--</p>
                 </div>
             </div>
@@ -160,12 +159,12 @@
         <!-- Gráfico de Classificação -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200">Distribuição de Classificações</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200" data-i18n="analytics.distribution">Distribuição de Classificações</h3>
                 <select id="classificationPeriodSelect" class="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-gray-300">
-                    <option value="hour">Última Hora</option>
-                    <option value="day">Hoje</option>
-                    <option value="week" selected>Última Semana</option>
-                    <option value="month">Último Mês</option>
+                    <option value="hour" data-i18n="analytics.last_hour">Última Hora</option>
+                    <option value="day" data-i18n="analytics.today">Hoje</option>
+                    <option value="week" selected data-i18n="analytics.last_week">Última Semana</option>
+                    <option value="month" data-i18n="analytics.last_month">Último Mês</option>
                 </select>
             </div>
             <div id="classificationChartContainer" class="relative overflow-hidden" style="height: 350px; width: 100%;">
@@ -177,12 +176,12 @@
         <!-- Gráfico de Tendência -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200">Tendência de Rejeições</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200" data-i18n="rejection_trend">Tendência de Rejeições</h3>
                 <select id="trendPeriodSelect" class="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-gray-300">
-                    <option value="hour">Última Hora</option>
-                    <option value="day">Hoje</option>
-                    <option value="week" selected>Última Semana</option>
-                    <option value="month">Último Mês</option>
+                    <option value="hour" data-i18n="analytics.last_hour">Última Hora</option>
+                    <option value="day" data-i18n="analytics.today">Hoje</option>
+                    <option value="week" selected data-i18n="analytics.last_week">Última Semana</option>
+                    <option value="month" data-i18n="analytics.last_month">Último Mês</option>
                 </select>
             </div>
             <div id="trendChartContainer" class="relative overflow-hidden" style="height: 350px; width: 100%;">
@@ -195,9 +194,9 @@
     <!-- Tabela de Histórico -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
         <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200">Histórico de Eventos</h3>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200" data-i18n="event_history">Histórico de Eventos</h3>
             <button id="openFilterModalBtn" class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
-                <i class="fas fa-filter mr-1"></i> Filtrar
+                <i class="fas fa-filter mr-1"></i> <span data-i18n="filter">Filtrar</span>
             </button>
         </div>
 
@@ -205,10 +204,10 @@
             <table class="w-full text-sm">
                 <thead class="bg-gray-50 dark:bg-gray-700">
                     <tr>
-                        <th class="px-4 py-2 text-left font-semibold text-gray-900 dark:text-gray-300">Horário</th>
-                        <th class="px-4 py-2 text-left font-semibold text-gray-900 dark:text-gray-300">Tipo</th>
-                        <th class="px-4 py-2 text-left font-semibold text-gray-900 dark:text-gray-300">Confiança</th>
-                        <th class="px-4 py-2 text-left font-semibold text-gray-900 dark:text-gray-300">Detalhes</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-900 dark:text-gray-300" data-i18n="time">Horário</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-900 dark:text-gray-300" data-i18n="type">Tipo</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-900 dark:text-gray-300" data-i18n="confidence">Confiança</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-900 dark:text-gray-300" data-i18n="details">Detalhes</th>
                     </tr>
                 </thead>
                 <tbody id="eventHistoryTableBody" class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -227,7 +226,7 @@
 
         <!-- Botão de Exportação -->
         <button id="exportAlertsBtn" class="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
-            <i class="fas fa-download mr-2"></i> Exportar
+            <i class="fas fa-download mr-2"></i> <span data-i18n="analytics.export">Exportar</span>
         </button>
     </div>
 
@@ -348,10 +347,10 @@
             if (data.detection_types) {
                 const pieData = {
                     labels: [
-                        'Latas Normais',
-                        'Latas Invertidas',
-                        'Latas Tombadas',
-                        'Fraturas'
+                        window.i18n('normal_cans'),
+                        window.i18n('inverted_cans'),
+                        window.i18n('fallen_cans'),
+                        window.i18n('fractures')
                     ],
                     datasets: [{
                         data: [
@@ -371,9 +370,9 @@
             // Gráfico de Barras: Comparação
             if (data.detection_types) {
                 const barData = {
-                    labels: ['Normal', 'Invertida', 'Tombada', 'Fratura'],
+                    labels: [window.i18n('normal'), window.i18n('inverted'), window.i18n('fallen'), window.i18n('fracture')],
                     datasets: [{
-                        label: 'Contagem',
+                        label: window.i18n('count'),
                         data: [
                             data.detection_types.normal || 0,
                             data.detection_types.inverted || 0,
@@ -391,7 +390,7 @@
                 const lineData = {
                     labels: data.detections_per_hour.labels || [],
                     datasets: [{
-                        label: 'Total Detecções',
+                        label: window.i18n('total_detections'),
                         data: data.detections_per_hour.totals || [],
                         borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',

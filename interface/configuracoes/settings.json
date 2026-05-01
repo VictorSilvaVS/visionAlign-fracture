@@ -1,6 +1,9 @@
 {
     "MODEL_PARAMS": {
         "model_path": "model/visionalign_v11s.pt",
+        "align_model_path": "model/_openvino_model/VisionAlign_openvino_model",
+        "fracture_model_path": "model/_openvino_model/VisionFracture_openvino_model",
+        "dataset_path": "data/dataset_collect/images",
         "model_version": "3.4.1",
         "model_type": "yolo26.openvino",
         "size_dataset": "79",

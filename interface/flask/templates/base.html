@@ -339,7 +339,8 @@
                     <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
                         <i class="fas fa-cogs text-white text-xl"></i>
                     </div>
-                    <h1 class="text-xl font-bold text-gray-800">VisionAlign - Classificador de Latas</h1>
+                    <h1 class="text-xl font-bold text-gray-800" data-i18n="system_title">VisionAlign - Classificador de
+                        Latas</h1>
                 </div>
                 <div class="flex items-center space-x-4">
                     <div class="relative">
@@ -355,7 +356,7 @@
                             <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
                                 <i class="fas fa-user text-gray-600"></i>
                             </div>
-                            <span class="text-sm font-medium">{{ (current_user.first_name ~ " " ~
+                            <span class="text-sm font-medium" data-i18n="operator">{{ (current_user.first_name ~ " " ~
                                 current_user.last_name) | trim | default(current_user.username) | default('Operador')
                                 }}</span>
                             <i class="fas fa-chevron-down text-gray-500 text-xs"></i>
@@ -373,16 +374,17 @@
                                 </p>
                             </div>
 
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-cog w-5 mr-2 text-gray-500"></i>
-                                Configurações da Conta
+                            <a href="#" id="account-settings-trigger"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                <i class="fas fa-user-gear w-5 mr-2 text-blue-500"></i>
+                                <span data-i18n="account_settings">Configurações da Conta</span>
                             </a>
 
                             <div class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex justify-between items-center cursor-pointer"
                                 onclick="document.getElementById('theme-toggle').click()">
                                 <div>
                                     <i class="fas fa-moon w-5 mr-2 text-gray-500"></i>
-                                    Tema Escuro
+                                    <span data-i18n="dark_mode">Tema Escuro</span>
                                 </div>
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" id="theme-toggle" class="sr-only peer">
@@ -395,7 +397,7 @@
                             <a href="{{ url_for('logout') }}"
                                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-t border-gray-100">
                                 <i class="fas fa-sign-out-alt w-5 mr-2 text-gray-500"></i>
-                                Sair
+                                <span data-i18n="logout">Sair</span>
                             </a>
                         </div>
                     </div>
@@ -411,17 +413,22 @@
                     <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                         <!-- Links usam url_for e verificam endpoint ativo -->
                         <a href="{{ url_for('index') }}"
-                            class="tab-button {% if request.endpoint == 'index' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Monitoramento</a>
+                            class="tab-button {% if request.endpoint == 'index' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                            data-i18n="monitoring">Monitoramento</a>
                         <a href="{{ url_for('analytics_page') }}"
-                            class="tab-button {% if request.endpoint == 'analytics_page' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Análises</a>
+                            class="tab-button {% if request.endpoint == 'analytics_page' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                            data-i18n="analytics">Análises</a>
                         <!-- Placeholder -->
                         {% if current_user.role == 'admin' %}
                         <a href="{{ url_for('settings_page') }}"
-                            class="tab-button {% if request.endpoint == 'settings_page' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Configurações</a>
+                            class="tab-button {% if request.endpoint == 'settings_page' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                            data-i18n="settings">Configurações</a>
                         <a href="{{ url_for('users') }}"
-                            class="tab-button {% if request.endpoint == 'users' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">users</a>
+                            class="tab-button {% if request.endpoint == 'users' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                            data-i18n="users">users</a>
                         <a href="{{ url_for('retrain_page') }}"
-                            class="tab-button {% if request.endpoint == 'retrain_page' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Retreinamento</a>
+                            class="tab-button {% if request.endpoint == 'retrain_page' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                            data-i18n="retraining">Retreinamento</a>
                         {% endif %}
                     </nav>
                 </div>
@@ -440,17 +447,18 @@
                         <div class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center">
                             <i class="fas fa-cogs text-white text-xs"></i>
                         </div>
-                        <span class="text-sm text-gray-600">VisionAlign Classificador v3.2.1</span>
+                        <span class="text-sm text-gray-600"><span data-i18n="system_name">VisionAlign
+                                Classificador</span> v3.2.1</span>
                     </div>
                     <div class="mt-4 md:mt-0 text-sm text-gray-500">
                         <!-- Usando a variável 'now' injetada pelo context processor -->
-                        &copy; {{ now().year if now else '2023' }} VisionAlign Technologies. Todos os direitos
-                        reservados.
+                        &copy; {{ now().year if now else '2023' }} VisionAlign Technologies. <span
+                            data-i18n="all_rights">Todos os direitos reservados.</span>
                     </div>
                     <div class="mt-4 md:mt-0 flex space-x-6">
                         <span class="text-sm text-gray-500 flex items-center">
                             <span class="status-indicator status-online"></span>
-                            Status: Online
+                            <span data-i18n="status_online">Status: Online</span>
                         </span>
                     </div>
                 </div>
@@ -471,13 +479,139 @@
             </div>
             <div class="mt-4 flex justify-center space-x-4">
                 <button id="snapshot-btn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"><i
-                        class="fas fa-camera mr-2"></i> Capturar Frame</button>
+                        class="fas fa-camera mr-2"></i> <span data-i18n="capture_frame">Capturar Frame</span></button>
                 <button id="modal-pause-resume-btn"
                     class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600"><i
-                        class="fas fa-pause mr-2"></i> Pausar Stream</button>
+                        class="fas fa-pause mr-2"></i> <span data-i18n="pause_stream">Pausar Stream</span></button>
             </div>
             <div id="status-message-bottom" class="mt-2 text-center text-sm text-white"></div>
             <!-- Status message area -->
+        </div>
+    </div>
+
+    <!-- Account Settings Modal (Nível Industrial) -->
+    <div id="account-settings-modal" class="fixed inset-0 z-[100] hidden overflow-y-auto" aria-labelledby="modal-title"
+        role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" aria-hidden="true"
+                onclick="closeAccountModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+                class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-gray-100">
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-white flex items-center">
+                        <i class="fas fa-user-shield mr-3"></i>
+                        <span data-i18n="account_portal">Portal de Gerenciamento da Conta</span>
+                    </h3>
+                    <button onclick="closeAccountModal()" class="text-white hover:text-gray-200 transition-colors">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
+                </div>
+
+                <div class="bg-white px-8 pt-6 pb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <!-- Sidebar de Navegação do Modal -->
+                        <div class="space-y-2">
+                            <button onclick="switchAccountTab('general')"
+                                class="account-tab-btn w-full text-left px-4 py-2 rounded-lg bg-blue-50 text-blue-700 font-bold flex items-center transition-all"
+                                id="tab-btn-general">
+                                <i class="fas fa-globe mr-3"></i> <span data-i18n="general">Geral</span>
+                            </button>
+                            <button onclick="switchAccountTab('docs')"
+                                class="account-tab-btn w-full text-left px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-50 flex items-center transition-all"
+                                id="tab-btn-docs">
+                                <i class="fas fa-book mr-3"></i> <span data-i18n="docs">Documentação</span>
+                            </button>
+                            <button onclick="switchAccountTab('evolution')"
+                                class="account-tab-btn w-full text-left px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-50 flex items-center transition-all"
+                                id="tab-btn-evolution">
+                                <i class="fas fa-rocket mr-3"></i> <span data-i18n="evolution">Evolução</span>
+                            </button>
+                        </div>
+
+                        <!-- Conteúdo Central -->
+                        <div class="md:col-span-2">
+                            <!-- Tab: Geral -->
+                            <div id="account-tab-general" class="account-tab-content space-y-6">
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-2"
+                                        data-i18n="interface_language">Idioma da Interface</label>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <button onclick="changeLanguage('pt')"
+                                            class="lang-btn flex items-center justify-center px-4 py-3 border-2 border-blue-500 rounded-xl bg-blue-50 text-blue-700 transition-all font-bold"
+                                            id="lang-pt">
+                                            <img src="https://flagcdn.com/w40/br.png" class="w-6 mr-2 rounded-sm">
+                                            Português
+                                        </button>
+                                        <button onclick="changeLanguage('en')"
+                                            class="lang-btn flex items-center justify-center px-4 py-3 border-2 border-transparent hover:border-gray-300 rounded-xl bg-gray-50 text-gray-600 transition-all font-bold"
+                                            id="lang-en">
+                                            <img src="https://flagcdn.com/w40/us.png" class="w-6 mr-2 rounded-sm">
+                                            English
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="p-4 bg-yellow-50 border border-yellow-100 rounded-xl flex items-start">
+                                    <i class="fas fa-info-circle text-yellow-500 mt-1 mr-3"></i>
+                                    <p class="text-xs text-yellow-700 leading-relaxed" data-i18n="lang_info">O idioma
+                                        selecionado será aplicado instantaneamente a todos os menus e notificações do
+                                        sistema.</p>
+                                </div>
+                            </div>
+
+                            <!-- Tab: Documentação -->
+                            <div id="account-tab-docs" class="account-tab-content hidden space-y-4">
+                                <h4 class="font-bold text-gray-800" data-i18n="manuals_title">Manuais de Operação</h4>
+                                <div class="space-y-2">
+                                    <a href="#"
+                                        class="flex items-center p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-file-pdf text-red-500 mr-3"></i>
+                                        <div>
+                                            <p class="text-sm font-bold text-gray-700">Guia de Calibração VisionAlign v3
+                                            </p>
+                                            <p class="text-[10px] text-gray-400">PDF • 4.2 MB</p>
+                                        </div>
+                                    </a>
+                                    <a href="#"
+                                        class="flex items-center p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-file-video text-blue-500 mr-3"></i>
+                                        <div>
+                                            <p class="text-sm font-bold text-gray-700">Tutorial: Retreinamento OTX
+                                                Native</p>
+                                            <p class="text-[10px] text-gray-400">MP4 • 128 MB</p>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Tab: Evolução -->
+                            <div id="account-tab-evolution" class="account-tab-content hidden space-y-4">
+                                <ul class="space-y-3">
+                                    <li
+                                        class="flex items-center text-xs text-gray-600 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                        <span
+                                            class="w-3 h-3 rounded-full bg-green-500 mr-3 shadow-sm shadow-green-200"></span>
+                                        <div class="flex flex-col">
+                                            <span class="font-bold text-gray-800">v3.2 (Current Version)</span>
+                                            <span class="text-gray-500">Migração total para OpenVINO OTX
+                                                (Concluído)</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 px-8 py-4 flex justify-end space-x-3">
+                    <button onclick="closeAccountModal()"
+                        class="px-6 py-2 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all shadow-sm"
+                        data-i18n="close">Fechar</button>
+                    <button onclick="saveAccountSettings()"
+                        class="px-6 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-all shadow-md shadow-blue-200"
+                        data-i18n="save_changes">Salvar Alterações</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -521,6 +655,379 @@
                 localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
             });
         }
+
+        // --- SISTEMA DE TRADUÇÃO (i18n) & MODAL DE CONTA ---
+        const translations = {
+            'pt': {
+                'account_settings': 'Configurações da Conta',
+                'account_portal': 'Portal de Gerenciamento da Conta',
+                'general': 'Geral',
+                'docs': 'Documentação',
+                'evolution': 'Evolução',
+                'interface_language': 'Idioma da Interface',
+                'lang_info': 'O idioma selecionado será aplicado instantaneamente a todos os menus e notificações do sistema.',
+                'manuals_title': 'Manuais de Operação',
+                'close': 'Fechar',
+                'save_changes': 'Salvar Alterações',
+                'monitoring': 'Monitoramento',
+                'analytics': 'Análises',
+                'settings': 'Configurações',
+                'users': 'Usuários',
+                'retraining': 'Retreinamento',
+                'system_title': 'VisionAlign - Classificador de Latas',
+                'operator': 'Operador',
+                'dark_mode': 'Tema Escuro',
+                'logout': 'Sair',
+                'system_name': 'VisionAlign Classificador',
+                'all_rights': 'Todos os direitos reservados.',
+                'status_online': 'Status: Online',
+                'capture_frame': 'Capturar Frame',
+                'pause_stream': 'Pausar Stream',
+                'realtime_panel': 'Painel de Operação Real-time',
+                'system_active': 'Sistema Ativo',
+                'main_camera': 'Câmera Principal',
+                'resolution': 'Resolução',
+                'detecting': 'Detectando...',
+                'fractures': 'Fraturas',
+                'normal': 'Normais',
+                'fallen': 'Tombadas',
+                'inverted': 'Invertidas',
+                'line_performance': 'Desempenho da Linha',
+                'acceptance_rate': 'Taxa de Aceitação',
+                'error_incidence': 'Incidência de Erros',
+                'recent_alerts': 'Alertas Recentes',
+                'see_all': 'Ver todos',
+                'retrain_center': 'Centro de Retreinamento IA',
+                'retrain_desc': 'Gerencie o ciclo de vida e o aprimoramento dos seus modelos YOLO.',
+                'dataset_status': 'Status do Dataset',
+                'images_collected': 'Imagens Coletadas:',
+                'classes_detected': 'Classes Detectadas:',
+                'last_update': 'Última Atualização:',
+                'start_retrain': 'Iniciar Retreinamento',
+                'target_model': 'Modelo Alvo',
+                'epochs': 'Épocas (Epochs)',
+                'epochs_info': 'Mínimo 10, Máximo 300 para estabilidade.',
+                'start_training': 'Iniciar Treinamento',
+                'abort_training': 'Abortar Treinamento',
+                'model_diagnosis': 'Autodiagnóstico de Modelos',
+                'diagnosis_desc': 'Verifique a integridade e prontidão operacional dos modelos carregados.',
+                'waiting': 'AGUARDANDO',
+                'test_models_now': 'Testar Modelos Agora',
+                'test_lab': 'Laboratório de Testes',
+                'test_lab_desc': 'Envie uma foto para testar a acurácia de detecção e segmentação em tempo real.',
+                'express_train': 'Treino Relâmpago',
+                'express_train_desc': 'Ajuste fino rápido usando poucas fotos (10-30). Ideal para corrigir erros específicos de detecção.',
+                'kpis': 'KPIs',
+                'detections_hour': 'Detecções (última hora)',
+                'avg_time': 'Tempo Médio (ms)',
+                'model_info': 'Informações do Modelo',
+                'version': 'Versão',
+                'last_trained': 'Último Treinamento',
+                'dataset_size': 'Tamanho Dataset',
+                'rejection_trend': 'Tendência de Rejeições',
+                'event_history': 'Histórico de Eventos',
+                'filter': 'Filtrar',
+                'time': 'Horário',
+                'type': 'Tipo',
+                'confidence': 'Confiança',
+                'details': 'Detalhes',
+                'normal_cans': 'Latas Normais',
+                'inverted_cans': 'Latas Invertidas',
+                'fallen_cans': 'Latas Tombadas',
+                'count': 'Contagem',
+                'total_detections': 'Total de Detecções',
+                'analytics.period': 'Período',
+                'analytics.last_hour': 'Última Hora',
+                'analytics.today': 'Hoje',
+                'analytics.last_week': 'Última Semana',
+                'analytics.last_month': 'Último Mês',
+                'analytics.year': 'Ano Completo',
+                'analytics.export': 'Exportar',
+                'analytics.refresh': 'Atualizar',
+                'analytics.distribution': 'Distribuição de Classificações',
+                'analytics.comparison': 'Comparação por Tipo',
+                'analytics.trend': 'Tendência ao Longo do Tempo',
+                'analytics.total_detections': 'Total de Detecções',
+                'analytics.avg_confidence': 'Confiança Média',
+                'analytics.error_rate': 'Taxa de Erro',
+                'error_rate': 'Taxa de Erro',
+                'system_settings': 'Configurações do Sistema',
+                'ia_detection': 'IA & Detecção',
+                'visual_styles': 'Cores & Estilos',
+                'video_camera': 'Vídeo & Câmera',
+                'dataset_training': 'Dataset & Treino',
+                'advanced': 'Avançado',
+                'classification_settings': 'Configurações de Classificação (IA)',
+                'normal_threshold': 'Limiar para Normal',
+                'fallen_threshold': 'Limiar para Tombada',
+                'inverted_threshold': 'Limiar para Invertida',
+                'fracture_threshold': 'Limiar para Fratura',
+                'iou_overlap': 'IOU (Overlap)',
+                'image_adjustments': 'Ajustes de Imagem (Filtros IA)',
+                'gamma_correction': 'Correção de Gamma (Brilho)',
+                'clahe_filter': 'Filtro CLAHE (Equalização Adaptativa)',
+                'visual_customization': 'Customização Visual',
+                'normal_lata_color': 'Cor - Lata Normal',
+                'inverted_lata_color': 'Cor - Lata Invertida',
+                'fallen_lata_color': 'Cor - Lata Tombada',
+                'fracture_alert_color': 'Cor - Fratura Alert',
+                'detection_format': 'Formato das Detecções',
+                'border_thickness': 'Espessura da Borda',
+                'font_size': 'Tamanho da Fonte',
+                'font_thickness': 'Espessura da Fonte',
+                'show_label': 'Mostrar Rótulo',
+                'show_confidence': 'Mostrar Confiança',
+                'text_background': 'Fundo no Texto',
+                'segmentation_mask': 'Máscara de Segmentação',
+                'video_source_settings': 'Configurações de Fonte de Vídeo',
+                'source_type': 'Tipo de Fonte',
+                'source_param': 'Parâmetro da Fonte',
+                'automatic': 'Automático',
+                'data_collection': 'Coleta de Dados para Treinamento',
+                'automatic_collection': 'Coleta Automática',
+                'collection_interval': 'Intervalo (seg)',
+                'retention_days': 'Retenção (dias)',
+                'event_collection': 'Coleta por Eventos',
+                'distrust_detections': 'Detecções com Dúvida',
+                'advanced_settings': 'Configurações Avançadas',
+                'exclusion_zones': 'Zonas de Exclusão (Áreas Cegas)',
+                'draw': 'Desenhar',
+                'manual_add': 'Adicionar Manual',
+                'roi_calibration': 'Calibração de ROI (AOI 51mm)',
+                'capture_mark': 'Capturar Frame & Marcar',
+                'system_actions': 'Ações do Sistema',
+                'restart_service': 'Reiniciar Serviço',
+                'backup': 'Backup',
+                'restore': 'Restaurar',
+                'cancel': 'Cancelar',
+                'save_settings': 'Salvar Configurações',
+                'yesterday': 'ontem',
+                'loading': 'Carregando...',
+                'in_operation': 'EM OPERAÇÃO'
+            },
+            'en': {
+                'account_settings': 'Account Settings',
+                'account_portal': 'Account Management Portal',
+                'general': 'General',
+                'docs': 'Documentation',
+                'evolution': 'Evolution',
+                'interface_language': 'Interface Language',
+                'lang_info': 'The selected language will be applied instantly to all system menus and notifications.',
+                'manuals_title': 'Operating Manuals',
+                'close': 'Close',
+                'save_changes': 'Save Changes',
+                'monitoring': 'Monitoring',
+                'analytics': 'Analytics',
+                'settings': 'Settings',
+                'users': 'Users',
+                'retraining': 'Retraining',
+                'system_title': 'VisionAlign - Can Classifier',
+                'operator': 'Operator',
+                'dark_mode': 'Dark Mode',
+                'logout': 'Logout',
+                'system_name': 'VisionAlign Classifier',
+                'all_rights': 'All rights reserved.',
+                'status_online': 'Status: Online',
+                'capture_frame': 'Capture Frame',
+                'pause_stream': 'Pause Stream',
+                'realtime_panel': 'Real-time Operation Panel',
+                'system_active': 'System Active',
+                'main_camera': 'Main Camera',
+                'resolution': 'Resolution',
+                'detecting': 'Detecting...',
+                'fractures': 'Fractures',
+                'normal': 'Normal',
+                'fallen': 'Fallen',
+                'inverted': 'Inverted',
+                'line_performance': 'Line Performance',
+                'acceptance_rate': 'Acceptance Rate',
+                'error_incidence': 'Error Incidence',
+                'recent_alerts': 'Recent Alerts',
+                'see_all': 'See all',
+                'retrain_center': 'AI Retraining Center',
+                'retrain_desc': 'Manage the lifecycle and improvement of your YOLO models.',
+                'dataset_status': 'Dataset Status',
+                'images_collected': 'Images Collected:',
+                'classes_detected': 'Classes Detected:',
+                'last_update': 'Last Update:',
+                'start_retrain': 'Start Retraining',
+                'target_model': 'Target Model',
+                'epochs': 'Epochs',
+                'epochs_info': 'Minimum 10, Maximum 300 for stability.',
+                'start_training': 'Start Training',
+                'abort_training': 'Abort Training',
+                'model_diagnosis': 'Model Autodiagnosis',
+                'diagnosis_desc': 'Check the integrity and operational readiness of loaded models.',
+                'waiting': 'WAITING',
+                'test_models_now': 'Test Models Now',
+                'test_lab': 'Test Laboratory',
+                'test_lab_desc': 'Upload a photo to test detection and segmentation accuracy in real-time.',
+                'drag_drop': 'Drag or click to select',
+                'run_visual_test': 'Run Visual Test',
+                'express_train': 'Express Training',
+                'express_train_desc': 'Quick fine-tuning using few photos (10-30). Ideal for correcting specific detection errors.',
+                'kpis': 'KPIs',
+                'detections_hour': 'Detections (last hour)',
+                'avg_time': 'Avg Time (ms)',
+                'model_info': 'Model Information',
+                'version': 'Version',
+                'last_trained': 'Last Trained',
+                'dataset_size': 'Dataset Size',
+                'rejection_trend': 'Rejection Trend',
+                'event_history': 'Event History',
+                'filter': 'Filter',
+                'time': 'Time',
+                'type': 'Type',
+                'confidence': 'Confidence',
+                'details': 'Details',
+                'normal_cans': 'Normal Cans',
+                'inverted_cans': 'Inverted Cans',
+                'fallen_cans': 'Fallen Cans',
+                'count': 'Count',
+                'total_detections': 'Total Detections',
+                'analytics.period': 'Period',
+                'analytics.last_hour': 'Last Hour',
+                'analytics.today': 'Today',
+                'analytics.last_week': 'Last Week',
+                'analytics.last_month': 'Last Month',
+                'analytics.year': 'Full Year',
+                'analytics.export': 'Export',
+                'analytics.refresh': 'Refresh',
+                'analytics.distribution': 'Classification Distribution',
+                'analytics.comparison': 'Comparison by Type',
+                'analytics.trend': 'Trend Over Time',
+                'analytics.total_detections': 'Total Detections',
+                'analytics.avg_confidence': 'Avg Confidence',
+                'analytics.error_rate': 'Error Rate',
+                'error_rate': 'Error Rate',
+                'system_settings': 'System Settings',
+                'ia_detection': 'AI & Detection',
+                'visual_styles': 'Colors & Styles',
+                'video_camera': 'Video & Camera',
+                'dataset_training': 'Dataset & Training',
+                'advanced': 'Advanced',
+                'classification_settings': 'Classification Settings (AI)',
+                'normal_threshold': 'Normal Threshold',
+                'fallen_threshold': 'Fallen Threshold',
+                'inverted_threshold': 'Inverted Threshold',
+                'fracture_threshold': 'Fracture Threshold',
+                'iou_overlap': 'IOU (Overlap)',
+                'image_adjustments': 'Image Adjustments (AI Filters)',
+                'gamma_correction': 'Gamma Correction (Brightness)',
+                'clahe_filter': 'CLAHE Filter (Adaptive Equalization)',
+                'visual_customization': 'Visual Customization',
+                'normal_lata_color': 'Color - Normal Can',
+                'inverted_lata_color': 'Color - Inverted Can',
+                'fallen_lata_color': 'Color - Fallen Can',
+                'fracture_alert_color': 'Color - Fracture Alert',
+                'detection_format': 'Detection Format',
+                'border_thickness': 'Border Thickness',
+                'font_size': 'Font Size',
+                'font_thickness': 'Font Thickness',
+                'show_label': 'Show Label',
+                'show_confidence': 'Show Confidence',
+                'text_background': 'Text Background',
+                'segmentation_mask': 'Segmentation Mask',
+                'video_source_settings': 'Video Source Settings',
+                'source_type': 'Source Type',
+                'source_param': 'Source Parameter',
+                'automatic': 'Automatic',
+                'data_collection': 'Data Collection for Training',
+                'automatic_collection': 'Automatic Collection',
+                'collection_interval': 'Interval (sec)',
+                'retention_days': 'Retention (days)',
+                'event_collection': 'Event Collection',
+                'distrust_detections': 'Doubtful Detections',
+                'advanced_settings': 'Advanced Settings',
+                'exclusion_zones': 'Exclusion Zones (Blind Areas)',
+                'draw': 'Draw',
+                'manual_add': 'Manual Add',
+                'roi_calibration': 'ROI Calibration (AOI 51mm)',
+                'capture_mark': 'Capture Frame & Mark',
+                'system_actions': 'System Actions',
+                'restart_service': 'Restart Service',
+                'backup': 'Backup',
+                'restore': 'Restore',
+                'cancel': 'Cancel',
+                'save_settings': 'Save Settings',
+                'yesterday': 'yesterday',
+                'loading': 'Loading...',
+                'in_operation': 'IN OPERATION'
+            }
+        };
+
+        window.translations = translations;
+        window.i18n = function (key) {
+            const lang = localStorage.getItem('lang') || 'en';
+            return (translations[lang] && translations[lang][key]) ? translations[lang][key] : key;
+        };
+
+        function changeLanguage(lang) {
+            localStorage.setItem('lang', lang);
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+
+            // Atualiza botões visuais
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700');
+                btn.classList.add('border-transparent', 'bg-gray-50', 'text-gray-600');
+            });
+            const btn = document.getElementById(`lang-${lang}`);
+            if (btn) {
+                btn.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-700');
+                btn.classList.remove('border-transparent', 'bg-gray-50', 'text-gray-600');
+            }
+
+            // Notifica outros scripts
+            document.dispatchEvent(new CustomEvent('translationsApplied', { detail: { lang: lang } }));
+        }
+
+        function openAccountModal() {
+            document.getElementById('account-settings-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            // Carrega idioma atual
+            const currentLang = localStorage.getItem('lang') || 'en';
+            changeLanguage(currentLang);
+        }
+
+        function closeAccountModal() {
+            document.getElementById('account-settings-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function switchAccountTab(tabId) {
+            document.querySelectorAll('.account-tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`account-tab-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.account-tab-btn').forEach(el => {
+                el.classList.remove('bg-blue-50', 'text-blue-700', 'font-bold');
+                el.classList.add('text-gray-600', 'hover:bg-gray-50');
+            });
+            document.getElementById(`tab-btn-${tabId}`).classList.add('bg-blue-50', 'text-blue-700', 'font-bold');
+            document.getElementById(`tab-btn-${tabId}`).classList.remove('text-gray-600', 'hover:bg-gray-50');
+        }
+
+        function saveAccountSettings() {
+            const lang = localStorage.getItem('lang') || 'en';
+            // Aqui enviaria para o backend se necessário
+            alert(lang === 'pt' ? 'Configurações salvas com sucesso!' : 'Settings saved successfully!');
+            closeAccountModal();
+        }
+
+        document.getElementById('account-settings-trigger').addEventListener('click', (e) => {
+            e.preventDefault();
+            openAccountModal();
+        });
+
+        // Inicializa idioma
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('lang') || 'en';
+            changeLanguage(savedLang);
+        });
     </script>
     <!-- Removida linha que carregava analytics.js -->
     {% block scripts %}{% endblock %}

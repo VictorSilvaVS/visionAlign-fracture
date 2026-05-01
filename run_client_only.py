@@ -3,7 +3,7 @@ import os
 import threading
 import time
 import logging
-import torch
+from openvino.runtime import Core  # Para info de hardware
 from threading import RLock  # **OTIMIZAÇÃO: RLock para melhor concorrência no Xeon Gold**
 from collections import defaultdict
 from typing import Dict, Any, Optional
@@ -21,13 +21,10 @@ from utils.server import run_server
 from model.yolo_model import YOLOModel
 from utils.timezone_utils import get_current_utc_timestamp
 
-# --- Constantes ---
-DEFAULT_RTSP_URL = "rtsp://admin:Abc123456@10.81.50.64/Streaming/Channels/102"
-DEFAULT_DB_LOG_INTERVAL = 10
-DEFAULT_MAIN_LOOP_SLEEP = 60
-stats_lock = RLock()  # **OTIMIZAÇÃO: RLock para melhor concorrência no Xeon Gold**
-frame_lock = RLock()  # **OTIMIZAÇÃO: RLock para melhor concorrência no Xeon Gold**
-db_log_lock = RLock()  # **OTIMIZAÇÃO: RLock para melhor concorrência no Xeon Gold**
+# --- Globais ---
+stats_lock = RLock()
+frame_lock = RLock()
+db_log_lock = RLock()
 
 frame_container = [None]
 system_start_time = get_current_utc_timestamp().timestamp()
@@ -55,24 +52,11 @@ class ModelManager:
     def initialize(self) -> Optional[YOLOModel]:
         """Inicializa e configura o modelo YOLO."""
         try:
-            model_params = self.settings.get('MODEL_PARAMS', {})
             self._log_hardware_info()
             
-            # Pegamos o path do settings
-            raw_path = model_params.get('model_path')
-            
-            # --- Correção Automática para OpenVINO ---
-            # Se o arquivo .pt não existe mas a pasta openvino sim, usamos a pasta
-            base_name = raw_path.replace('.pt', '')
-            ov_path = f"{base_name}_openvino_model"
-            
-            final_path = raw_path
-            if not os.path.exists(raw_path) and os.path.exists(ov_path):
-                self.logger.info(f"Arquivo .pt não encontrado, mas pasta OpenVINO detectada: {ov_path}")
-                final_path = ov_path
-
+            # Inicializamos o modelo - a lógica de path agora é interna ao YOLOModel
             self.model = YOLOModel(
-                final_path,
+                None, # model_path não é mais necessário aqui
                 self.settings.copy()
             )
             
@@ -86,11 +70,15 @@ class ModelManager:
             raise
 
     def _log_hardware_info(self):
-        if torch.cuda.is_available():
-            self.logger.info("CUDA disponível. Usando GPU.")
-            torch.cuda.empty_cache()
-        else:
-            self.logger.info("CUDA não disponível. Usando CPU (Ideal para OpenVINO).")
+        try:
+            core = Core()
+            devices = core.available_devices
+            self.logger.info(f"OpenVINO Runtime disponível. Dispositivos detectados: {devices}")
+            for device in devices:
+                full_name = core.get_property(device, "FULL_DEVICE_NAME")
+                self.logger.info(f"Dispositivo OpenVINO: {device} ({full_name})")
+        except Exception as e:
+            self.logger.warning(f"Não foi possível obter detalhes do hardware OpenVINO: {e}")
 
     def _setup_video_source(self) -> bool:
         video_config = self.settings.get('AI_PARAMS', {}).get('advanced', {}).get('video_source', {})
@@ -110,7 +98,10 @@ class ModelManager:
         return loader(video_config)
 
     def _load_stream_source(self, config: Dict[str, Any]) -> bool:
-        stream_url = config.get('stream_url', DEFAULT_RTSP_URL)
+        stream_url = config.get('stream_url')
+        if not stream_url:
+            self.logger.error("URL de stream não configurada.")
+            return False
         self.logger.info(f"Carregando stream: {stream_url}")
         return self.model.load_stream(stream_url)
 
@@ -225,10 +216,11 @@ def cleanup_old_files_task(settings_manager):
             now = time.time()
             max_age_seconds = retention_days * 24 * 3600
             
-            # Pastas para limpar
+            # Pastas para limpar (relativas ao root se necessário)
+            project_root = os.path.dirname(os.path.abspath(__file__))
             target_dirs = [
-                r"E:\programs\visionAlign\data\alerts",
-                r"E:\programs\visionAlign\data\dataset_collect\images"
+                os.path.join(project_root, "data", "alerts"),
+                os.path.join(project_root, "data", "dataset_collect", "images")
             ]
             
             deleted_count = 0

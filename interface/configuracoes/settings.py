@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 import logging
-import os  # Necessário para os.replace
+import os 
 
 logger = logging.getLogger("VisionAlign." + __name__)
 
@@ -11,8 +11,11 @@ class Settings:
     DEFAULT_SETTINGS = {
         'MODEL_PARAMS': {
             'model_path': 'model/visionalign_v11s.pt',
+            'align_model_path': 'model/_openvino_model/VisionAlign_openvino_model',
+            'fracture_model_path': 'model/_openvino_model/VisionFracture_openvino_model',
+            'dataset_path': 'data/dataset_collect/images',
             'model_version': 'v11s',
-            'model_type': 'yolov8'
+            'model_type': 'openvino'
         },
         'AI_PARAMS': {
             'conf_default': 0.5,

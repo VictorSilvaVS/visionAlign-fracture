@@ -112,9 +112,9 @@
 <div id="monitor-content" class="p-6">
     <div class="bg-white rounded-lg shadow overflow-hidden">
         <div class="p-4 border-b border-gray-200 flex justify-between items-center">
-            <h3 class="text-lg font-medium text-gray-900">Painel de Operação Real-time</h3>
+            <h3 class="text-lg font-medium text-gray-900" data-i18n="realtime_panel">Painel de Operação Real-time</h3>
             <div id="connection-status" class="flex items-center text-sm text-green-600">
-                <span class="status-indicator status-online pulse"></span> Sistema Ativo
+                <span class="status-indicator status-online pulse"></span> <span data-i18n="system_active">Sistema Ativo</span>
             </div>
         </div>
 
@@ -143,9 +143,8 @@
                     </div>
                     <div class="mt-4 flex justify-between items-center">
                         <div class="flex-1">
-                            <h4 class="font-bold text-gray-800">Câmera Principal</h4>
-                            <p class="text-xs text-gray-500" id="current-resolution-display">Resolução: Detectando...
-                            </p>
+                            <h4 class="font-bold text-gray-800" data-i18n="main_camera">Câmera Principal</h4>
+                            <p class="text-xs text-gray-500" id="current-resolution-display"><span data-i18n="resolution">Resolução</span>: <span data-i18n="detecting">Detectando...</span></p>
                         </div>
                         <div class="flex space-x-2">
                             <button id="toggleFullscreenButton"
@@ -171,38 +170,38 @@
                     <!-- Metrics Grid -->
                     <div class="grid grid-cols-2 gap-3">
                         <div class="bg-purple-50 p-4 rounded-xl border border-purple-100 text-center">
-                            <p class="text-xs font-bold text-purple-600 uppercase">Fraturas</p>
+                            <p class="text-xs font-bold text-purple-600 uppercase" data-i18n="fractures">Fraturas</p>
                             <p id="stat-fracture" class="text-3xl font-black text-purple-700 mt-1">--</p>
                             <p class="text-[10px] text-purple-400 mt-1"><span class="stat-trend-text">--%</span> vs
-                                ontem</p>
+                                <span data-i18n="yesterday">ontem</span></p>
                         </div>
                         <div class="bg-green-50 p-4 rounded-xl border border-green-100 text-center">
-                            <p class="text-xs font-bold text-green-600 uppercase">Normais</p>
+                            <p class="text-xs font-bold text-green-600 uppercase" data-i18n="normal">Normais</p>
                             <p id="stat-normal" class="text-3xl font-black text-green-700 mt-1">--</p>
-                            <p class="text-[10px] text-green-400 mt-1"><span class="stat-trend-text">--%</span> vs ontem
+                            <p class="text-[10px] text-green-400 mt-1"><span class="stat-trend-text">--%</span> vs <span data-i18n="yesterday">ontem</span>
                             </p>
                         </div>
                         <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-100 text-center">
-                            <p class="text-xs font-bold text-yellow-600 uppercase">Tombadas</p>
+                            <p class="text-xs font-bold text-yellow-600 uppercase" data-i18n="fallen">Tombadas</p>
                             <p id="stat-fallen" class="text-3xl font-black text-yellow-700 mt-1">--</p>
                             <p class="text-[10px] text-yellow-400 mt-1"><span class="stat-trend-text">--%</span> vs
-                                ontem</p>
+                                <span data-i18n="yesterday">ontem</span></p>
                         </div>
                         <div class="bg-red-50 p-4 rounded-xl border border-red-100 text-center">
-                            <p class="text-xs font-bold text-red-600 uppercase">Invertidas</p>
+                            <p class="text-xs font-bold text-red-600 uppercase" data-i18n="inverted">Invertidas</p>
                             <p id="stat-inverted" class="text-3xl font-black text-red-700 mt-1">--</p>
-                            <p class="text-[10px] text-red-400 mt-1"><span class="stat-trend-text">--%</span> vs ontem
+                            <p class="text-[10px] text-red-400 mt-1"><span class="stat-trend-text">--%</span> vs <span data-i18n="yesterday">ontem</span>
                             </p>
                         </div>
                     </div>
 
                     <!-- Performance Bars -->
                     <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-4">
-                        <h4 class="text-sm font-bold text-gray-700 border-b pb-2">Desempenho da Linha</h4>
+                        <h4 class="text-sm font-bold text-gray-700 border-b pb-2" data-i18n="line_performance">Desempenho da Linha</h4>
 
                         <div>
                             <div class="flex justify-between mb-1">
-                                <span class="text-xs font-medium text-gray-600">Taxa de Aceitação</span>
+                                <span class="text-xs font-medium text-gray-600" data-i18n="acceptance_rate">Taxa de Aceitação</span>
                                 <span id="rate-acceptance-value" class="text-xs font-bold text-green-600">--%</span>
                             </div>
                             <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
@@ -213,7 +212,7 @@
 
                         <div>
                             <div class="flex justify-between mb-1">
-                                <span class="text-xs font-medium text-gray-600">Incidência de Erros</span>
+                                <span class="text-xs font-medium text-gray-600" data-i18n="error_incidence">Incidência de Erros</span>
                                 <span id="rate-error-value" class="text-xs font-bold text-red-600">--%</span>
                             </div>
                             <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
@@ -225,13 +224,10 @@
 
                     <!-- Alerts -->
                     <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                        <h4 class="text-sm font-bold text-gray-700 mb-3 flex justify-between">
-                            Alertas Recentes
-                            <span class="text-[10px] text-blue-500 font-normal cursor-pointer hover:underline">Ver
-                                todos</span>
-                        </h4>
+                            <span data-i18n="recent_alerts">Alertas Recentes</span>
+                            <span class="text-[10px] text-blue-500 font-normal cursor-pointer hover:underline" data-i18n="see_all">Ver todos</span>
                         <div id="alerts-list" class="space-y-3 max-h-48 overflow-y-auto pr-1">
-                            <p class="text-xs text-gray-400 text-center py-4">Carregando...</p>
+                            <p class="text-xs text-gray-400 text-center py-4" data-i18n="loading">Carregando...</p>
                         </div>
                     </div>
                 </div>
@@ -247,7 +243,7 @@
                         class="lg:col-span-2 grid grid-cols-2 gap-3 bg-blue-50/30 p-4 rounded-xl border border-blue-100">
                         <div class="col-span-2 flex items-center justify-between pb-2 border-b border-blue-100/50">
                             <span class="text-xs font-black text-blue-600 tracking-wider">WASHER 22</span>
-                            <span class="text-[10px] px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-bold">EM
+                            <span class="text-[10px] px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-bold" data-i18n="in_operation">EM
                                 OPERAÇÃO</span>
                         </div>
 
