@@ -34,8 +34,6 @@ def initialize_components(logger):
         QMessageBox.critical(None, "Erro Fatal",
                            f"O sistema não pode ser iniciado:\n\n{str(e)}\n\nO aplicativo será encerrado.")
         sys.exit(1)
-
-
 def main():
     app = QApplication(sys.argv)
     app.setApplicationName("VisionAlign")

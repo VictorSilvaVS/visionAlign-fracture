@@ -109,129 +109,193 @@
 {% endblock %}
 
 {% block content %}
-<div id="monitor-content" class="p-6">
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
-            <h3 class="text-lg font-medium text-gray-900" data-i18n="realtime_panel">Painel de Operação Real-time</h3>
-            <div id="connection-status" class="flex items-center text-sm text-green-600">
-                <span class="status-indicator status-online pulse"></span> <span data-i18n="system_active">Sistema Ativo</span>
+<div id="monitor-content" class="p-6 space-y-8">
+    <div class="glass-card overflow-hidden">
+        <div class="p-6 border-b border-white/5 flex justify-between items-center bg-industrial-900/50">
+            <div>
+                <h3 class="text-xl font-bold text-white" data-i18n="realtime_panel">Industrial Operation Center</h3>
+                <p class="text-xs text-industrial-400 font-medium">Real-time AI Neural Processing Active</p>
+            </div>
+            <div id="connection-status" class="flex items-center space-x-3 px-4 py-2 bg-green-500/10 rounded-xl border border-green-500/20 text-green-400">
+                <span class="status-indicator status-online pulse-accent"></span> 
+                <span class="text-xs font-black uppercase tracking-widest" data-i18n="system_active">System Online</span>
             </div>
         </div>
 
-        <div class="p-4">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Main Camera View (Left/Center) -->
-                <div class="lg:col-span-2">
-                    <div id="mainMonitorVideoContainer" class="video-container rounded-lg shadow-inner bg-gray-900">
-                        <img id="mainMonitorStream" src="{{ url_for('video_feed') }}" alt="Live Stream">
+        <div class="p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Main Camera View -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div id="mainMonitorVideoContainer" class="video-container rounded-2xl overflow-hidden shadow-2xl border border-white/10 group">
+                        <img id="mainMonitorStream" src="/api/v1/video/feed" alt="Live Stream" class="transition-transform duration-700 group-hover:scale-[1.01]">
+                        
+                        <!-- Overlay HUD -->
+                        <div class="absolute top-4 left-4 flex flex-col space-y-2 pointer-events-none">
+                            <div class="px-3 py-1.5 bg-black/60 backdrop-blur-md rounded-lg border border-white/10 flex items-center space-x-2">
+                                <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                                <span class="text-[10px] font-black text-white uppercase tracking-widest">REC</span>
+                            </div>
+                        </div>
+
                         <div id="fullscreenControls"
-                            class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 p-3 rounded-lg shadow-lg flex items-center space-x-4 z-50 hidden">
-                            <button id="saveFrameButtonFs" class="text-white hover:text-blue-300 transition-colors"
-                                title="Salvar Frame (Download)">
-                                <i class="fas fa-camera fa-lg"></i>
+                            class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-industrial-900/90 backdrop-blur-xl px-6 py-4 rounded-2xl shadow-2xl flex items-center space-x-8 border border-white/10 z-50 hidden">
+                            <button id="saveFrameButtonFs" class="text-industrial-400 hover:text-blue-400 transition-all hover:scale-110" title="Capture Frame">
+                                <i class="fas fa-camera fa-xl"></i>
                             </button>
-                            <button id="saveTrainingFrameButton"
-                                class="text-white hover:text-green-300 transition-colors"
-                                title="Gravar no Dataset (Treinamento)">
-                                <i class="fas fa-database fa-lg"></i>
+                            <button id="saveTrainingFrameButton" class="text-industrial-400 hover:text-green-400 transition-all hover:scale-110" title="Inject into Dataset">
+                                <i class="fas fa-brain fa-xl"></i>
                             </button>
-                            <button id="exitFullscreenButtonAlt" class="text-white hover:text-red-300 transition-colors"
-                                title="Sair da Tela Cheia">
-                                <i class="fas fa-compress-arrows-alt fa-lg"></i>
+                            <button id="exitFullscreenButtonAlt" class="text-industrial-400 hover:text-red-400 transition-all hover:scale-110" title="Exit Neural View">
+                                <i class="fas fa-compress-arrows-alt fa-xl"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="mt-4 flex justify-between items-center">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-gray-800" data-i18n="main_camera">Câmera Principal</h4>
-                            <p class="text-xs text-gray-500" id="current-resolution-display"><span data-i18n="resolution">Resolução</span>: <span data-i18n="detecting">Detectando...</span></p>
+                    
+                    <div class="flex justify-between items-end px-2">
+                        <div>
+                            <h4 class="text-lg font-bold text-white flex items-center" data-i18n="main_camera">
+                                <i class="fas fa-video mr-2 text-blue-500 text-sm"></i>
+                                Fluxo de Produção Principal
+                            </h4>
+                            <p class="text-xs text-industrial-400 font-medium" id="current-resolution-display">
+                                <span data-i18n="resolution">Processamento</span>: <span class="text-blue-400 font-bold" data-i18n="detecting">FP16 OpenVINO</span>
+                            </p>
                         </div>
-                        <div class="flex space-x-2">
-                            <button id="toggleFullscreenButton"
-                                class="p-2 bg-gray-100 rounded-md hover:bg-gray-200 text-gray-700" title="Tela Cheia">
-                                <i class="fas fa-expand"></i>
+                        <div class="flex space-x-3">
+                            <button id="toggleFullscreenButton" class="w-10 h-10 glass-card flex items-center justify-center text-industrial-300 hover:text-white hover:bg-blue-600/20 transition-all" title="Fullscreen">
+                                <i class="fas fa-expand-alt"></i>
                             </button>
-                            <button id="saveFrameButton"
-                                class="p-2 bg-gray-100 rounded-md hover:bg-gray-200 text-gray-700"
-                                title="Capturar Frame">
+                            <button id="saveFrameButton" class="w-10 h-10 glass-card flex items-center justify-center text-industrial-300 hover:text-white hover:bg-blue-600/20 transition-all" title="Snapshot">
                                 <i class="fas fa-camera"></i>
                             </button>
-                            <a href="{{ url_for('settings_page') }}"
-                                class="p-2 bg-gray-100 rounded-md hover:bg-gray-200 text-gray-700"
-                                title="Configurações">
-                                <i class="fas fa-cog"></i>
-                            </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Statistics and Alerts Panel (Right) -->
+                <!-- Statistics and Alerts -->
                 <div class="space-y-6">
                     <!-- Metrics Grid -->
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-purple-50 p-4 rounded-xl border border-purple-100 text-center">
-                            <p class="text-xs font-bold text-purple-600 uppercase" data-i18n="fractures">Fraturas</p>
-                            <p id="stat-fracture" class="text-3xl font-black text-purple-700 mt-1">--</p>
-                            <p class="text-[10px] text-purple-400 mt-1"><span class="stat-trend-text">--%</span> vs
-                                <span data-i18n="yesterday">ontem</span></p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="glass-card p-5 border-l-4 border-l-purple-500 hover-scale cursor-default">
+                            <p class="text-[10px] font-black text-industrial-400 uppercase tracking-widest" data-i18n="fractures">Fraturas</p>
+                            <div class="flex items-baseline space-x-2 mt-1">
+                                <span id="stat-fracture" class="text-3xl font-extrabold text-white">0</span>
+                                <span class="text-[10px] font-bold text-red-400"><i class="fas fa-caret-up mr-0.5"></i>2%</span>
+                            </div>
                         </div>
-                        <div class="bg-green-50 p-4 rounded-xl border border-green-100 text-center">
-                            <p class="text-xs font-bold text-green-600 uppercase" data-i18n="normal">Normais</p>
-                            <p id="stat-normal" class="text-3xl font-black text-green-700 mt-1">--</p>
-                            <p class="text-[10px] text-green-400 mt-1"><span class="stat-trend-text">--%</span> vs <span data-i18n="yesterday">ontem</span>
-                            </p>
+                        <div class="glass-card p-5 border-l-4 border-l-blue-500 hover-scale cursor-default">
+                            <p class="text-[10px] font-black text-industrial-400 uppercase tracking-widest" data-i18n="normal">Normais</p>
+                            <div class="flex items-baseline space-x-2 mt-1">
+                                <span id="stat-normal" class="text-3xl font-extrabold text-white">0</span>
+                                <span class="text-[10px] font-bold text-green-400"><i class="fas fa-caret-up mr-0.5"></i>98%</span>
+                            </div>
                         </div>
-                        <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-100 text-center">
-                            <p class="text-xs font-bold text-yellow-600 uppercase" data-i18n="fallen">Tombadas</p>
-                            <p id="stat-fallen" class="text-3xl font-black text-yellow-700 mt-1">--</p>
-                            <p class="text-[10px] text-yellow-400 mt-1"><span class="stat-trend-text">--%</span> vs
-                                <span data-i18n="yesterday">ontem</span></p>
+                        <div class="glass-card p-5 border-l-4 border-l-yellow-500 hover-scale cursor-default">
+                            <p class="text-[10px] font-black text-industrial-400 uppercase tracking-widest" data-i18n="fallen">Tombadas</p>
+                            <span id="stat-fallen" class="text-3xl font-extrabold text-white mt-1 block">0</span>
                         </div>
-                        <div class="bg-red-50 p-4 rounded-xl border border-red-100 text-center">
-                            <p class="text-xs font-bold text-red-600 uppercase" data-i18n="inverted">Invertidas</p>
-                            <p id="stat-inverted" class="text-3xl font-black text-red-700 mt-1">--</p>
-                            <p class="text-[10px] text-red-400 mt-1"><span class="stat-trend-text">--%</span> vs <span data-i18n="yesterday">ontem</span>
-                            </p>
+                        <div class="glass-card p-5 border-l-4 border-l-red-500 hover-scale cursor-default">
+                            <p class="text-[10px] font-black text-industrial-400 uppercase tracking-widest" data-i18n="inverted">Invertidas</p>
+                            <span id="stat-inverted" class="text-3xl font-extrabold text-white mt-1 block">0</span>
                         </div>
                     </div>
 
-                    <!-- Performance Bars -->
-                    <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-4">
-                        <h4 class="text-sm font-bold text-gray-700 border-b pb-2" data-i18n="line_performance">Desempenho da Linha</h4>
-
-                        <div>
-                            <div class="flex justify-between mb-1">
-                                <span class="text-xs font-medium text-gray-600" data-i18n="acceptance_rate">Taxa de Aceitação</span>
-                                <span id="rate-acceptance-value" class="text-xs font-bold text-green-600">--%</span>
-                            </div>
-                            <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                                <div id="rate-acceptance-bar" class="bg-green-500 h-full transition-all duration-500"
-                                    style="width: 0%"></div>
-                            </div>
+                    <!-- Performance -->
+                    <div class="glass-card p-6 space-y-5">
+                        <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                            <h4 class="text-xs font-black text-industrial-300 uppercase tracking-widest" data-i18n="line_performance">Neural KPI Performance</h4>
+                            <span id="stat-fps" class="text-xs font-bold text-blue-500">0.0 FPS</span>
                         </div>
 
-                        <div>
-                            <div class="flex justify-between mb-1">
-                                <span class="text-xs font-medium text-gray-600" data-i18n="error_incidence">Incidência de Erros</span>
-                                <span id="rate-error-value" class="text-xs font-bold text-red-600">--%</span>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-[10px] font-bold text-industrial-400 uppercase" data-i18n="acceptance_rate">Taxa de Aceitação</span>
+                                    <span id="rate-acceptance-value" class="text-[10px] font-black text-green-400">0.0%</span>
+                                </div>
+                                <div class="w-full bg-industrial-950 rounded-full h-1.5 overflow-hidden border border-white/5">
+                                    <div id="rate-acceptance-bar" class="bg-gradient-to-r from-blue-600 to-green-500 h-full transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)]" style="width: 0%"></div>
+                                </div>
                             </div>
-                            <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                                <div id="rate-error-bar" class="bg-red-500 h-full transition-all duration-500"
-                                    style="width: 0%"></div>
+
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-[10px] font-bold text-industrial-400 uppercase" data-i18n="error_incidence">Incidência de Anomalias</span>
+                                    <span id="rate-error-value" class="text-[10px] font-black text-red-400">0.0%</span>
+                                </div>
+                                <div class="w-full bg-industrial-950 rounded-full h-1.5 overflow-hidden border border-white/5">
+                                    <div id="rate-error-bar" class="bg-gradient-to-r from-orange-500 to-red-600 h-full transition-all duration-1000 shadow-[0_0_10px_rgba(239,68,68,0.3)]" style="width: 0%"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Alerts -->
-                    <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                            <span data-i18n="recent_alerts">Alertas Recentes</span>
-                            <span class="text-[10px] text-blue-500 font-normal cursor-pointer hover:underline" data-i18n="see_all">Ver todos</span>
-                        <div id="alerts-list" class="space-y-3 max-h-48 overflow-y-auto pr-1">
-                            <p class="text-xs text-gray-400 text-center py-4" data-i18n="loading">Carregando...</p>
+                    <div class="glass-card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-xs font-black text-industrial-300 uppercase tracking-widest" data-i18n="recent_alerts">Log de Eventos</h4>
+                            <i class="fas fa-history text-industrial-500 text-xs"></i>
+                        </div>
+                        <div id="alerts-list" class="space-y-3 max-h-40 overflow-y-auto custom-scrollbar">
+                            <p class="text-[10px] text-industrial-500 text-center py-4 italic" data-i18n="loading">Sincronizando com o motor de inferência...</p>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Secondary Grids -->
+            <div class="mt-12 pt-8 border-t border-white/5">
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Line Status -->
+                    <div class="lg:col-span-3 glass-card p-6 bg-industrial-900/30">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-6 bg-blue-600 rounded-full"></div>
+                                <h4 class="text-sm font-black text-white uppercase tracking-wider">Módulos de Visão Secundários</h4>
+                            </div>
+                            <span class="text-[10px] font-bold text-industrial-400 uppercase">Multi-Stream Sync Enabled</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {% for i in range(1, 5) %}
+                            <div class="group relative aspect-video bg-industrial-950 rounded-xl overflow-hidden border border-white/5 hover:border-blue-500/50 transition-all cursor-pointer">
+                                <img src="/api/v1/video/feed" class="w-full h-full object-cover opacity-40 group-hover:opacity-100 transition-opacity">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                                <div class="absolute bottom-2 left-2 flex items-center space-x-2">
+                                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                                    <span class="text-[9px] font-black text-white uppercase tracking-tighter">CAM 0{{ i }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- ROI Analysis -->
+                    <div class="glass-card p-6 border-l-4 border-l-red-600/50">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-xs font-black text-white uppercase tracking-widest">ROI Cluster</h4>
+                            <span class="text-[9px] px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-full font-bold">Neural Engine</span>
+                        </div>
+                        <div class="aspect-square bg-industrial-950 rounded-xl border border-white/10 grid grid-cols-2 grid-rows-2 gap-1 p-1">
+                            {% for i in range(1, 5) %}
+                            <div class="roi-slot relative group bg-industrial-900 rounded-lg overflow-hidden cursor-pointer" onclick="expandRoi({{ i }})">
+                                <img id="roi-img-{{ i }}" src="" class="w-full h-full object-cover hidden">
+                                <div id="roi-placeholder-{{ i }}" class="w-full h-full flex items-center justify-center">
+                                    <span class="text-[8px] font-black text-industrial-600">ROI {{ i }}</span>
+                                </div>
+                                <div class="absolute inset-0 border border-white/0 group-hover:border-blue-500/50 rounded-lg transition-all"></div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <p class="text-[8px] text-industrial-500 mt-4 text-center leading-relaxed font-medium uppercase tracking-widest">
+                            Análise estática de pontos críticos <br> 51mm AOI Calibration
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
             <!-- Secondary Cameras Area (Dual Line Support) -->
             <div class="mt-8 pt-6 border-t border-gray-100">
@@ -256,7 +320,7 @@
                             </div>
                             <div
                                 class="aspect-video bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden border-2 border-transparent group-hover:border-blue-400 transition-all shadow-sm">
-                                <img src="{{ url_for('video_feed') }}" class="w-full h-full object-cover">
+                                <img src="/api/v1/video/feed" class="w-full h-full object-cover">
                             </div>
                         </div>
 
@@ -386,7 +450,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='monitor.js') }}?v={{ range(1, 100000) | random }}"></script>
+<script src="{{ url_for('static', path='monitor.js') }}?v={{ range(1, 100000) | random }}"></script>
 <script>
     // Script unificado para captura de frames pelo servidor
     async function captureFrame(btn) {

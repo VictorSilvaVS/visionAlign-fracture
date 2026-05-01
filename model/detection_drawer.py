@@ -12,6 +12,7 @@ class DetectionDrawer:
         self.show_conf = True
         self.show_bg = True
         self.show_mask = True  # Ativado por padrão para segmentação
+        self.show_heatmap = True # Ativa o brilho de "IA Explicável"
 
     def set_params(self, params):
         """Atualiza os parâmetros de desenho."""
@@ -22,10 +23,15 @@ class DetectionDrawer:
         self.show_conf = bool(params.get('show_conf', self.show_conf))
         self.show_bg = bool(params.get('show_bg', self.show_bg))
         self.show_mask = bool(params.get('show_mask', self.show_mask))
+        self.show_heatmap = bool(params.get('show_heatmap', self.show_heatmap))
 
     def draw_detections(self, frame, results_obj, names_map, show_track_id=True):
-        """Desenha detecções com suporte a masks (segmentação).
-        Prioriza masks sobre boxes se disponíveis."""
+        """Desenha detecções com suporte a masks (segmentação) e heatmaps."""
+        
+        # IA Explicável: Desenha Heatmap (Brilho de Atenção) antes de tudo para ficar sob as labels
+        if self.show_heatmap:
+            self.draw_heatmap(frame, results_obj, names_map)
+
         # Primeiro, desenha masks se show_mask estiver ativado
         if self.show_mask and getattr(results_obj, 'masks', None) is not None:
             try:
@@ -109,3 +115,45 @@ class DetectionDrawer:
         
         text_color = (255, 255, 255) if self.show_bg else color
         cv2.putText(frame, label_text, (text_x, text_y), font, self.font_scale, text_color, self.font_thickness, cv2.LINE_AA)
+
+    def draw_heatmap(self, frame, results_obj, names_map):
+        """Gera um mapa de calor (Glow de Atenção) sobre os defeitos detectados."""
+        if results_obj.boxes is None or len(results_obj.boxes) == 0:
+            return
+            
+        heatmap_overlay = np.zeros_like(frame, dtype=np.uint8)
+        has_heatmap = False
+        
+        cls_list = results_obj.boxes.cls.int().cpu().numpy()
+        boxes_xyxy = results_obj.boxes.xyxy.int().cpu().numpy()
+        
+        for idx, (box, c) in enumerate(zip(boxes_xyxy, cls_list)):
+            cls_name = names_map.get(int(c), "Unknown")
+            # Só gera heatmap para defeitos ou itens críticos para não poluir
+            if cls_name.lower() in ['fracture', 'defect', 'fail', 'lata_invertida', 'lata_tombada']:
+                has_heatmap = True
+                x1, y1, x2, y2 = box
+                
+                # Se houver máscara, usa a geometria da máscara para o brilho
+                if getattr(results_obj, 'masks', None) is not None and idx < len(results_obj.masks.xy):
+                    mask_xy = results_obj.masks.xy[idx]
+                    if len(mask_xy) > 0:
+                        pts = np.int32([mask_xy])
+                        cv2.fillPoly(heatmap_overlay, pts, (0, 0, 255))
+                else:
+                    # Caso contrário, usa a BBox com um gradiente radial
+                    cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
+                    w, h = x2 - x1, y2 - y1
+                    cv2.ellipse(heatmap_overlay, (cx, cy), (w//2, h//2), 0, 0, 360, (0, 0, 255), -1)
+        
+        if has_heatmap:
+            # Aplica desfoque gaussiano pesado para criar o efeito de "brilho de atenção" (IA Explicável)
+            heatmap_overlay = cv2.GaussianBlur(heatmap_overlay, (51, 51), 0)
+            # Aplica o mapa de cores JET para parecer um heatmap térmico profissional
+            # (Note: convertemos para escala de cinza primeiro para aplicar o colormap corretamente)
+            gray = cv2.cvtColor(heatmap_overlay, cv2.COLOR_BGR2GRAY)
+            colored_heatmap = cv2.applyColorMap(gray, cv2.COLORMAP_JET)
+            
+            # Mescla com o frame original de forma suave (apenas onde há ativação)
+            mask_inv = gray > 10
+            frame[mask_inv] = cv2.addWeighted(frame, 0.7, colored_heatmap, 0.3, 0)[mask_inv]

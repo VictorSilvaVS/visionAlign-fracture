@@ -6,22 +6,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- O título será definido em cada página filha -->
     <title>{% block title %}VisionAlign - Classificação de Latas{% endblock %}</title>
-    <!-- Tailwind CSS -->
+    <!-- Modern Typography: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS with Custom Config -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        industrial: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        accent: '#3b82f6'
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Estilos inline do HTML fornecido -->
+    
     <style>
+        :root {
+            --glass-bg: rgba(15, 23, 42, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-glow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+
+        body {
+            background-color: #020617;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .premium-gradient {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+
+        .accent-text {
+            color: #3b82f6;
+            text-shadow: var(--accent-glow);
+        }
+
         .video-container {
             position: relative;
             padding-bottom: 56.25%;
             height: 0;
             overflow: hidden;
-            background: #1a202c;
+            background: #000;
+            border-radius: 0.75rem;
+            border: 1px solid var(--glass-border);
         }
 
-        .video-container video,
-        .video-container canvas {
+        .video-container img {
             position: absolute;
             top: 0;
             left: 0;
@@ -30,374 +90,208 @@
             object-fit: cover;
         }
 
-        .tab-content {
-            display: none;
-            /* Será controlado por JS se necessário na página filha */
+        /* Micro-animations */
+        .hover-scale {
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .tab-content.active {
-            display: block;
-            /* Será controlado por JS se necessário na página filha */
+        .hover-scale:hover {
+            transform: scale(1.02);
         }
 
         .status-indicator {
-            width: 12px;
-            height: 12px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             display: inline-block;
-            margin-right: 8px;
+            box-shadow: 0 0 10px currentColor;
         }
 
-        .status-online {
-            background-color: #10B981;
+        .status-online { color: #10B981; background-color: #10B981; }
+        .status-offline { color: #EF4444; background-color: #EF4444; }
+        .status-warning { color: #F59E0B; background-color: #F59E0B; }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
         }
 
-        .status-offline {
-            background-color: #EF4444;
+        .pulse-accent {
+            animation: pulse-glow 2s infinite;
         }
 
-        .status-warning {
-            background-color: #F59E0B;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
         }
 
-        /* Estilos para o modo escuro */
-        .dark body {
-            background-color: #1a202c;
-            /* bg-gray-900 */
-            color: #f7fafc;
-            /* text-gray-100 */
+        /* --- DARK MODE OVERRIDES --- */
+        .dark ::placeholder { 
+            color: #718096 !important; 
+            opacity: 1; 
         }
 
-        .dark .bg-white {
-            background-color: #2d3748;
-            /* bg-gray-800 */
-        }
+        .dark .bg-gray-200 { background-color: #4b5563; }
+        .dark .text-gray-800 { color: #e5e7eb; }
+        .dark .hover\:bg-gray-300:hover { background-color: #6b7280; }
+        .dark .focus\:ring-gray-500:focus { --tw-ring-color: #9ca3af; }
+        .dark .bg-gray-100 { background-color: #374151; }
+        .dark .hover\:bg-gray-200:hover { background-color: #4b5563; }
 
-        .dark .text-gray-900,
-        .dark .text-gray-800,
-        .dark .text-gray-700,
-        .dark .text-gray-600,
-        .dark .text-gray-500 {
-            color: #e2e8f0;
-            /* text-gray-300 ou similar */
+        .dark .card { 
+            background-color: #1f2937; /* bg-gray-800 */
+            border-color: #374151; /* border-gray-700 */
         }
+        .dark .card-header { border-bottom-color: #374151; }
+        .dark .card-title { color: #f3f4f6; }
 
-        .dark .border-gray-200,
-        .dark .border-gray-100 {
-            border-color: #4a5568;
-            /* border-gray-700 */
+        .dark .search-input { 
+            background-color: #374151; 
+            border-color: #4b5563; 
+            color: #f3f4f6; 
         }
+        .dark .search-input::placeholder { color: #9ca3af; }
 
-        .dark .hover\:bg-gray-100:hover {
-            background-color: #4a5568;
-            /* bg-gray-700 */
+        .dark .search-btn { 
+            background-color: #4b5563; 
+            color: #f3f4f6; 
         }
+        .dark .search-btn:hover { background-color: #6b7280; }
 
-        /* Ajustes específicos para os elementos solicitados no modo escuro */
-        .dark .bg-gray-50 {
-            /* Usado no painel de Estatísticas e no thead */
-            background-color: #374151;
-            /* bg-gray-700 (um pouco mais claro que o card-bg do dark mode) */
+        .dark .user-table th { 
+            background-color: #111827; 
+            color: #9ca3af; 
+            border-bottom: 1px solid #374151; 
         }
-
-        .dark .text-gray-500 {
-            /* Usado nos textos dos cards de estatísticas e no thead */
-            color: #9ca3af;
-            /* text-gray-400 */
+        .dark .user-table td { 
+            border-bottom-color: #374151; 
+            color: #d1d5db; 
         }
+        .dark .user-table tbody tr:hover { background-color: #1f2937; }
 
-        .dark .text-gray-700 {
-            /* Usado nos textos das barras de progresso */
-            color: #d1d5db;
-            /* text-gray-300 */
+        .dark .user-name { color: #f3f4f6; }
+        .dark .user-details { color: #9ca3af; }
+
+        .dark .badge { color: #1f2937; }
+
+        .dark .dropdown-menu { 
+            background-color: #1f2937; 
+            border-color: #374151; 
         }
+        .dark .dropdown-item { color: #d1d5db; }
+        .dark .dropdown-item:hover { background-color: #374151; }
 
-        .dark .border-gray-200 {
-            /* Usado nas bordas internas do painel de estatísticas */
-            border-color: #4b5563;
-            /* border-gray-600 */
+        .dark .pagination { border-top-color: #374151; }
+        .dark .page-info { color: #9ca3af; }
+        .dark .page-btn { 
+            background-color: #1f2937; 
+            color: #d1d5db; 
+            border-color: #374151; 
         }
-
-        .dark .border-gray-300 {
-            /* Usado na borda do select */
-            border-color: #6b7280;
-            /* border-gray-500 */
+        .dark .page-btn:hover:not(:disabled) { background-color: #374151; }
+        .dark .page-btn.active { 
+            background-color: #3b82f6; 
+            color: white; 
+            border-color: #3b82f6; 
         }
-
-        /* Para o select especificamente, se ele não herdar a cor do texto corretamente */
-        .dark select,
-        .dark input[type="text"],
-        .dark input[type="number"],
-        .dark textarea {
-            color: #f7fafc !important;
-            /* text-gray-100 */
-            background-color: #1a202c !important;
-            /* bg-gray-900 */
-            border-color: #4a5568 !important;
-            /* border-gray-700 */
-        }
-
-        /* Placeholder color for dark mode */
-        .dark ::placeholder {
-            color: #718096 !important;
-            /* gray-500 */
-            opacity: 1;
-        }
-
-        /* Para o botão com bg-gray-200 e text-gray-800 */
-        .dark .bg-gray-200 {
-            background-color: #4b5563;
-            /* bg-gray-600 */
-        }
-
-        .dark .text-gray-800 {
-            color: #e5e7eb;
-            /* text-gray-200 */
-        }
-
-        .dark .hover\:bg-gray-300:hover {
-            background-color: #6b7280;
-            /* bg-gray-500 */
-        }
-
-        .dark .focus\:ring-gray-500:focus {
-            /* Adapta a cor do anel de foco */
-            --tw-ring-color: #9ca3af;
-            /* ring-gray-400 */
-        }
-
-        /* Para botões com bg-gray-100 e hover:bg-gray-200 */
-        .dark .bg-gray-100 {
-            background-color: #374151;
-            /* bg-gray-700 */
-        }
-
-        .dark .hover\:bg-gray-200:hover {
-            background-color: #4b5563;
-            /* bg-gray-600 */
-        }
-
-        /* Estilos para a tabela de usuários e seus componentes no modo escuro */
-        .dark .card {
-            background-color: #2d3748;
-            /* bg-gray-800 */
-            border-color: #4a5568;
-            /* border-gray-700 */
-        }
-
-        .dark .card-header {
-            border-bottom-color: #4a5568;
-            /* border-gray-700 */
-        }
-
-        .dark .card-title {
-            color: #e2e8f0;
-            /* text-gray-300 */
-        }
-
-        .dark .search-input {
-            background-color: #374151;
-            /* bg-gray-700 */
-            border-color: #6b7280;
-            /* border-gray-500 */
-            color: #e2e8f0;
-            /* text-gray-300 */
-        }
-
-        .dark .search-input::placeholder {
-            color: #9ca3af;
-            /* text-gray-400 */
-        }
-
-        .dark .search-btn {
-            background-color: #4b5563;
-            /* bg-gray-600 */
-            color: #e2e8f0;
-            /* text-gray-300 */
-        }
-
-        .dark .search-btn:hover {
-            background-color: #6b7280;
-            /* bg-gray-500 */
-        }
-
-        .dark .user-table thead tr {
-            /* Mantém apenas se houver estilos de TR que não são cobertos por TH */
-            /* background-color: #374151; */
-            /* Removido: TH agora controla o fundo */
-            /* border-bottom-color: #4a5568; */
-            /* Removido: TH agora controla sua borda inferior */
-        }
-
-        .dark .user-table th {
-            background-color: #374151;
-            /* bg-gray-700 */
-            color: #9ca3af;
-            /* text-gray-400 */
-            border-bottom: 1px solid #4a5568;
-            /* Cor da borda inferior para o modo escuro */
-        }
-
-        .dark .user-table td {
-            border-bottom-color: #4a5568;
-            /* border-gray-700 */
-            color: #d1d5db;
-            /* text-gray-300 */
-        }
-
-        .dark .user-table tbody tr:hover {
-            /* Efeito hover para as linhas do corpo da tabela */
-            background-color: #374151;
-            /* bg-gray-700, um pouco mais claro que o fundo do card */
-        }
-
-        .dark .user-name {
-            /* Se for uma classe específica e não herdar de .text-gray-xxx */
-            color: #e2e8f0;
-            /* text-gray-300 */
-        }
-
-        .dark .user-details {
-            /* Se for uma classe específica e não herdar de .text-gray-xxx */
-            color: #9ca3af;
-            /* text-gray-400 */
-        }
-
-        .dark .badge {
-            /* Estilo base para badges no modo escuro */
-            color: #1f2937;
-            /* text-gray-800 (para contraste com fundos claros de badge) */
-        }
-
-        /* .dark .badge-online, .dark .badge-offline, etc. podem precisar de ajustes se as cores de fundo não contrastarem bem */
-        .dark .dropdown-menu {
-            background-color: #374151;
-            /* bg-gray-700 */
-            border-color: #4a5568;
-            /* border-gray-700 */
-        }
-
-        .dark .dropdown-item {
-            color: #d1d5db;
-            /* text-gray-300 */
-        }
-
-        .dark .dropdown-item:hover {
-            background-color: #4b5563;
-            /* bg-gray-600 */
-        }
-
-        .dark .pagination {
-            border-top-color: #4a5568;
-            /* border-gray-700 */
-        }
-
-        .dark .page-info {
-            color: #9ca3af;
-            /* text-gray-400 */
-        }
-
-        .dark .page-btn {
-            background-color: #374151;
-            /* bg-gray-700 */
-            color: #d1d5db;
-            /* text-gray-300 */
-            border-color: #4b5563;
-            /* border-gray-600 */
-        }
-
-        .dark .page-btn:hover:not(:disabled) {
-            background-color: #4b5563;
-            /* bg-gray-600 */
-        }
-
-        .dark .page-btn.active {
-            background-color: #60a5fa;
-            /* Cor primária do tema escuro (azul claro) */
-            color: #1f2937;
-            /* text-gray-800 (para contraste) */
-            border-color: #60a5fa;
-        }
-
-        .dark .page-btn:disabled {
-            color: #6b7280;
-            /* text-gray-500 */
-            border-color: #374151;
-            /* bg-gray-700 */
+        .dark .page-btn:disabled { 
+            color: #4b5563; 
+            border-color: #1f2937; 
         }
     </style>
     <!-- Bloco para estilos CSS específicos da página -->
     {% block styles %}{% endblock %}
 </head>
 
-<body class="bg-gray-100 text-gray-900 font-sans">
-    <div class="min-h-screen flex flex-col">
+<body class="bg-industrial-950 text-industrial-100 font-sans antialiased">
+    <div class="min-h-screen flex flex-col relative overflow-hidden">
+        <!-- Background Glow -->
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+
         <!-- Header -->
-        <header class="bg-white shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+        <header class="sticky top-0 z-50 glass-card mx-4 mt-4 !rounded-2xl !bg-industrial-900/50 backdrop-blur-md">
+            <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                 <div class="flex items-center space-x-4">
-                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
-                        <i class="fas fa-cogs text-white text-xl"></i>
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <i class="fas fa-microchip text-white text-2xl"></i>
                     </div>
-                    <h1 class="text-xl font-bold text-gray-800" data-i18n="system_title">VisionAlign - Classificador de
-                        Latas</h1>
+                    <div>
+                        <h1 class="text-xl font-extrabold tracking-tight text-white" data-i18n="system_title">
+                            Vision<span class="text-blue-500">Align</span>
+                        </h1>
+                        <p class="text-[10px] uppercase tracking-[0.2em] text-industrial-400 font-bold">Industrial Monitoring 4.0</p>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-4">
+                
+                <div class="flex items-center space-x-6">
+                    <!-- Global Status -->
+                    <div class="hidden md:flex items-center space-x-3 px-4 py-2 bg-industrial-950/50 rounded-lg border border-white/5">
+                        <span class="status-indicator status-online pulse-accent"></span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-industrial-300">Live Server</span>
+                    </div>
+
                     <div class="relative">
-                        <button class="p-2 rounded-full hover:bg-gray-100">
-                            <i class="fas fa-bell text-gray-600"></i>
-                            <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                        <button class="p-2.5 rounded-xl hover:bg-white/5 transition-colors relative">
+                            <i class="fas fa-bell text-industrial-400"></i>
+                            <span class="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-blue-500 border-2 border-industrial-900"></span>
                         </button>
                     </div>
-                    <!-- Menu de Usuário com Dropdown -->
+
+                    <!-- User Menu -->
                     <div class="relative">
                         <button id="user-menu-button"
-                            class="flex items-center space-x-2 focus:outline-none p-1 rounded-md hover:bg-gray-100">
-                            <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-                                <i class="fas fa-user text-gray-600"></i>
+                            class="flex items-center space-x-3 focus:outline-none p-1.5 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10">
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-industrial-700 to-industrial-800 flex items-center justify-center border border-white/10">
+                                <i class="fas fa-user-gear text-industrial-300"></i>
                             </div>
-                            <span class="text-sm font-medium" data-i18n="operator">{{ (current_user.first_name ~ " " ~
-                                current_user.last_name) | trim | default(current_user.username) | default('Operador')
-                                }}</span>
-                            <i class="fas fa-chevron-down text-gray-500 text-xs"></i>
+                            <div class="hidden sm:block text-left">
+                                <span class="block text-sm font-bold text-white leading-none mb-1" data-i18n="operator">
+                                    {{ (current_user.first_name ~ " " ~ current_user.last_name) | trim | default(current_user.username) | default('Operador') }}
+                                </span>
+                                <span class="text-[10px] text-industrial-400 uppercase font-black">Level: Admin</span>
+                            </div>
+                            <i class="fas fa-chevron-down text-industrial-500 text-xs ml-2"></i>
                         </button>
 
                         <!-- Dropdown Menu -->
                         <div id="user-menu-dropdown"
-                            class="hidden absolute right-0 mt-2 w-60 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                            <div class="px-4 py-3 border-b border-gray-100">
-                                <p class="text-sm font-medium truncate">{{ (current_user.first_name ~ " " ~
-                                    current_user.last_name) | trim | default(current_user.username) |
-                                    default('Operador') }}</p>
-                                <p class="text-xs text-gray-500 truncate">{{ current_user.email |
-                                    default(current_user.username ~ '@example.com') | default('email@example.com') }}
-                                </p>
+                            class="hidden absolute right-0 mt-3 w-64 glass-card p-2 z-[100]">
+                            <div class="px-4 py-3 border-b border-white/5 mb-2">
+                                <p class="text-xs text-industrial-400 uppercase font-black tracking-widest mb-1">User Profile</p>
+                                <p class="text-sm font-bold text-white truncate">{{ current_user.username }}</p>
                             </div>
 
                             <a href="#" id="account-settings-trigger"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                <i class="fas fa-user-gear w-5 mr-2 text-blue-500"></i>
-                                <span data-i18n="account_settings">Configurações da Conta</span>
+                                class="flex items-center px-4 py-2.5 text-sm text-industrial-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                <i class="fas fa-id-card w-5 mr-3 text-blue-500"></i>
+                                <span data-i18n="account_settings">Account Portal</span>
                             </a>
 
-                            <div class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex justify-between items-center cursor-pointer"
-                                onclick="document.getElementById('theme-toggle').click()">
-                                <div>
-                                    <i class="fas fa-moon w-5 mr-2 text-gray-500"></i>
-                                    <span data-i18n="dark_mode">Tema Escuro</span>
+                            <button onclick="document.getElementById('theme-toggle').click()"
+                                class="w-full flex items-center justify-between px-4 py-2.5 text-sm text-industrial-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                <div class="flex items-center">
+                                    <i class="fas fa-moon w-5 mr-3 text-industrial-400"></i>
+                                    <span data-i18n="dark_mode">Dark Interface</span>
                                 </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="theme-toggle" class="sr-only peer">
-                                    <div
-                                        class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600">
-                                    </div>
-                                </label>
-                            </div>
+                                <input type="checkbox" id="theme-toggle" class="sr-only peer" checked>
+                                <div class="w-8 h-4 bg-industrial-700 rounded-full relative peer-checked:bg-blue-600 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:after:translate-x-4"></div>
+                            </button>
 
                             <a href="{{ url_for('logout') }}"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-t border-gray-100">
-                                <i class="fas fa-sign-out-alt w-5 mr-2 text-gray-500"></i>
-                                <span data-i18n="logout">Sair</span>
+                                class="flex items-center px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 rounded-lg transition-colors mt-2 border-t border-white/5 pt-3">
+                                <i class="fas fa-power-off w-5 mr-3"></i>
+                                <span data-i18n="logout">Sign Out</span>
                             </a>
                         </div>
                     </div>
@@ -405,34 +299,43 @@
             </div>
         </header>
 
-        <!-- Main Content -->
-        <main class="flex-1">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6"> <!-- Adicionado pt-6 para espaçamento -->
-                <!-- Tabs Navigation -->
-                <div class="border-b border-gray-200 mb-6"> <!-- Adicionado mb-6 para espaçamento -->
-                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-                        <!-- Links usam url_for e verificam endpoint ativo -->
-                        <a href="{{ url_for('index') }}"
-                            class="tab-button {% if request.endpoint == 'index' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-                            data-i18n="monitoring">Monitoramento</a>
-                        <a href="{{ url_for('analytics_page') }}"
-                            class="tab-button {% if request.endpoint == 'analytics_page' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-                            data-i18n="analytics">Análises</a>
-                        <!-- Placeholder -->
-                        {% if current_user.role == 'admin' %}
-                        <a href="{{ url_for('settings_page') }}"
-                            class="tab-button {% if request.endpoint == 'settings_page' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-                            data-i18n="settings">Configurações</a>
-                        <a href="{{ url_for('users') }}"
-                            class="tab-button {% if request.endpoint == 'users' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-                            data-i18n="users">users</a>
-                        <a href="{{ url_for('retrain_page') }}"
-                            class="tab-button {% if request.endpoint == 'retrain_page' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-                            data-i18n="retraining">Retreinamento</a>
-                        {% endif %}
-                    </nav>
-                </div>
+        <!-- Navigation -->
+        <nav class="max-w-7xl mx-auto px-8 mt-6">
+            <div class="flex space-x-1 p-1.5 bg-industrial-900/50 backdrop-blur-md rounded-xl border border-white/5">
+                <a href="{{ url_for('index') }}"
+                    class="nav-link px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center space-x-2 {% if request.endpoint == 'index' %}bg-blue-600 text-white shadow-lg shadow-blue-600/20{% else %}text-industrial-400 hover:text-industrial-200 hover:bg-white/5{% endif %}"
+                    data-i18n="monitoring">
+                    <i class="fas fa-desktop text-xs"></i>
+                    <span>Real-time</span>
+                </a>
+                <a href="{{ url_for('analytics_page') }}"
+                    class="nav-link px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center space-x-2 {% if request.endpoint == 'analytics_page' %}bg-blue-600 text-white shadow-lg shadow-blue-600/20{% else %}text-industrial-400 hover:text-industrial-200 hover:bg-white/5{% endif %}"
+                    data-i18n="analytics">
+                    <i class="fas fa-chart-line text-xs"></i>
+                    <span>Analytics</span>
+                </a>
+                {% if current_user.role == 'admin' %}
+                <a href="{{ url_for('settings_page') }}"
+                    class="nav-link px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center space-x-2 {% if request.endpoint == 'settings_page' %}bg-blue-600 text-white shadow-lg shadow-blue-600/20{% else %}text-industrial-400 hover:text-industrial-200 hover:bg-white/5{% endif %}"
+                    data-i18n="settings">
+                    <i class="fas fa-sliders text-xs"></i>
+                    <span>Systems</span>
+                </a>
+                <a href="{{ url_for('users') }}"
+                    class="nav-link px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center space-x-2 {% if request.endpoint == 'users' %}bg-blue-600 text-white shadow-lg shadow-blue-600/20{% else %}text-industrial-400 hover:text-industrial-200 hover:bg-white/5{% endif %}"
+                    data-i18n="users">
+                    <i class="fas fa-users-gear text-xs"></i>
+                    <span>Access</span>
+                </a>
+                <a href="{{ url_for('retrain_page') }}"
+                    class="nav-link px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center space-x-2 {% if request.endpoint == 'retrain_page' %}bg-blue-600 text-white shadow-lg shadow-blue-600/20{% else %}text-industrial-400 hover:text-industrial-200 hover:bg-white/5{% endif %}"
+                    data-i18n="retraining">
+                    <i class="fas fa-brain text-xs"></i>
+                    <span>AI Engine</span>
+                </a>
+                {% endif %}
             </div>
+        </nav>
             <!-- Bloco onde o conteúdo específico da página será inserido -->
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 {% block content %}{% endblock %}
@@ -440,26 +343,34 @@
         </main>
 
         <!-- Footer -->
-        <footer class="bg-white border-t border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                <div class="flex flex-col md:flex-row justify-between items-center">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center">
-                            <i class="fas fa-cogs text-white text-xs"></i>
+        <footer class="mt-auto glass-card mx-4 mb-4 !rounded-2xl border-t-0 !bg-industrial-900/50 backdrop-blur-md">
+            <div class="max-w-7xl mx-auto px-8 py-6">
+                <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-industrial-800 flex items-center justify-center border border-white/5">
+                            <i class="fas fa-shield-halved text-blue-500 text-sm"></i>
                         </div>
-                        <span class="text-sm text-gray-600"><span data-i18n="system_name">VisionAlign
-                                Classificador</span> v3.2.1</span>
+                        <div class="text-left">
+                            <span class="block text-xs font-black text-white uppercase tracking-tighter">VisionAlign Engine</span>
+                            <span class="text-[9px] text-industrial-400 font-bold uppercase tracking-widest">Version 2.0.0-PRO (LTS)</span>
+                        </div>
                     </div>
-                    <div class="mt-4 md:mt-0 text-sm text-gray-500">
-                        <!-- Usando a variável 'now' injetada pelo context processor -->
-                        &copy; {{ now().year if now else '2023' }} VisionAlign Technologies. <span
-                            data-i18n="all_rights">Todos os direitos reservados.</span>
+                    
+                    <div class="text-[10px] text-industrial-500 font-medium tracking-wide">
+                        &copy; {{ now().year if now else '2026' }} VisionAlign Technologies. 
+                        <span class="mx-2 text-industrial-700">|</span> 
+                        <span data-i18n="all_rights">High-Performance Neural Inspection</span>
                     </div>
-                    <div class="mt-4 md:mt-0 flex space-x-6">
-                        <span class="text-sm text-gray-500 flex items-center">
+
+                    <div class="flex items-center space-x-6">
+                        <div class="flex items-center space-x-2 px-3 py-1.5 bg-industrial-950 rounded-lg border border-white/5">
+                            <i class="fas fa-microchip text-[10px] text-industrial-400"></i>
+                            <span class="text-[10px] font-bold text-industrial-300 uppercase">FP16 Engine</span>
+                        </div>
+                        <div class="flex items-center space-x-2 px-3 py-1.5 bg-industrial-950 rounded-lg border border-white/5">
                             <span class="status-indicator status-online"></span>
-                            <span data-i18n="status_online">Status: Online</span>
-                        </span>
+                            <span class="text-[10px] font-bold text-industrial-300 uppercase">System Sync</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -619,7 +530,7 @@
         window.USER_ROLE = "{{ current_user.role if current_user.is_authenticated else 'anonymous' }}";
     </script>
     <!-- Incluir o script.js principal -->
-    <script src="{{ url_for('static', filename='script.js') }}?v={{ range(1, 100000) | random }}"></script>
+    <script src="{{ url_for('static', path='script.js') }}?v={{ range(1, 100000) | random }}"></script>
     <script>
         // Controle do dropdown do menu do usuário
         const userMenuButton = document.getElementById('user-menu-button');

@@ -545,7 +545,6 @@ class YOLOModel:
                             keep_idx.append(k)
                     
                     if keep_idx:
-                        # FIX: Filtra o objeto de resultado inteiro para manter boxes, masks e IDs em sincronia
                         r_align = r_align[keep_idx]
                         
                         boxes_xyxy = r_align.boxes.xyxy.int().cpu().numpy()

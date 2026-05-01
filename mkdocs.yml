@@ -1,0 +1,67 @@
+site_name: VisionSystem Documentation
+site_description: Documentação técnica do ecossistema industrial VisionSystem.
+site_url: http://127.0.0.1:8000/
+theme:
+  name: material
+  language: pt
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+    - content.code.annotate
+
+plugins:
+  - search
+  - i18n:
+      languages:
+        - locale: pt
+          name: Português
+          default: true
+        - locale: en
+          name: English
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - attr_list
+  - md_in_html
+
+nav:
+  - VisionSystem: index.md
+  - Módulos:
+    - VisionAlign: vision_align.md
+    - VisionFracture: vision_fracture.md
+  - Inteligência Artificial:
+    - Arquitetura IA: architecture.md
+    - Treinamento OTX: otx_training.md
+    - Melhoria Contínua: continuous_improvement.md
+    - Cérebro Global: global_brain.md
+    - Manutenção: maintenance.md
+    - Glossário: glossary.md
+  - FAQ's: faqs.md

@@ -66,8 +66,12 @@ class OTXManager:
 
     def export(self, model_path, output_dir="exported", format="openvino"):
         """
-        Exporta o modelo para o formato OpenVINO.
-        """
+Próximos passos sugeridos:
+
+Testar o servidor: Podemos rodar o comando uvicorn backend.app.main:app --reload para verificar se tudo sobe corretamente.
+Migrar Configurações: Implementar a lógica de leitura/escrita do settings.json via API no roteador de settings.
+Atualizar o Cliente PyQt5: Ajustar o main_window.py para usar os novos endpoints /api/v1/... e autenticação via Token.
+Deseja que eu ajude a rodar o servidor para teste ou prefere continuar a migração dos outros módulos?  """
         # Exemplo: otx export --model model.pth --output exported --format openvino
         cmd = ["otx", "export", "--model", str(model_path), "--output", str(output_dir), "--format", format]
         return self._run_command(cmd)

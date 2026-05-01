@@ -47,52 +47,81 @@ function resetInactivityTimer() {
 }
 
 // ========================================================================
+// Funções Auxiliares de API
+// ========================================================================
+
+async function apiFetch(endpoint, options = {}) {
+    const token = localStorage.getItem('access_token');
+    const defaultHeaders = {
+        'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+        defaultHeaders['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(endpoint, {
+        ...options,
+        headers: {
+            ...defaultHeaders,
+            ...options.headers
+        }
+    });
+
+    if (response.status === 401) {
+        // Token expirado ou inválido
+        localStorage.removeItem('access_token');
+        window.location.href = '/login';
+        return;
+    }
+
+    return response;
+}
+
+// ========================================================================
 // Lógica da Página de Login
 // ========================================================================
 
 function initializeLoginPage() {
-    console.log("Initializing Login Page...");
-    // Garante que o timer de inatividade comece assim que a página de login é carregada
-    resetInactivityTimer();
+    console.log("Initializing Login Page (FastAPI Edition)...");
 
     const loginForm = document.getElementById('login-form');
-    if (!loginForm) {
-        console.error("Elemento 'login-form' não encontrado.");
-        return;
-    }
+    if (!loginForm) return;
 
     loginForm.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Impede o envio padrão do formulário
-
+        event.preventDefault();
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
-
-        showMessage('error-message', ''); // Limpa mensagens anteriores
+        
+        const errorElement = document.getElementById('error-message');
+        if (errorElement) errorElement.textContent = '';
 
         try {
-            const response = await fetch('/api/login', {
+            const formData = new URLSearchParams();
+            formData.append('username', username);
+            formData.append('password', password);
+
+            const response = await fetch('/api/v1/auth/login', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: JSON.stringify({ username, password }),
+                body: formData,
             });
 
             const data = await response.json();
 
-            if (response.ok && data.success) {
-                // Login bem-sucedido, redireciona para a página principal
+            if (response.ok && data.access_token) {
+                localStorage.setItem('access_token', data.access_token);
                 window.location.href = '/';
             } else {
-                // Exibe mensagem de erro
-                showMessage('error-message', data.message || 'Erro desconhecido no login.', true);
+                if (errorElement) errorElement.textContent = data.detail || 'Falha na autenticação industrial.';
             }
         } catch (error) {
-            console.error('Erro ao tentar fazer login:', error);
-            showMessage('error-message', 'Erro de conexão ao tentar fazer login.', true);
+            console.error('Erro de conexão:', error);
+            if (errorElement) errorElement.textContent = 'Erro crítico de rede. Verifique o servidor.';
         }
     });
-    console.log("Login form listener added.");
 }
 
 // ========================================================================
@@ -139,102 +168,42 @@ let saveSettingsBtn;
 let cancelSettingsBtn;
 
 async function fetchAndUpdateStats() {
-    // Só executa se estivermos na página principal (onde os elementos existem)
-    if (!statNormal) {
-        // console.log("Not on index page, skipping stats fetch.");
-        return;
-    }
-    // console.log("Fetching stats...");
+    if (!statNormal) return;
+    
     try {
-        // Chamar /api/basic_stats que retorna JSON não criptografado
-        const response = await fetch('/api/basic_stats');
+        const response = await apiFetch('/api/v1/stats/');
         if (!response.ok) {
-            console.error(`Erro ao buscar /api/basic_stats: ${response.status}`);
-            // Limpar os campos ou mostrar N/A em caso de erro
-            if (statNormal) statNormal.textContent = '--';
-            if (statFallenValue) statFallenValue.textContent = '--';
-            if (statInvertedValue) statInvertedValue.textContent = '--';
-            // ... limpar outros campos relevantes ...
+            console.error(`Erro industrial ao buscar stats: ${response.status}`);
             return;
         }
 
-        const stats = await response.json(); // Dados já são JSON
+        const data = await response.json();
 
         // --- Atualiza Stats Grid ---
-        if (statFracture) statFracture.textContent = stats.fracture ?? '--';
-        if (statNormal) statNormal.textContent = stats.lata_normal ?? '--';
-        if (statFallen) statFallen.textContent = stats.lata_tombada ?? '--'; // Usando statFallen ao invés de statFallenValue para consistência com init
-        if (statInverted) statInverted.textContent = stats.lata_invertida ?? '--';
+        // A nova API retorna detections: { normal, inverted, fallen, fracture }
+        if (statFracture) statFracture.textContent = data.detections?.fracture ?? '0';
+        if (statNormal) statNormal.textContent = data.detections?.normal ?? '0';
+        if (statFallen) statFallen.textContent = data.detections?.fallen ?? '0';
+        if (statInverted) statInverted.textContent = data.detections?.inverted ?? '0';
 
-        if (statFps) statFps.textContent = stats.fps ? stats.fps.toFixed(1) : '--';
+        if (statFps) statFps.textContent = data.fps ? data.fps.toFixed(1) : '0.0';
 
-        // --- Atualiza Tendências ---
-        // Assumindo que a API retornará pct de mudança eventualmente
-        updateTrend('stat-fracture', stats.fracture_change_pct);
-        updateTrend('stat-normal', stats.lata_normal_change_pct);
-        updateTrend('stat-fallen', stats.lata_tombada_change_pct);
-        updateTrend('stat-inverted', stats.lata_invertida_change_pct);
-
-        // Atualiza FPS (sem cálculo de tendência complexo por enquanto)
-        // Se você tiver um elemento para a tendência do FPS, você pode chamá-lo aqui:
-        // Exemplo: updateFPSTrend(stats.fps_trend_value); // Uma nova função específica para FPS se necessário
-        // A função updateTrend original (com isFps flag) era para uma estrutura HTML diferente.
-        // For now, we assume FPS trend is not displayed in the same way as can counts.
-        // If you need to update FPS trend similar to the old way:
-        /*
-        const fpsTrendElement = document.getElementById('stat-fps-trend'); // Assuming an ID for FPS trend text
-        if (fpsTrendElement && stats.fps_trend_text) { // Assuming API provides 'fps_trend_text'
-            fpsTrendElement.textContent = stats.fps_trend_text;
-            // Add color classes based on trend if needed
-        }
-        */
-
-        // --- Calcula e Atualiza Taxas de Aceitação/Erro ---
-        // Não é possível calcular taxas detalhadas com basic_stats
-        const acceptanceRate = 0; // Placeholder
-        const fallenRate = 0; // Placeholder
-        const invertedRate = 0; // Placeholder
-
-        if (rateAcceptanceValue) rateAcceptanceValue.textContent = `${acceptanceRate.toFixed(1)}%`;
-        if (rateAcceptanceBar) rateAcceptanceBar.style.width = `${acceptanceRate}%`;
-        if (rateFallenValue) rateFallenValue.textContent = `${fallenRate.toFixed(1)}%`;
-        if (rateFallenBar) rateFallenBar.style.width = `${fallenRate}%`;
-        if (rateInvertedValue) rateInvertedValue.textContent = `${invertedRate.toFixed(1)}%`;
-        if (rateInvertedBar) rateInvertedBar.style.width = `${invertedRate}%`;
-
-        // --- Atualiza Status das Câmeras ---
-        // updateCameraStatus(null); // Status de câmera não vêm de basic_stats
-
-        // Guarda os stats atuais para a próxima comparação
-        previousStats = {
-            fracture: stats.fracture || 0,
-            lata_normal: stats.lata_normal || 0,
-            lata_invertida: stats.lata_invertida || 0,
-            lata_tombada: stats.lata_tombada || 0,
-            fps: stats.fps || 0
-        };
-
-        // --- Atualiza Video Overlay ---
+        // --- Atualiza Sistema ---
         if (videoResolution) {
-            videoResolution.textContent = 'N/A'; // Resolução não vem de basic_stats
+            videoResolution.textContent = data.system_info?.device || 'CPU';
         }
-        // Usar o tempo de atividade do sistema como timestamp do vídeo por simplicidade
+        
+        // Atualiza Uptime (usando o tempo local do script como fallback)
         if (videoTimestamp) {
-            // Poderia usar stats.system_uptime_seconds se preferir o tempo do backend
             const elapsedSeconds = Math.floor((Date.now() - scriptLoadTime) / 1000);
             videoTimestamp.textContent = formatUptime(elapsedSeconds);
         }
 
-        // --- Atualiza Footer System Info ---
-        if (systemTime) { // Uptime não vem de basic_stats
-            systemTime.textContent = formatUptime(0); // Ou algum placeholder
-        }
-        if (systemLoad) {
-            // CPU/RAM é complexo de obter remotamente de forma confiável, usamos placeholder
-            systemLoad.textContent = "CPU/RAM: N/A";
-        }
+        // --- Atualiza Tendências (Opcional: Simulação se não houver no backend) ---
+        // Aqui você pode manter a lógica de tendência se desejar comparar com previousStats
+        
     } catch (error) {
-        console.error('Erro na requisição de stats:', error);
+        console.error('Falha na comunicação com o Motor de IA:', error);
     }
 }
 

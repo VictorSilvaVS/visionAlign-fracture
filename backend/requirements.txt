@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+python-multipart
+pydantic
+pydantic-settings
+python-jose[cryptography]
+passlib[bcrypt]
+cryptography
+aiofiles
+requests
+opencv-python-headless
+numpy
+flask-login # For compatibility during migration if needed
+flask # For compatibility during migration if needed

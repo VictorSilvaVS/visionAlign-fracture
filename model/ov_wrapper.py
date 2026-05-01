@@ -265,7 +265,15 @@ class OVModel:
         ie = Core()
         model = ie.read_model(xml_path)
         self._compiled = ie.compile_model(model, 'CPU')
-        self._output_names = [o.any_name for o in self._compiled.outputs]
+        # Algumas versões/modelos do OpenVINO podem não ter nomes definidos para os tensores de saída.
+        # Usamos any_name com um fallback para evitar RuntimeError.
+        self._output_names = []
+        for i, o in enumerate(self._compiled.outputs):
+            try:
+                name = o.any_name
+            except Exception:
+                name = f"output_{i}"
+            self._output_names.append(name)
 
         self._tracker = _ByteTracker()
 

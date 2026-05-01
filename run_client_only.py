@@ -22,6 +22,8 @@ from model.yolo_model import YOLOModel
 from utils.timezone_utils import get_current_utc_timestamp
 
 # --- Globais ---
+DEFAULT_DB_LOG_INTERVAL = 60
+DEFAULT_MAIN_LOOP_SLEEP = 0.1
 stats_lock = RLock()
 frame_lock = RLock()
 db_log_lock = RLock()
