@@ -1,36 +1,46 @@
 # Maintenance and Troubleshooting
 
-This guide helps resolve the most common day-to-day issues on the production line, focusing on physical and operational causes.
+This guide helps resolve the most common daily problems on the production line, focusing on physical and operational care.
 
 ---
 
-## 🛠️ "What to do if..." (Problems and Solutions)
+## What to do if... (Problems and Solutions)
 
-### 1. The image is blurry or "cloudy"
-*   **Probable Cause:** Accumulation of oil, dust, or lubricant on the camera lens.
-*   **Action:** Carefully clean the lens with a microfiber cloth and **isopropyl alcohol**. Never use rough cloths or water.
+### 1. The image is blurry or cloudy
+*   Probable cause: Accumulation of oil, dust, or lubricant on the camera lens.
+*   Action: Clean the lens carefully with a soft cloth and isopropyl alcohol. Do not use rough cloths.
 
-### 2. The system is not detecting anything (Black Screen)
-*   **Probable Cause:** Network cable (Ethernet) or power cable is loose.
-*   **Action:** Check the physical connections at the back of the camera and on the industrial switch. Ensure the link LED is flashing.
+### 2. The system is not showing an image (Black Screen)
+*   Probable cause: Network or power cable is loose.
+*   Action: Check if the cables are properly connected to the camera and the computer.
 
-### 3. False Negatives (AI missed an obvious fracture)
-*   **Probable Cause:** External lighting interference (sunlight reflection or nearby welding light).
-*   **Action:** Ensure the camera's protective shield is correctly positioned to block external light. Clean the VisionSystem's lighting LEDs.
+### 3. The system missed an obvious crack
+*   Probable cause: External light reflection (such as sunlight or strong nearby lamps).
+*   Action: Check if the camera shield is in the right place to block external lights. Clean the system's lighting LEDs.
 
-### 4. Image lag or "freezing"
-*   **Probable Cause:** Overheating of the Edge Computing box.
-*   **Action:** Check if the server's fans are obstructed by dirt. Perform a cleaning with compressed air if necessary.
+### 4. The image is slow or freezing
+*   Probable cause: The computer might be too hot.
+*   Action: Check if the computer fans are clean and dust-free.
 
 ---
 
-## 📅 Preventive Maintenance Plan
+## Preventive Maintenance Plan
 
 | Activity | Frequency | Tool |
 | :--- | :--- | :--- |
-| Lens Cleaning | Daily (shift start) | Isopropyl Alcohol |
-| Cable Check | Weekly | Visual Inspection |
-| Filter/Fan Cleaning | Monthly | Compressed Air |
-| Log Backup | Quarterly | Automatic via Dashboard |
+| Lens Cleaning | Daily (start of shift) | Isopropyl Alcohol |
+| Cable Verification | Weekly | Visual Inspection |
+| Computer Cleaning | Monthly | Compressed Air |
+| Data Backup | Quarterly | Automatic |
 
-> **Pro Tip:** 90% of "bad AI" errors are actually caused by an oil-dirty lens. Keep the machine's vision clean!
+---
+
+!!! danger "Industrial Safety"
+    Never perform physical maintenance (lens or cable cleaning) while the conveyor belt is in motion. Turn off the vision system before any direct intervention on the camera.
+
+!!! note "Golden Tip"
+    Most AI reading errors are caused by dirty lenses. Always keep the camera clean to ensure 98% accuracy.
+
+---
+
+Last updated: May 2026

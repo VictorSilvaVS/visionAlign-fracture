@@ -6,23 +6,23 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Documentação técnica do ecossistema industrial VisionSystem.">
+        <meta name="description" content="Sistema de Visão Computacional Industrial para Inspeção de Latas">
+      
+      
+        <meta name="author" content="Victor Silva">
       
       
       
-        <link rel="canonical" href="http://127.0.0.1:8000/continuous_improvement/">
+        <link rel="prev" href="../glossary/">
       
       
-        <link rel="prev" href="../otx_training/">
-      
-      
-        <link rel="next" href="../global_brain/">
+        <link rel="next" href="../maintenance/">
       
       
         
           <link rel="alternate" href="./" hreflang="pt">
         
-          <link rel="alternate" href="../en/continuous_improvement/" hreflang="en">
+          <link rel="alternate" href="../en/api_reference/" hreflang="en">
         
       
       
@@ -31,7 +31,7 @@
     
     
       
-        <title>Melhoria Contínua - VisionSystem Documentation</title>
+        <title>API e Segurança - VisionAlign-Fracture</title>
       
     
     
@@ -73,7 +73,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#melhoria-continua-de-processo" class="md-skip">
+        <a href="#referencia-da-api-e-seguranca" class="md-skip">
           Ir para o conteúdo
         </a>
       
@@ -96,7 +96,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
-    <a href=".." title="VisionSystem Documentation" class="md-header__button md-logo" aria-label="VisionSystem Documentation" data-md-component="logo">
+    <a href=".." title="VisionAlign-Fracture" class="md-header__button md-logo" aria-label="VisionAlign-Fracture" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,13 +110,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            VisionSystem Documentation
+            VisionAlign-Fracture
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Melhoria Contínua
+              API e Segurança
             
           </span>
         </div>
@@ -129,9 +129,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Mudar para modo escuro"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+      <label class="md-header__button md-icon" title="Mudar para modo escuro" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -139,9 +139,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Mudar para modo claro"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+      <label class="md-header__button md-icon" title="Mudar para modo claro" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -169,7 +169,7 @@
           </li>
         
           <li class="md-select__item">
-            <a href="../en/continuous_improvement/" hreflang="en" class="md-select__link">
+            <a href="../en/api_reference/" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
@@ -247,7 +247,7 @@
   
     
   
-  VisionSystem
+  Início
 
       </a>
     </li>
@@ -259,18 +259,93 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="../vision_align/" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="../installation/" class="md-tabs__link">
+        
   
   
-  Módulos
+    
+  
+  Instalação
 
-        </a>
-      </li>
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../tecnologias/" class="md-tabs__link">
+        
+  
+  
     
+  
+  Tecnologias
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Arquitetura
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../como_foi_feito/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Como foi feito
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../glossary/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Glossário
+
+      </a>
+    </li>
   
 
       
@@ -281,18 +356,36 @@
     
   
   
-    
-    
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../architecture/" class="md-tabs__link">
-          
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
   
   
-  Inteligência Artificial
+    
+  
+  API e Segurança
 
-        </a>
-      </li>
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../maintenance/" class="md-tabs__link">
+        
+  
+  
     
+  
+  Manutenção
+
+      </a>
+    </li>
   
 
       
@@ -308,7 +401,7 @@
   
     
   
-  FAQ's
+  Perguntas Frequentes
 
       </a>
     </li>
@@ -337,13 +430,13 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navegação" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="VisionSystem Documentation" class="md-nav__button md-logo" aria-label="VisionSystem Documentation" data-md-component="logo">
+    <a href=".." title="VisionAlign-Fracture" class="md-nav__button md-logo" aria-label="VisionAlign-Fracture" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    VisionSystem Documentation
+    VisionAlign-Fracture
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -362,7 +455,7 @@
   <span class="md-ellipsis">
     
   
-    VisionSystem
+    Início
   
 
     
@@ -377,73 +470,19 @@
     
       
       
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Módulos
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Módulos
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../vision_align/" class="md-nav__link">
+      <a href="../installation/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    VisionAlign
+    Instalação
   
 
     
@@ -455,23 +494,22 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
   
     <li class="md-nav__item">
-      <a href="../vision_fracture/" class="md-nav__link">
+      <a href="../tecnologias/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    VisionFracture
+    Tecnologias
   
 
     
@@ -483,74 +521,9 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
     
       
       
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-        
-        
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Inteligência Artificial
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Inteligência Artificial
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
   
   
   
@@ -563,7 +536,7 @@
   <span class="md-ellipsis">
     
   
-    Arquitetura IA
+    Arquitetura
   
 
     
@@ -575,23 +548,22 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
   
     <li class="md-nav__item">
-      <a href="../otx_training/" class="md-nav__link">
+      <a href="../como_foi_feito/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Treinamento OTX
+    Como foi feito
   
 
     
@@ -603,10 +575,36 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossário
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
   
   
     
@@ -628,7 +626,7 @@
   <span class="md-ellipsis">
     
   
-    Melhoria Contínua
+    API e Segurança
   
 
     
@@ -646,7 +644,7 @@
   <span class="md-ellipsis">
     
   
-    Melhoria Contínua
+    API e Segurança
   
 
     
@@ -672,10 +670,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ciclo-de-aperfeicoamento" class="md-nav__link">
+  <a href="#1-seguranca-dos-dados-criptografia" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Ciclo de Aperfeiçoamento
+        1. Segurança dos Dados (Criptografia)
       
     </span>
   </a>
@@ -683,10 +681,71 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#analise-comparativa" class="md-nav__link">
+  <a href="#2-pontos-de-comunicacao-endpoints" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Análise Comparativa
+        2. Pontos de Comunicação (Endpoints)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Pontos de Comunicação (Endpoints)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#estatisticas-e-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estatísticas e Status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#controle-de-video" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Controle de Vídeo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logs-em-tempo-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logs em Tempo Real
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#atualizacao-de-configuracoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Atualização de Configurações
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-acesso-de-usuarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Acesso de Usuários
       
     </span>
   </a>
@@ -700,38 +759,9 @@
     </li>
   
 
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../global_brain/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
     
-  
-    Cérebro Global
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
+      
+      
   
   
   
@@ -756,42 +786,6 @@
     </li>
   
 
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../glossary/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Glossário
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
     
       
       
@@ -807,7 +801,7 @@
   <span class="md-ellipsis">
     
   
-    FAQ's
+    Perguntas Frequentes
   
 
     
@@ -847,10 +841,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ciclo-de-aperfeicoamento" class="md-nav__link">
+  <a href="#1-seguranca-dos-dados-criptografia" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Ciclo de Aperfeiçoamento
+        1. Segurança dos Dados (Criptografia)
       
     </span>
   </a>
@@ -858,10 +852,71 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#analise-comparativa" class="md-nav__link">
+  <a href="#2-pontos-de-comunicacao-endpoints" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Análise Comparativa
+        2. Pontos de Comunicação (Endpoints)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Pontos de Comunicação (Endpoints)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#estatisticas-e-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estatísticas e Status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#controle-de-video" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Controle de Vídeo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logs-em-tempo-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logs em Tempo Real
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#atualizacao-de-configuracoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Atualização de Configurações
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-acesso-de-usuarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Acesso de Usuários
       
     </span>
   </a>
@@ -885,53 +940,45 @@
 
 
 
-<h1 id="melhoria-continua-de-processo">Melhoria Contínua de Processo</h1>
-<p>O VisionAlign é projetado para aumentar sua eficácia operacional de forma contínua. Diferente de sistemas de visão tradicionais baseados em algoritmos estáticos, esta solução evolui conforme novos dados são processados.</p>
-<h2 id="ciclo-de-aperfeicoamento">Ciclo de Aperfeiçoamento</h2>
-<pre class="mermaid"><code>stateDiagram-v2
-    [*] --&gt; Operação
-    Operação --&gt; Incerteza: Baixa Confiança
-    Incerteza --&gt; Coleta: Armazenamento
-    Coleta --&gt; Validação: Feedback
-    Validação --&gt; OTX: Treinamento
-    OTX --&gt; Otimização: OpenVINO
-    Otimização --&gt; Operação: Implementação</code></pre>
-<h2 id="analise-comparativa">Análise Comparativa</h2>
-<table>
-<thead>
-<tr>
-<th style="text-align: left;">Critério</th>
-<th style="text-align: left;">Visão Computacional Tradicional</th>
-<th style="text-align: left;">VisionAlign AI</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: left;"><strong>Novos Padrões</strong></td>
-<td style="text-align: left;">Requer re-engenharia de software</td>
-<td style="text-align: left;">Aprendizado via novos exemplos</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Variabilidade Ambiental</strong></td>
-<td style="text-align: left;">Sensível a mudanças de luz/ruído</td>
-<td style="text-align: left;">Alta capacidade de generalização</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Custo de Manutenção</strong></td>
-<td style="text-align: left;">Elevado (ajustes manuais frequentes)</td>
-<td style="text-align: left;">Reduzido (auto-ajustável)</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Escalabilidade</strong></td>
-<td style="text-align: left;">Complexa (depende de hardware específico)</td>
-<td style="text-align: left;">Alta (independente de plataforma)</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>[!IMPORTANT]
-O diferencial estratégico do VisionAlign reside na sua capacidade de sinalizar o desconhecido, permitindo que falhas inéditas sejam incorporadas ao conhecimento do sistema de forma estruturada.</p>
-</blockquote>
+<h1 id="referencia-da-api-e-seguranca">Referência da API e Segurança</h1>
+<p>Este documento descreve como os dados são protegidos e como os diferentes computadores conversam entre si.</p>
+<hr />
+<h2 id="1-seguranca-dos-dados-criptografia">1. Segurança dos Dados (Criptografia)</h2>
+<ul>
+<li><strong>Dados Protegidos:</strong> Todas as informações sensíveis (estatísticas, configurações e imagens) são trancadas antes de serem enviadas pela rede.</li>
+<li><strong>Método:</strong> AES-128-CBC.</li>
+<li><strong>Chave:</strong> Gerada automaticamente na primeira execução do servidor.</li>
+<li><strong>Funcionamento:</strong> O servidor tranca os dados e só o computador que possui a mesma chave consegue abrir e ler as informações.</li>
+</ul>
+<hr />
+<h2 id="2-pontos-de-comunicacao-endpoints">2. Pontos de Comunicação (Endpoints)</h2>
+<h3 id="estatisticas-e-status">Estatísticas e Status</h3>
+<ul>
+<li><strong>URL:</strong> <code>/api/stats</code></li>
+<li><strong>Uso:</strong> O sistema pede as contagens de produção e o status da inteligência artificial.</li>
+</ul>
+<h3 id="controle-de-video">Controle de Vídeo</h3>
+<ul>
+<li><strong>URL:</strong> <code>/api/change_source</code></li>
+<li><strong>Uso:</strong> Permite mudar a câmera ou o vídeo que está sendo analisado.</li>
+</ul>
+<h3 id="logs-em-tempo-real">Logs em Tempo Real</h3>
+<ul>
+<li><strong>URL:</strong> <code>/console_stream</code></li>
+<li><strong>Uso:</strong> Mostra as mensagens do sistema ao vivo no navegador sem precisar atualizar a página.</li>
+</ul>
+<h3 id="atualizacao-de-configuracoes">Atualização de Configurações</h3>
+<ul>
+<li><strong>URL:</strong> <code>/api/settings</code></li>
+<li><strong>Uso:</strong> Envia novos ajustes de sensibilidade para a inteligência artificial sem precisar reiniciar o sistema.</li>
+</ul>
+<hr />
+<h2 id="3-acesso-de-usuarios">3. Acesso de Usuários</h2>
+<p>O sistema controla quem pode acessar cada área:
+*   <strong>Login:</strong> Exige nome de usuário e senha.
+*   <strong>Administrador:</strong> Apenas usuários com permissão de administrador podem alterar as configurações críticas da inteligência artificial.</p>
+<hr />
+<p>Última atualização: Maio de 2026</p>
 
 
 
@@ -981,7 +1028,7 @@ O diferencial estratégico do VisionAlign reside na sua capacidade de sinalizar 
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "Mais 1 nesta p\u00e1gina", "search.result.more.other": "Mais # nesta p\u00e1gina", "search.result.none": "Nenhum resultado encontrado", "search.result.one": "1 resultado encontrado", "search.result.other": "# resultados encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "Mais 1 nesta p\u00e1gina", "search.result.more.other": "Mais # nesta p\u00e1gina", "search.result.none": "Nenhum resultado encontrado", "search.result.one": "1 resultado encontrado", "search.result.other": "# resultados encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>

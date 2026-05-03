@@ -6,23 +6,23 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Documentação técnica do ecossistema industrial VisionSystem.">
+        <meta name="description" content="Sistema de Visão Computacional Industrial para Inspeção de Latas">
+      
+      
+        <meta name="author" content="Victor Silva">
       
       
       
-        <link rel="canonical" href="http://127.0.0.1:8000/global_brain/">
+        <link rel="prev" href="../architecture/">
       
       
-        <link rel="prev" href="../continuous_improvement/">
-      
-      
-        <link rel="next" href="../maintenance/">
+        <link rel="next" href="../glossary/">
       
       
         
           <link rel="alternate" href="./" hreflang="pt">
         
-          <link rel="alternate" href="../en/global_brain/" hreflang="en">
+          <link rel="alternate" href="../en/como_foi_feito/" hreflang="en">
         
       
       
@@ -31,7 +31,7 @@
     
     
       
-        <title>Cérebro Global - VisionSystem Documentation</title>
+        <title>Como foi feito - VisionAlign-Fracture</title>
       
     
     
@@ -73,7 +73,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#cerebro-global-inteligencia-coletiva-industrial" class="md-skip">
+        <a href="#como-foi-feito" class="md-skip">
           Ir para o conteúdo
         </a>
       
@@ -96,7 +96,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
-    <a href=".." title="VisionSystem Documentation" class="md-header__button md-logo" aria-label="VisionSystem Documentation" data-md-component="logo">
+    <a href=".." title="VisionAlign-Fracture" class="md-header__button md-logo" aria-label="VisionAlign-Fracture" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,13 +110,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            VisionSystem Documentation
+            VisionAlign-Fracture
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Cérebro Global
+              Como foi feito
             
           </span>
         </div>
@@ -129,9 +129,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Mudar para modo escuro"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+      <label class="md-header__button md-icon" title="Mudar para modo escuro" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -139,9 +139,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Mudar para modo claro"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+      <label class="md-header__button md-icon" title="Mudar para modo claro" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -169,7 +169,7 @@
           </li>
         
           <li class="md-select__item">
-            <a href="../en/global_brain/" hreflang="en" class="md-select__link">
+            <a href="../en/como_foi_feito/" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
@@ -247,7 +247,7 @@
   
     
   
-  VisionSystem
+  Início
 
       </a>
     </li>
@@ -259,18 +259,55 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="../vision_align/" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="../installation/" class="md-tabs__link">
+        
   
   
-  Módulos
+    
+  
+  Instalação
 
-        </a>
-      </li>
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../tecnologias/" class="md-tabs__link">
+        
+  
+  
     
+  
+  Tecnologias
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Arquitetura
+
+      </a>
+    </li>
   
 
       
@@ -281,18 +318,74 @@
     
   
   
-    
-    
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../architecture/" class="md-tabs__link">
-          
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
   
   
-  Inteligência Artificial
+    
+  
+  Como foi feito
 
-        </a>
-      </li>
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../glossary/" class="md-tabs__link">
+        
+  
+  
     
+  
+  Glossário
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../api_reference/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  API e Segurança
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../maintenance/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Manutenção
+
+      </a>
+    </li>
   
 
       
@@ -308,7 +401,7 @@
   
     
   
-  FAQ's
+  Perguntas Frequentes
 
       </a>
     </li>
@@ -337,13 +430,13 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navegação" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="VisionSystem Documentation" class="md-nav__button md-logo" aria-label="VisionSystem Documentation" data-md-component="logo">
+    <a href=".." title="VisionAlign-Fracture" class="md-nav__button md-logo" aria-label="VisionAlign-Fracture" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    VisionSystem Documentation
+    VisionAlign-Fracture
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -362,7 +455,7 @@
   <span class="md-ellipsis">
     
   
-    VisionSystem
+    Início
   
 
     
@@ -377,73 +470,19 @@
     
       
       
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Módulos
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Módulos
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../vision_align/" class="md-nav__link">
+      <a href="../installation/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    VisionAlign
+    Instalação
   
 
     
@@ -455,23 +494,22 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
   
     <li class="md-nav__item">
-      <a href="../vision_fracture/" class="md-nav__link">
+      <a href="../tecnologias/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    VisionFracture
+    Tecnologias
   
 
     
@@ -483,74 +521,9 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
     
       
       
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-        
-        
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Inteligência Artificial
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Inteligência Artificial
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
   
   
   
@@ -563,7 +536,7 @@
   <span class="md-ellipsis">
     
   
-    Arquitetura IA
+    Arquitetura
   
 
     
@@ -575,66 +548,9 @@
     </li>
   
 
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../otx_training/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
     
-  
-    Treinamento OTX
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../continuous_improvement/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Melhoria Contínua
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
+      
+      
   
   
     
@@ -656,7 +572,7 @@
   <span class="md-ellipsis">
     
   
-    Cérebro Global
+    Como foi feito
   
 
     
@@ -674,7 +590,7 @@
   <span class="md-ellipsis">
     
   
-    Cérebro Global
+    Como foi feito
   
 
     
@@ -700,10 +616,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#como-funciona-o-conceito-aprendeu-uma-aprenderam-todas" class="md-nav__link">
+  <a href="#1-o-inicio-e-os-desafios" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Como funciona (O conceito "Aprendeu Uma, Aprenderam Todas")
+        1. O Início e os Desafios
       
     </span>
   </a>
@@ -711,30 +627,46 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ia-explicavel-o-mapa-de-calor-heatmap" class="md-nav__link">
+  <a href="#2-a-mudanca-para-tecnologia-intel" class="md-nav__link">
     <span class="md-ellipsis">
       
-        IA Explicável: O Mapa de Calor (Heatmap)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="IA Explicável: O Mapa de Calor (Heatmap)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#onde-a-ia-esta-olhando" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        "Onde a IA está olhando?"
+        2. A Mudança para Tecnologia Intel
       
     </span>
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#3-divisao-de-trabalho-funil-de-inspecao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Divisão de Trabalho (Funil de Inspeção)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-resolvendo-o-atraso-do-video" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Resolvendo o Atraso do Vídeo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-seguranca-industrial" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Segurança Industrial
+      
+    </span>
+  </a>
   
 </li>
       
@@ -745,38 +677,9 @@
     </li>
   
 
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../maintenance/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
     
-  
-    Manutenção
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
+      
+      
   
   
   
@@ -801,11 +704,57 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
+    
       
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api_reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API e Segurança
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maintenance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manutenção
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -824,7 +773,7 @@
   <span class="md-ellipsis">
     
   
-    FAQ's
+    Perguntas Frequentes
   
 
     
@@ -864,10 +813,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#como-funciona-o-conceito-aprendeu-uma-aprenderam-todas" class="md-nav__link">
+  <a href="#1-o-inicio-e-os-desafios" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Como funciona (O conceito "Aprendeu Uma, Aprenderam Todas")
+        1. O Início e os Desafios
       
     </span>
   </a>
@@ -875,30 +824,46 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ia-explicavel-o-mapa-de-calor-heatmap" class="md-nav__link">
+  <a href="#2-a-mudanca-para-tecnologia-intel" class="md-nav__link">
     <span class="md-ellipsis">
       
-        IA Explicável: O Mapa de Calor (Heatmap)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="IA Explicável: O Mapa de Calor (Heatmap)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#onde-a-ia-esta-olhando" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        "Onde a IA está olhando?"
+        2. A Mudança para Tecnologia Intel
       
     </span>
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#3-divisao-de-trabalho-funil-de-inspecao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Divisão de Trabalho (Funil de Inspeção)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-resolvendo-o-atraso-do-video" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Resolvendo o Atraso do Vídeo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-seguranca-industrial" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Segurança Industrial
+      
+    </span>
+  </a>
   
 </li>
       
@@ -919,29 +884,32 @@
 
 
 
-<h1 id="cerebro-global-inteligencia-coletiva-industrial">Cérebro Global: Inteligência Coletiva Industrial</h1>
-<p>O <strong>Cérebro Global</strong> é o recurso mais avançado do VisionSystem. Ele permite que o aprendizado de uma única máquina em qualquer lugar do mundo seja compartilhado instantaneamente com todas as outras unidades da sua empresa.</p>
-<h2 id="como-funciona-o-conceito-aprendeu-uma-aprenderam-todas">Como funciona (O conceito "Aprendeu Uma, Aprenderam Todas")</h2>
-<p>Imagine que sua fábrica na Polônia encontre um defeito inédito, causado por uma variação rara na matéria-prima. 
-1.  <strong>Descoberta Local:</strong> A IA na Polônia detecta a anomalia, captura a imagem e o sistema OTX realiza o retreino automático.
-2.  <strong>Sincronização de Inteligência:</strong> Assim que o novo "conhecimento" (os pesos do modelo) é validado, ele é enviado para o Cérebro Global (Nuvem Privada).
-3.  <strong>Atualização Universal:</strong> Sem que ninguém precise apertar um botão, a fábrica no Brasil recebe essa atualização. Agora, se esse mesmo defeito aparecer no Brasil, a IA já saberá exatamente o que fazer, mesmo sem nunca ter visto aquele erro antes localmente.</p>
-<pre class="mermaid"><code>graph TD
-    A[Fábrica Polônia] --&gt;|Novo Defeito| B(OTX Local)
-    B --&gt;|Atualização de Pesos| C{Cérebro Global}
-    C --&gt;|Sincronização| D[Fábrica Brasil]
-    C --&gt;|Sincronização| E[Fábrica USA]
-    D --&gt;|Imunidade| F[Defeito Detectado de Primeira]</code></pre>
+<h1 id="como-foi-feito">Como Foi Feito</h1>
+<p>Este documento conta a história do desenvolvimento do VisionAlign-Fracture e as decisões tomadas para chegar ao sistema atual.</p>
 <hr />
-<h2 id="ia-explicavel-o-mapa-de-calor-heatmap">IA Explicável: O Mapa de Calor (Heatmap)</h2>
-<p>Para garantir que operadores e gestores confiem plenamente na decisão da máquina, o VisionSystem utiliza a <strong>IA Explicável</strong>.</p>
-<h3 id="onde-a-ia-esta-olhando">"Onde a IA está olhando?"</h3>
-<p>Em vez de apenas exibir uma caixa de texto dizendo "Fratura", o sistema gera um <strong>Mapa de Calor Térmico (Heatmap)</strong> sobre a imagem. 
-*   <strong>Brilho Vermelho:</strong> Indica as zonas de alta ativação neural, ou seja, exatamente onde a IA encontrou a deformação.
-*   <strong>Transparência:</strong> Permite ver o metal original sob o brilho, confirmando visualmente a falha.</p>
-<blockquote>
-<p><strong>Benefício para o CEO:</strong> Você não precisa entender de algoritmos para saber que a IA está certa. O brilho na tela mostra o "raciocínio" visual do sistema, eliminando o medo da "caixa-preta".</p>
-</blockquote>
+<h2 id="1-o-inicio-e-os-desafios">1. O Início e os Desafios</h2>
+<p>O projeto começou com a necessidade de inspecionar latas em alta velocidade. No início, usamos ferramentas comuns de mercado (como Ultralytics YOLO). </p>
+<p><strong>O Problema:</strong> Essas ferramentas eram pesadas e exigiam computadores muito caros com placas de vídeo potentes. Na fábrica, precisávamos de algo que rodasse em computadores simples.</p>
+<hr />
+<h2 id="2-a-mudanca-para-tecnologia-intel">2. A Mudança para Tecnologia Intel</h2>
+<p>Decidimos mudar para o OpenVINO da Intel. Essa escolha permitiu que o sistema rodasse até 5 vezes mais rápido usando apenas o processador comum do computador.</p>
+<p><strong>Resultado:</strong> Economia de hardware e maior estabilidade para rodar 24 horas por dia.</p>
+<hr />
+<h2 id="3-divisao-de-trabalho-funil-de-inspecao">3. Divisão de Trabalho (Funil de Inspeção)</h2>
+<p>Criamos uma estratégia de "equipe digital" para que o sistema não ficasse lento:</p>
+<ul>
+<li><strong>Identificador:</strong> Localiza a lata na esteira.</li>
+<li><strong>Inspetor:</strong> Foca apenas na lata localizada para procurar falhas.</li>
+</ul>
+<p>Isso é como ter uma pessoa para separar as latas e outra apenas para olhar os detalhes de cada uma.</p>
+<hr />
+<h2 id="4-resolvendo-o-atraso-do-video">4. Resolvendo o Atraso do Vídeo</h2>
+<p>Câmeras industriais 4K enviam muitos dados. Se usássemos o método comum de leitura de vídeo, o sistema começaria a mostrar imagens com atraso. Usamos o programa FFmpeg para garantir que o sistema sempre veja o "agora", descartando imagens velhas automaticamente.</p>
+<hr />
+<h2 id="5-seguranca-industrial">5. Segurança Industrial</h2>
+<p>Para proteger os dados da fábrica, todas as informações que passam pela rede são trancadas com uma chave digital (criptografia). Somente o computador autorizado pode ler essas informações.</p>
+<hr />
+<p>Última atualização: Maio de 2026</p>
 
 
 
@@ -991,7 +959,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "Mais 1 nesta p\u00e1gina", "search.result.more.other": "Mais # nesta p\u00e1gina", "search.result.none": "Nenhum resultado encontrado", "search.result.one": "1 resultado encontrado", "search.result.other": "# resultados encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "Mais 1 nesta p\u00e1gina", "search.result.more.other": "Mais # nesta p\u00e1gina", "search.result.none": "Nenhum resultado encontrado", "search.result.one": "1 resultado encontrado", "search.result.other": "# resultados encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>

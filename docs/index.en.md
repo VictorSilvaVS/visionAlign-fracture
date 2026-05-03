@@ -1,29 +1,43 @@
-# VisionSystem: Intelligent Inspection Ecosystem
+# VisionAlign-Fracture Documentation
 
-**VisionSystem** is an integrated industrial monitoring solution that combines the power of multiple AI models to ensure maximum quality and traceability on the factory floor.
+Welcome to the official documentation for VisionAlign-Fracture, an inspection system for industrial production lines.
 
-## Collaborative Architecture
+This system uses artificial intelligence to ensure quality in can manufacturing. It identifies if cans are in the correct position and detects small cracks or flaws that would be difficult to see with the naked eye.
 
-The hallmark of VisionSystem lies in the synergy between its core modules:
+![System Interface](assets/images/dashboard.png)
 
-1.  **VisionAlign:** Responsible for global detection and positioning. It provides spatial context and isolates the Region of Interest (ROI).
-2.  **VisionFracture:** Operates within the ROI provided by VisionAlign, performing integrity inspection (fractures) and BodyMaker Identification (BM ID).
+!!! info "System Status"
+    VisionAlign-Fracture is operating on version 2.1 with full support for Intel processors via OpenVINO.
 
-```mermaid
-graph LR
-    A[Industrial Camera] --> B[VisionSystem]
-    subgraph Modules
-    B --> C[VisionAlign]
-    C -->|ROI Handoff| D[VisionFracture]
-    end
-    D --> E[Traceability and Alerts]
-```
+## Navigation Guide
+
+We recommend following the order below to understand the system:
+
+### Getting Started
+* [Installation Guide](installation.md): How to set up the computer and necessary software.
+* [Technologies Used](tecnologias.md): List of software and libraries that power the system.
+
+### Architecture and AI
+* [System Architecture](architecture.md): How the system processes images in two stages.
+* [How It Was Made](como_foi_feito.md): History and decisions made during development.
+* [Glossary](glossary.md): Simple explanation of terms to make communication easier.
+
+### Support and Operation
+* [Maintenance](maintenance.md): How to take care of cameras and hardware.
+* [FAQs](faqs.md): Answers to the most common questions.
+
+### Integration and Security
+* [API Reference](api_reference.md): Technical information on how the system communicates and stays secure.
 
 ---
 
-## Ecosystem Capabilities
+## Main Features
 
-- **Total Autonomy:** The system manages its own learning cycle via OTX (OpenVINO Training Extensions).
-- **BM ID Traceability:** Automatic identification of the source machine (*BodyMaker Identification*).
-- **High-Throughput Inspection:** Optimized processing with Intel OpenVINO for high-speed production lines.
-- **Rigorous Validation:** New models are tested against 30% of real data before going into production.
+1. VisionAlign: Locates and tracks cans on the conveyor belt.
+2. VisionFracture: Analyzes each can individually to find flaws.
+3. Global Brain: Allows the system to learn from new examples.
+4. Security: Protects factory data through encryption.
+
+---
+
+Last updated: May 2026

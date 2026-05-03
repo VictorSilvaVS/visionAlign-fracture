@@ -6,17 +6,17 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Documentação técnica do ecossistema industrial VisionSystem.">
+        <meta name="description" content="Sistema de Visão Computacional Industrial para Inspeção de Latas">
+      
+      
+        <meta name="author" content="Victor Silva">
       
       
       
-        <link rel="canonical" href="http://127.0.0.1:8000/glossary/">
+        <link rel="prev" href="../como_foi_feito/">
       
       
-        <link rel="prev" href="../maintenance/">
-      
-      
-        <link rel="next" href="../faqs/">
+        <link rel="next" href="../api_reference/">
       
       
         
@@ -31,7 +31,7 @@
     
     
       
-        <title>Glossário - VisionSystem Documentation</title>
+        <title>Glossário - VisionAlign-Fracture</title>
       
     
     
@@ -73,7 +73,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -96,7 +96,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
-    <a href=".." title="VisionSystem Documentation" class="md-header__button md-logo" aria-label="VisionSystem Documentation" data-md-component="logo">
+    <a href=".." title="VisionAlign-Fracture" class="md-header__button md-logo" aria-label="VisionAlign-Fracture" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,7 +110,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            VisionSystem Documentation
+            VisionAlign-Fracture
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -129,9 +129,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Mudar para modo escuro"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+      <label class="md-header__button md-icon" title="Mudar para modo escuro" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -139,9 +139,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Mudar para modo claro"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+      <label class="md-header__button md-icon" title="Mudar para modo claro" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -247,7 +247,7 @@
   
     
   
-  VisionSystem
+  Início
 
       </a>
     </li>
@@ -259,18 +259,74 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="../vision_align/" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="../installation/" class="md-tabs__link">
+        
   
   
-  Módulos
+    
+  
+  Instalação
 
-        </a>
-      </li>
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../tecnologias/" class="md-tabs__link">
+        
+  
+  
     
+  
+  Tecnologias
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Arquitetura
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../como_foi_feito/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Como foi feito
+
+      </a>
+    </li>
   
 
       
@@ -281,18 +337,55 @@
     
   
   
-    
-    
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../architecture/" class="md-tabs__link">
-          
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
   
   
-  Inteligência Artificial
+    
+  
+  Glossário
 
-        </a>
-      </li>
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../api_reference/" class="md-tabs__link">
+        
+  
+  
     
+  
+  API e Segurança
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../maintenance/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Manutenção
+
+      </a>
+    </li>
   
 
       
@@ -308,7 +401,7 @@
   
     
   
-  FAQ's
+  Perguntas Frequentes
 
       </a>
     </li>
@@ -337,13 +430,13 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navegação" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="VisionSystem Documentation" class="md-nav__button md-logo" aria-label="VisionSystem Documentation" data-md-component="logo">
+    <a href=".." title="VisionAlign-Fracture" class="md-nav__button md-logo" aria-label="VisionAlign-Fracture" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    VisionSystem Documentation
+    VisionAlign-Fracture
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -362,7 +455,7 @@
   <span class="md-ellipsis">
     
   
-    VisionSystem
+    Início
   
 
     
@@ -377,73 +470,19 @@
     
       
       
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Módulos
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Módulos
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../vision_align/" class="md-nav__link">
+      <a href="../installation/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    VisionAlign
+    Instalação
   
 
     
@@ -455,23 +494,22 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
   
     <li class="md-nav__item">
-      <a href="../vision_fracture/" class="md-nav__link">
+      <a href="../tecnologias/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    VisionFracture
+    Tecnologias
   
 
     
@@ -483,74 +521,9 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
     
       
       
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-        
-        
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Inteligência Artificial
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Inteligência Artificial
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
   
   
   
@@ -563,7 +536,7 @@
   <span class="md-ellipsis">
     
   
-    Arquitetura IA
+    Arquitetura
   
 
     
@@ -575,23 +548,22 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
   
     <li class="md-nav__item">
-      <a href="../otx_training/" class="md-nav__link">
+      <a href="../como_foi_feito/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Treinamento OTX
+    Como foi feito
   
 
     
@@ -603,94 +575,9 @@
     </li>
   
 
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../continuous_improvement/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
     
-  
-    Melhoria Contínua
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../global_brain/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Cérebro Global
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../maintenance/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Manutenção
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
+      
+      
   
   
     
@@ -756,10 +643,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-bm-id-bodymaker-identification" class="md-nav__link">
+  <a href="#1-bm-id" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. BM ID (BodyMaker Identification)
+        1. BM ID
       
     </span>
   </a>
@@ -767,10 +654,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-roi-region-of-interest-regiao-de-interesse" class="md-nav__link">
+  <a href="#2-roi-regiao-de-interesse" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. ROI (Region of Interest / Região de Interesse)
+        2. ROI (Região de Interesse)
       
     </span>
   </a>
@@ -789,10 +676,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-edge-computing-computacao-de-borda" class="md-nav__link">
+  <a href="#4-computacao-de-borda-edge-computing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Edge Computing (Computação de Borda)
+        4. Computação de Borda (Edge Computing)
       
     </span>
   </a>
@@ -800,10 +687,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-heatmap-mapa-de-calor" class="md-nav__link">
+  <a href="#5-mapa-de-calor-heatmap" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Heatmap (Mapa de Calor)
+        5. Mapa de Calor (Heatmap)
       
     </span>
   </a>
@@ -811,10 +698,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-dataset-conjunto-de-dados" class="md-nav__link">
+  <a href="#6-dataset" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. Dataset (Conjunto de Dados)
+        6. Dataset
       
     </span>
   </a>
@@ -850,11 +737,57 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
+    
       
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api_reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API e Segurança
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maintenance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manutenção
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -873,7 +806,7 @@
   <span class="md-ellipsis">
     
   
-    FAQ's
+    Perguntas Frequentes
   
 
     
@@ -913,10 +846,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-bm-id-bodymaker-identification" class="md-nav__link">
+  <a href="#1-bm-id" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. BM ID (BodyMaker Identification)
+        1. BM ID
       
     </span>
   </a>
@@ -924,10 +857,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-roi-region-of-interest-regiao-de-interesse" class="md-nav__link">
+  <a href="#2-roi-regiao-de-interesse" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. ROI (Region of Interest / Região de Interesse)
+        2. ROI (Região de Interesse)
       
     </span>
   </a>
@@ -946,10 +879,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-edge-computing-computacao-de-borda" class="md-nav__link">
+  <a href="#4-computacao-de-borda-edge-computing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Edge Computing (Computação de Borda)
+        4. Computação de Borda (Edge Computing)
       
     </span>
   </a>
@@ -957,10 +890,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-heatmap-mapa-de-calor" class="md-nav__link">
+  <a href="#5-mapa-de-calor-heatmap" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Heatmap (Mapa de Calor)
+        5. Mapa de Calor (Heatmap)
       
     </span>
   </a>
@@ -968,10 +901,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-dataset-conjunto-de-dados" class="md-nav__link">
+  <a href="#6-dataset" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. Dataset (Conjunto de Dados)
+        6. Dataset
       
     </span>
   </a>
@@ -1018,24 +951,26 @@
 
 
 <h1 id="glossario-de-termos">Glossário de Termos</h1>
-<p>Para garantir que operadores, gestores e o time de TI falem a mesma língua, este glossário define os termos técnicos mais importantes do VisionSystem.</p>
+<p>Este guia explica termos técnicos de forma simples para facilitar o dia a dia na fábrica.</p>
 <hr />
-<h3 id="1-bm-id-bodymaker-identification">1. BM ID (BodyMaker Identification)</h3>
-<p>É o "RG" da máquina. É o código gravado no metal que identifica qual BodyMaker produziu aquela lata específica. Essencial para rastrear falhas na origem.</p>
-<h3 id="2-roi-region-of-interest-regiao-de-interesse">2. ROI (Region of Interest / Região de Interesse)</h3>
-<p>É o "recorte" da imagem. Em vez de olhar para a esteira inteira, a IA recorta apenas a área onde a lata está para analisar com mais detalhe.</p>
+<h3 id="1-bm-id">1. BM ID</h3>
+<p>É como o "RG" da máquina. É um código que identifica qual máquina produziu aquela lata específica.</p>
+<h3 id="2-roi-regiao-de-interesse">2. ROI (Região de Interesse)</h3>
+<p>É o "recorte" da imagem. Em vez de olhar para a esteira inteira, o sistema foca apenas na área da lata.</p>
 <h3 id="3-otx-openvino-training-extensions">3. OTX (OpenVINO Training Extensions)</h3>
-<p>É o "motor de aprendizado" do sistema. É a tecnologia que permite ao VisionSystem aprender novos defeitos sozinho, sem precisar de um programador.</p>
-<h3 id="4-edge-computing-computacao-de-borda">4. Edge Computing (Computação de Borda)</h3>
-<p>Significa que o processamento é feito localmente, dentro da fábrica. Os dados não precisam ir para a internet para serem analisados, o que garante velocidade e privacidade.</p>
-<h3 id="5-heatmap-mapa-de-calor">5. Heatmap (Mapa de Calor)</h3>
-<p>A representação visual do "raciocínio" da IA. É o brilho colorido (geralmente vermelho) que aparece sobre a imagem indicando exatamente onde o defeito foi encontrado.</p>
-<h3 id="6-dataset-conjunto-de-dados">6. Dataset (Conjunto de Dados)</h3>
-<p>O banco de imagens usado para treinar a IA. Quanto maior e mais variado o dataset, mais inteligente e difícil de enganar o sistema se torna.</p>
+<p>É a ferramenta que permite ao sistema aprender novos tipos de defeitos sozinho.</p>
+<h3 id="4-computacao-de-borda-edge-computing">4. Computação de Borda (Edge Computing)</h3>
+<p>Significa que o processamento é feito localmente, dentro da fábrica, sem depender da internet.</p>
+<h3 id="5-mapa-de-calor-heatmap">5. Mapa de Calor (Heatmap)</h3>
+<p>Uma marcação colorida que mostra exatamente onde a inteligência artificial encontrou a falha na lata.</p>
+<h3 id="6-dataset">6. Dataset</h3>
+<p>O conjunto de fotos usado para treinar a inteligência artificial.</p>
 <h3 id="7-inferencia">7. Inferência</h3>
-<p>É o ato da IA "tomar uma decisão". Quando a câmera captura um frame e o sistema decide em milissegundos se a lata é "Normal" ou "Fratura".</p>
+<p>É o momento em que o sistema toma uma decisão (por exemplo: "esta lata está com fratura").</p>
 <h3 id="8-openvino">8. OpenVINO</h3>
-<p>Uma tecnologia da Intel que acelera a inteligência artificial, permitindo que ela rode em altíssima velocidade em processadores comuns.</p>
+<p>Tecnologia que acelera a análise das imagens usando o processador do computador.</p>
+<hr />
+<p>Última atualização: Maio de 2026</p>
 
 
 
@@ -1085,7 +1020,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "Mais 1 nesta p\u00e1gina", "search.result.more.other": "Mais # nesta p\u00e1gina", "search.result.none": "Nenhum resultado encontrado", "search.result.one": "1 resultado encontrado", "search.result.other": "# resultados encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "Mais 1 nesta p\u00e1gina", "search.result.more.other": "Mais # nesta p\u00e1gina", "search.result.none": "Nenhum resultado encontrado", "search.result.one": "1 resultado encontrado", "search.result.other": "# resultados encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>

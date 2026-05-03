@@ -1,29 +1,33 @@
 # Glossário de Termos
 
-Para garantir que operadores, gestores e o time de TI falem a mesma língua, este glossário define os termos técnicos mais importantes do VisionSystem.
+Este guia explica termos técnicos de forma simples para facilitar o dia a dia na fábrica.
 
 ---
 
-### 1. BM ID (BodyMaker Identification)
-É o "RG" da máquina. É o código gravado no metal que identifica qual BodyMaker produziu aquela lata específica. Essencial para rastrear falhas na origem.
+### 1. BM ID
+É como o "RG" da máquina. É um código que identifica qual máquina produziu aquela lata específica.
 
-### 2. ROI (Region of Interest / Região de Interesse)
-É o "recorte" da imagem. Em vez de olhar para a esteira inteira, a IA recorta apenas a área onde a lata está para analisar com mais detalhe.
+### 2. ROI (Região de Interesse)
+É o "recorte" da imagem. Em vez de olhar para a esteira inteira, o sistema foca apenas na área da lata.
 
 ### 3. OTX (OpenVINO Training Extensions)
-É o "motor de aprendizado" do sistema. É a tecnologia que permite ao VisionSystem aprender novos defeitos sozinho, sem precisar de um programador.
+É a ferramenta que permite ao sistema aprender novos tipos de defeitos sozinho.
 
-### 4. Edge Computing (Computação de Borda)
-Significa que o processamento é feito localmente, dentro da fábrica. Os dados não precisam ir para a internet para serem analisados, o que garante velocidade e privacidade.
+### 4. Computação de Borda (Edge Computing)
+Significa que o processamento é feito localmente, dentro da fábrica, sem depender da internet.
 
-### 5. Heatmap (Mapa de Calor)
-A representação visual do "raciocínio" da IA. É o brilho colorido (geralmente vermelho) que aparece sobre a imagem indicando exatamente onde o defeito foi encontrado.
+### 5. Mapa de Calor (Heatmap)
+Uma marcação colorida que mostra exatamente onde a inteligência artificial encontrou a falha na lata.
 
-### 6. Dataset (Conjunto de Dados)
-O banco de imagens usado para treinar a IA. Quanto maior e mais variado o dataset, mais inteligente e difícil de enganar o sistema se torna.
+### 6. Dataset
+O conjunto de fotos usado para treinar a inteligência artificial.
 
 ### 7. Inferência
-É o ato da IA "tomar uma decisão". Quando a câmera captura um frame e o sistema decide em milissegundos se a lata é "Normal" ou "Fratura".
+É o momento em que o sistema toma uma decisão (por exemplo: "esta lata está com fratura").
 
 ### 8. OpenVINO
-Uma tecnologia da Intel que acelera a inteligência artificial, permitindo que ela rode em altíssima velocidade em processadores comuns.
+Tecnologia que acelera a análise das imagens usando o processador do computador.
+
+---
+
+Última atualização: Maio de 2026

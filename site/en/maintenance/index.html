@@ -6,17 +6,17 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Documentação técnica do ecossistema industrial VisionSystem.">
+        <meta name="description" content="Sistema de Visão Computacional Industrial para Inspeção de Latas">
+      
+      
+        <meta name="author" content="Victor Silva">
       
       
       
-        <link rel="canonical" href="http://127.0.0.1:8000/en/maintenance/">
+        <link rel="prev" href="../api_reference/">
       
       
-        <link rel="prev" href="../global_brain/">
-      
-      
-        <link rel="next" href="../glossary/">
+        <link rel="next" href="../faqs/">
       
       
         
@@ -31,7 +31,7 @@
     
     
       
-        <title>Manutenção - VisionSystem Documentation</title>
+        <title>Manutenção - VisionAlign-Fracture (EN)</title>
       
     
     
@@ -73,7 +73,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -96,7 +96,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../" title="VisionSystem Documentation" class="md-header__button md-logo" aria-label="VisionSystem Documentation" data-md-component="logo">
+    <a href="../" title="VisionAlign-Fracture (EN)" class="md-header__button md-logo" aria-label="VisionAlign-Fracture (EN)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,7 +110,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            VisionSystem Documentation
+            VisionAlign-Fracture (EN)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -129,9 +129,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Mudar para modo escuro"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+      <label class="md-header__button md-icon" title="Mudar para modo escuro" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -139,9 +139,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Mudar para modo claro"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+      <label class="md-header__button md-icon" title="Mudar para modo claro" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -247,7 +247,7 @@
   
     
   
-  VisionSystem
+  Início
 
       </a>
     </li>
@@ -259,18 +259,112 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="../vision_align/" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="../installation/" class="md-tabs__link">
+        
   
   
-  Módulos
+    
+  
+  Instalação
 
-        </a>
-      </li>
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../tecnologias/" class="md-tabs__link">
+        
+  
+  
     
+  
+  Tecnologias
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Arquitetura
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../como_foi_feito/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Como foi feito
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../glossary/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Glossário
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../api_reference/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  API e Segurança
+
+      </a>
+    </li>
   
 
       
@@ -281,18 +375,17 @@
     
   
   
-    
-    
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../architecture/" class="md-tabs__link">
-          
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
   
   
-  Inteligência Artificial
+    
+  
+  Manutenção
 
-        </a>
-      </li>
-    
+      </a>
+    </li>
   
 
       
@@ -308,7 +401,7 @@
   
     
   
-  FAQ's
+  Perguntas Frequentes
 
       </a>
     </li>
@@ -337,13 +430,13 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../" title="VisionSystem Documentation" class="md-nav__button md-logo" aria-label="VisionSystem Documentation" data-md-component="logo">
+    <a href="../" title="VisionAlign-Fracture (EN)" class="md-nav__button md-logo" aria-label="VisionAlign-Fracture (EN)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    VisionSystem Documentation
+    VisionAlign-Fracture (EN)
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -362,7 +455,7 @@
   <span class="md-ellipsis">
     
   
-    VisionSystem
+    Início
   
 
     
@@ -377,73 +470,19 @@
     
       
       
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Módulos
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Módulos
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../vision_align/" class="md-nav__link">
+      <a href="../installation/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    VisionAlign
+    Instalação
   
 
     
@@ -455,23 +494,22 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
   
     <li class="md-nav__item">
-      <a href="../vision_fracture/" class="md-nav__link">
+      <a href="../tecnologias/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    VisionFracture
+    Tecnologias
   
 
     
@@ -483,74 +521,9 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
     
       
       
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-        
-        
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Inteligência Artificial
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Inteligência Artificial
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
   
   
   
@@ -563,7 +536,7 @@
   <span class="md-ellipsis">
     
   
-    Arquitetura IA
+    Arquitetura
   
 
     
@@ -575,23 +548,22 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
   
     <li class="md-nav__item">
-      <a href="../otx_training/" class="md-nav__link">
+      <a href="../como_foi_feito/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Treinamento OTX
+    Como foi feito
   
 
     
@@ -603,23 +575,22 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
   
     <li class="md-nav__item">
-      <a href="../continuous_improvement/" class="md-nav__link">
+      <a href="../glossary/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Melhoria Contínua
+    Glossário
   
 
     
@@ -631,23 +602,22 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
   
     <li class="md-nav__item">
-      <a href="../global_brain/" class="md-nav__link">
+      <a href="../api_reference/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Cérebro Global
+    API e Segurança
   
 
     
@@ -659,10 +629,9 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
     
@@ -731,19 +700,19 @@
   <a href="#what-to-do-if-problems-and-solutions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🛠️ "What to do if..." (Problems and Solutions)
+        What to do if... (Problems and Solutions)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="🛠️ &#34;What to do if...&#34; (Problems and Solutions)">
+    <nav class="md-nav" aria-label="What to do if... (Problems and Solutions)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#1-the-image-is-blurry-or-cloudy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. The image is blurry or "cloudy"
+        1. The image is blurry or cloudy
       
     </span>
   </a>
@@ -751,10 +720,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-the-system-is-not-detecting-anything-black-screen" class="md-nav__link">
+  <a href="#2-the-system-is-not-showing-an-image-black-screen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. The system is not detecting anything (Black Screen)
+        2. The system is not showing an image (Black Screen)
       
     </span>
   </a>
@@ -762,10 +731,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-false-negatives-ai-missed-an-obvious-fracture" class="md-nav__link">
+  <a href="#3-the-system-missed-an-obvious-crack" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. False Negatives (AI missed an obvious fracture)
+        3. The system missed an obvious crack
       
     </span>
   </a>
@@ -773,10 +742,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#4-image-lag-or-freezing" class="md-nav__link">
+  <a href="#4-the-image-is-slow-or-freezing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Image lag or "freezing"
+        4. The image is slow or freezing
       
     </span>
   </a>
@@ -792,7 +761,7 @@
   <a href="#preventive-maintenance-plan" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📅 Preventive Maintenance Plan
+        Preventive Maintenance Plan
       
     </span>
   </a>
@@ -802,42 +771,6 @@
     </ul>
   
 </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../glossary/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Glossário
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
       
     </li>
   
@@ -857,7 +790,7 @@
   <span class="md-ellipsis">
     
   
-    FAQ's
+    Perguntas Frequentes
   
 
     
@@ -900,19 +833,19 @@
   <a href="#what-to-do-if-problems-and-solutions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🛠️ "What to do if..." (Problems and Solutions)
+        What to do if... (Problems and Solutions)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="🛠️ &#34;What to do if...&#34; (Problems and Solutions)">
+    <nav class="md-nav" aria-label="What to do if... (Problems and Solutions)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#1-the-image-is-blurry-or-cloudy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. The image is blurry or "cloudy"
+        1. The image is blurry or cloudy
       
     </span>
   </a>
@@ -920,10 +853,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-the-system-is-not-detecting-anything-black-screen" class="md-nav__link">
+  <a href="#2-the-system-is-not-showing-an-image-black-screen" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. The system is not detecting anything (Black Screen)
+        2. The system is not showing an image (Black Screen)
       
     </span>
   </a>
@@ -931,10 +864,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-false-negatives-ai-missed-an-obvious-fracture" class="md-nav__link">
+  <a href="#3-the-system-missed-an-obvious-crack" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. False Negatives (AI missed an obvious fracture)
+        3. The system missed an obvious crack
       
     </span>
   </a>
@@ -942,10 +875,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#4-image-lag-or-freezing" class="md-nav__link">
+  <a href="#4-the-image-is-slow-or-freezing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Image lag or "freezing"
+        4. The image is slow or freezing
       
     </span>
   </a>
@@ -961,7 +894,7 @@
   <a href="#preventive-maintenance-plan" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📅 Preventive Maintenance Plan
+        Preventive Maintenance Plan
       
     </span>
   </a>
@@ -986,31 +919,31 @@
 
 
 <h1 id="maintenance-and-troubleshooting">Maintenance and Troubleshooting</h1>
-<p>This guide helps resolve the most common day-to-day issues on the production line, focusing on physical and operational causes.</p>
+<p>This guide helps resolve the most common daily problems on the production line, focusing on physical and operational care.</p>
 <hr />
-<h2 id="what-to-do-if-problems-and-solutions">🛠️ "What to do if..." (Problems and Solutions)</h2>
-<h3 id="1-the-image-is-blurry-or-cloudy">1. The image is blurry or "cloudy"</h3>
+<h2 id="what-to-do-if-problems-and-solutions">What to do if... (Problems and Solutions)</h2>
+<h3 id="1-the-image-is-blurry-or-cloudy">1. The image is blurry or cloudy</h3>
 <ul>
-<li><strong>Probable Cause:</strong> Accumulation of oil, dust, or lubricant on the camera lens.</li>
-<li><strong>Action:</strong> Carefully clean the lens with a microfiber cloth and <strong>isopropyl alcohol</strong>. Never use rough cloths or water.</li>
+<li>Probable cause: Accumulation of oil, dust, or lubricant on the camera lens.</li>
+<li>Action: Clean the lens carefully with a soft cloth and isopropyl alcohol. Do not use rough cloths.</li>
 </ul>
-<h3 id="2-the-system-is-not-detecting-anything-black-screen">2. The system is not detecting anything (Black Screen)</h3>
+<h3 id="2-the-system-is-not-showing-an-image-black-screen">2. The system is not showing an image (Black Screen)</h3>
 <ul>
-<li><strong>Probable Cause:</strong> Network cable (Ethernet) or power cable is loose.</li>
-<li><strong>Action:</strong> Check the physical connections at the back of the camera and on the industrial switch. Ensure the link LED is flashing.</li>
+<li>Probable cause: Network or power cable is loose.</li>
+<li>Action: Check if the cables are properly connected to the camera and the computer.</li>
 </ul>
-<h3 id="3-false-negatives-ai-missed-an-obvious-fracture">3. False Negatives (AI missed an obvious fracture)</h3>
+<h3 id="3-the-system-missed-an-obvious-crack">3. The system missed an obvious crack</h3>
 <ul>
-<li><strong>Probable Cause:</strong> External lighting interference (sunlight reflection or nearby welding light).</li>
-<li><strong>Action:</strong> Ensure the camera's protective shield is correctly positioned to block external light. Clean the VisionSystem's lighting LEDs.</li>
+<li>Probable cause: External light reflection (such as sunlight or strong nearby lamps).</li>
+<li>Action: Check if the camera shield is in the right place to block external lights. Clean the system's lighting LEDs.</li>
 </ul>
-<h3 id="4-image-lag-or-freezing">4. Image lag or "freezing"</h3>
+<h3 id="4-the-image-is-slow-or-freezing">4. The image is slow or freezing</h3>
 <ul>
-<li><strong>Probable Cause:</strong> Overheating of the Edge Computing box.</li>
-<li><strong>Action:</strong> Check if the server's fans are obstructed by dirt. Perform a cleaning with compressed air if necessary.</li>
+<li>Probable cause: The computer might be too hot.</li>
+<li>Action: Check if the computer fans are clean and dust-free.</li>
 </ul>
 <hr />
-<h2 id="preventive-maintenance-plan">📅 Preventive Maintenance Plan</h2>
+<h2 id="preventive-maintenance-plan">Preventive Maintenance Plan</h2>
 <table>
 <thead>
 <tr>
@@ -1022,29 +955,37 @@
 <tbody>
 <tr>
 <td style="text-align: left;">Lens Cleaning</td>
-<td style="text-align: left;">Daily (shift start)</td>
+<td style="text-align: left;">Daily (start of shift)</td>
 <td style="text-align: left;">Isopropyl Alcohol</td>
 </tr>
 <tr>
-<td style="text-align: left;">Cable Check</td>
+<td style="text-align: left;">Cable Verification</td>
 <td style="text-align: left;">Weekly</td>
 <td style="text-align: left;">Visual Inspection</td>
 </tr>
 <tr>
-<td style="text-align: left;">Filter/Fan Cleaning</td>
+<td style="text-align: left;">Computer Cleaning</td>
 <td style="text-align: left;">Monthly</td>
 <td style="text-align: left;">Compressed Air</td>
 </tr>
 <tr>
-<td style="text-align: left;">Log Backup</td>
+<td style="text-align: left;">Data Backup</td>
 <td style="text-align: left;">Quarterly</td>
-<td style="text-align: left;">Automatic via Dashboard</td>
+<td style="text-align: left;">Automatic</td>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<p><strong>Pro Tip:</strong> 90% of "bad AI" errors are actually caused by an oil-dirty lens. Keep the machine's vision clean!</p>
-</blockquote>
+<hr />
+<div class="admonition danger">
+<p class="admonition-title">Industrial Safety</p>
+<p>Never perform physical maintenance (lens or cable cleaning) while the conveyor belt is in motion. Turn off the vision system before any direct intervention on the camera.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Golden Tip</p>
+<p>Most AI reading errors are caused by dirty lenses. Always keep the camera clean to ensure 98% accuracy.</p>
+</div>
+<hr />
+<p>Last updated: May 2026</p>
 
 
 
@@ -1094,7 +1035,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>

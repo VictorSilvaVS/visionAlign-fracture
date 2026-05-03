@@ -1,29 +1,33 @@
 # Glossary of Terms
 
-To ensure that operators, managers, and the IT team speak the same language, this glossary defines the most important technical terms of the VisionSystem.
+This guide explains technical terms in simple language to make daily factory operations easier.
 
 ---
 
-### 1. BM ID (BodyMaker Identification)
-The machine's "ID card." It is the code engraved on the metal that identifies which BodyMaker produced that specific can. Essential for tracking failures back to their source.
+### 1. BM ID
+Like a machine's "ID card." It is a code that identifies which specific machine produced that particular can.
 
 ### 2. ROI (Region of Interest)
-The "crop" of the image. Instead of looking at the entire conveyor belt, the AI crops only the area where the can is located to analyze it in more detail.
+The "crop" of the image. Instead of looking at the entire conveyor belt, the system focuses only on the area of the can.
 
 ### 3. OTX (OpenVINO Training Extensions)
-The system's "learning engine." It is the technology that allows VisionSystem to learn new defects on its own, without needing a programmer.
+The tool that allows the system to learn new types of defects on its own.
 
 ### 4. Edge Computing
-Meaning that the processing is done locally, inside the factory. Data does not need to go to the internet to be analyzed, which ensures speed and privacy.
+Means that processing is done locally, inside the factory, without depending on the internet.
 
 ### 5. Heatmap
-The visual representation of the AI's "reasoning." It is the colored glow (usually red) that appears over the image indicating exactly where the defect was found.
+A colored marking that shows exactly where the artificial intelligence found the flaw on the can.
 
 ### 6. Dataset
-The collection of images used to train the AI. The larger and more varied the dataset, the smarter and harder to fool the system becomes.
+The collection of photos used to train the artificial intelligence.
 
 ### 7. Inference
-The act of the AI "making a decision." When the camera captures a frame and the system decides in milliseconds if the can is "Normal" or "Fracture."
+The moment when the system makes a decision (for example: "this can has a fracture").
 
 ### 8. OpenVINO
-An Intel technology that accelerates artificial intelligence, allowing it to run at very high speeds on standard processors.
+Technology that speeds up image analysis using the computer's processor.
+
+---
+
+Last updated: May 2026

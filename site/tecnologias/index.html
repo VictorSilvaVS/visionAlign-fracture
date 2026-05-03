@@ -6,23 +6,23 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Documentação técnica do ecossistema industrial VisionSystem.">
+        <meta name="description" content="Sistema de Visão Computacional Industrial para Inspeção de Latas">
+      
+      
+        <meta name="author" content="Victor Silva">
       
       
       
-        <link rel="canonical" href="http://127.0.0.1:8000/otx_training/">
+        <link rel="prev" href="../installation/">
       
       
-        <link rel="prev" href="../architecture/">
-      
-      
-        <link rel="next" href="../continuous_improvement/">
+        <link rel="next" href="../architecture/">
       
       
         
           <link rel="alternate" href="./" hreflang="pt">
         
-          <link rel="alternate" href="../en/otx_training/" hreflang="en">
+          <link rel="alternate" href="../en/tecnologias/" hreflang="en">
         
       
       
@@ -31,7 +31,7 @@
     
     
       
-        <title>Treinamento OTX - VisionSystem Documentation</title>
+        <title>Tecnologias - VisionAlign-Fracture</title>
       
     
     
@@ -73,7 +73,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#treinamento-e-otx" class="md-skip">
+        <a href="#tecnologias-utilizadas" class="md-skip">
           Ir para o conteúdo
         </a>
       
@@ -96,7 +96,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
-    <a href=".." title="VisionSystem Documentation" class="md-header__button md-logo" aria-label="VisionSystem Documentation" data-md-component="logo">
+    <a href=".." title="VisionAlign-Fracture" class="md-header__button md-logo" aria-label="VisionAlign-Fracture" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,13 +110,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            VisionSystem Documentation
+            VisionAlign-Fracture
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Treinamento OTX
+              Tecnologias
             
           </span>
         </div>
@@ -129,9 +129,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Mudar para modo escuro"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+      <label class="md-header__button md-icon" title="Mudar para modo escuro" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -139,9 +139,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Mudar para modo claro"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+      <label class="md-header__button md-icon" title="Mudar para modo claro" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -169,7 +169,7 @@
           </li>
         
           <li class="md-select__item">
-            <a href="../en/otx_training/" hreflang="en" class="md-select__link">
+            <a href="../en/tecnologias/" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
@@ -247,7 +247,7 @@
   
     
   
-  VisionSystem
+  Início
 
       </a>
     </li>
@@ -259,18 +259,17 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="../vision_align/" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="../installation/" class="md-tabs__link">
+        
   
   
-  Módulos
+    
+  
+  Instalação
 
-        </a>
-      </li>
-    
+      </a>
+    </li>
   
 
       
@@ -281,18 +280,112 @@
     
   
   
-    
-    
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../architecture/" class="md-tabs__link">
-          
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
   
   
-  Inteligência Artificial
+    
+  
+  Tecnologias
 
-        </a>
-      </li>
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
     
+  
+  Arquitetura
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../como_foi_feito/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Como foi feito
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../glossary/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Glossário
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../api_reference/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  API e Segurança
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../maintenance/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Manutenção
+
+      </a>
+    </li>
   
 
       
@@ -308,7 +401,7 @@
   
     
   
-  FAQ's
+  Perguntas Frequentes
 
       </a>
     </li>
@@ -337,13 +430,13 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navegação" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="VisionSystem Documentation" class="md-nav__button md-logo" aria-label="VisionSystem Documentation" data-md-component="logo">
+    <a href=".." title="VisionAlign-Fracture" class="md-nav__button md-logo" aria-label="VisionAlign-Fracture" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    VisionSystem Documentation
+    VisionAlign-Fracture
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -362,7 +455,7 @@
   <span class="md-ellipsis">
     
   
-    VisionSystem
+    Início
   
 
     
@@ -377,73 +470,19 @@
     
       
       
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Módulos
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Módulos
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../vision_align/" class="md-nav__link">
+      <a href="../installation/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    VisionAlign
+    Instalação
   
 
     
@@ -455,130 +494,9 @@
     </li>
   
 
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../vision_fracture/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    VisionFracture
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
     
       
       
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-        
-        
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Inteligência Artificial
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Inteligência Artificial
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Arquitetura IA
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
   
   
     
@@ -600,7 +518,7 @@
   <span class="md-ellipsis">
     
   
-    Treinamento OTX
+    Tecnologias
   
 
     
@@ -618,7 +536,7 @@
   <span class="md-ellipsis">
     
   
-    Treinamento OTX
+    Tecnologias
   
 
     
@@ -644,38 +562,65 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#treinamento-autonomo-e-inteligente" class="md-nav__link">
+  <a href="#1-linguagem-base" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Treinamento Autônomo e Inteligente
+        1. Linguagem Base
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Treinamento Autônomo e Inteligente">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#beneficios-operacionais" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Benefícios Operacionais
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#comandos-operacionais" class="md-nav__link">
+  <a href="#2-inteligencia-artificial-e-visao" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Comandos Operacionais
+        2. Inteligência Artificial e Visão
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-interface-e-controle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Interface e Controle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-seguranca-e-dados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Segurança e Dados
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-ferramentas-de-apoio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Ferramentas de Apoio
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lista-completa-de-bibliotecas-resumo-tecnico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lista Completa de Bibliotecas (Resumo Técnico)
       
     </span>
   </a>
@@ -689,23 +634,22 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
   
     <li class="md-nav__item">
-      <a href="../continuous_improvement/" class="md-nav__link">
+      <a href="../architecture/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Melhoria Contínua
+    Arquitetura
   
 
     
@@ -717,23 +661,22 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
   
     <li class="md-nav__item">
-      <a href="../global_brain/" class="md-nav__link">
+      <a href="../como_foi_feito/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Cérebro Global
+    Como foi feito
   
 
     
@@ -745,38 +688,9 @@
     </li>
   
 
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../maintenance/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
     
-  
-    Manutenção
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
+      
+      
   
   
   
@@ -801,11 +715,57 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
+    
       
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api_reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API e Segurança
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maintenance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manutenção
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -824,7 +784,7 @@
   <span class="md-ellipsis">
     
   
-    FAQ's
+    Perguntas Frequentes
   
 
     
@@ -864,38 +824,65 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#treinamento-autonomo-e-inteligente" class="md-nav__link">
+  <a href="#1-linguagem-base" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Treinamento Autônomo e Inteligente
+        1. Linguagem Base
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Treinamento Autônomo e Inteligente">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#beneficios-operacionais" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Benefícios Operacionais
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#comandos-operacionais" class="md-nav__link">
+  <a href="#2-inteligencia-artificial-e-visao" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Comandos Operacionais
+        2. Inteligência Artificial e Visão
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-interface-e-controle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Interface e Controle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-seguranca-e-dados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Segurança e Dados
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-ferramentas-de-apoio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Ferramentas de Apoio
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lista-completa-de-bibliotecas-resumo-tecnico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lista Completa de Bibliotecas (Resumo Técnico)
       
     </span>
   </a>
@@ -919,27 +906,67 @@
 
 
 
-<h1 id="treinamento-e-otx">Treinamento e OTX</h1>
-<p>O <strong>OpenVINO Training Extensions (OTX)</strong> é a ferramenta central para o refinamento de modelos no VisionAlign. Ele permite a atualização de pesos de detecção sem a necessidade de intervenção manual complexa.</p>
-<h2 id="treinamento-autonomo-e-inteligente">Treinamento Autônomo e Inteligente</h2>
-<p>O diferencial do VisionAlign é a sua capacidade de <strong>autotreinamento</strong>. Através da integração com o OTX, o sistema não apenas detecta falhas, mas gerencia sua própria evolução técnica:</p>
+<h1 id="tecnologias-utilizadas">Tecnologias Utilizadas</h1>
+<p>Este documento lista todas as ferramentas e bibliotecas que fazem o VisionAlign-Fracture funcionar. O sistema foi construído para ser rápido e rodar em computadores comuns de fábrica.</p>
+<hr />
+<h2 id="1-linguagem-base">1. Linguagem Base</h2>
 <ul>
-<li><strong>Gatilhos Automáticos:</strong> O sistema monitora a densidade de imagens coletadas no "dataset de incerteza". Ao atingir um limiar crítico, o backend dispara um processo de retreinamento em segundo plano.</li>
-<li><strong>Intervenção Zero:</strong> Todo o pipeline (preparação de dados, treinamento, otimização OpenVINO e deploy do novo modelo) ocorre sem a necessidade de comandos manuais ou parada de linha.</li>
-<li><strong>Auto-Validação e Backup:</strong> O sistema isola automaticamente <strong>30% das novas imagens</strong> para validação rigorosa. O novo modelo só é implementado se apresentar uma <strong>superioridade acima de 90%</strong> em métricas-chave ou uma redução significativa no <strong>LOSS</strong> (perda). Caso aprovado, o modelo antigo é movido para um diretório de backup, permitindo reversão instantânea se necessário.</li>
-</ul>
-<h3 id="beneficios-operacionais">Benefícios Operacionais</h3>
-<ul>
-<li><strong>Automação:</strong> Redução da necessidade de especialistas em ciência de dados no local.</li>
-<li><strong>Eficiência:</strong> Otimização para os aceleradores de hardware disponíveis.</li>
-<li><strong>Customização:</strong> Modelos perfeitamente ajustados para as condições reais da linha de produção.</li>
+<li><strong>Python (3.11):</strong> É a base de todo o sistema. Escolhido por ser compatível com as melhores ferramentas de inteligência artificial do mercado.</li>
 </ul>
 <hr />
-<h2 id="comandos-operacionais">Comandos Operacionais</h2>
-<p>O motor backend executa as seguintes operações:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>otx<span class="w"> </span>train<span class="w"> </span>--model<span class="w"> </span>detection<span class="w"> </span>--data<span class="w"> </span>data.yaml
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>otx<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--model<span class="w"> </span>model.pth<span class="w"> </span>--format<span class="w"> </span>openvino
-</code></pre></div></p>
+<h2 id="2-inteligencia-artificial-e-visao">2. Inteligência Artificial e Visão</h2>
+<ul>
+<li><strong>Intel OpenVINO:</strong> É o "motor" que faz a inteligência artificial rodar rápido em processadores Intel, sem precisar de placas de vídeo caras.</li>
+<li><strong>OpenCV:</strong> Biblioteca usada para manipular as imagens da câmera, fazer recortes e desenhar as marcações na tela.</li>
+<li><strong>NumPy:</strong> Usado para fazer cálculos matemáticos rápidos com as imagens.</li>
+</ul>
+<hr />
+<h2 id="3-interface-e-controle">3. Interface e Controle</h2>
+<ul>
+<li><strong>PyQt5:</strong> Usado para criar o programa que o operador usa no computador da fábrica.</li>
+<li><strong>Flask:</strong> Transforma o sistema em um servidor que pode ser acessado pelo navegador.</li>
+<li><strong>FastAPI:</strong> Uma tecnologia moderna usada no backend para garantir que a comunicação de dados seja instantânea.</li>
+<li><strong>Uvicorn:</strong> O servidor que faz o FastAPI rodar com alta performance.</li>
+</ul>
+<hr />
+<h2 id="4-seguranca-e-dados">4. Segurança e Dados</h2>
+<ul>
+<li><strong>Cryptography (Fernet):</strong> Protege todas as informações enviadas pela rede, garantindo que ninguém de fora consiga ver os dados da fábrica.</li>
+<li><strong>SQLite:</strong> Um banco de dados simples que guarda o histórico de produção e os usuários do sistema.</li>
+<li><strong>Flask-Login:</strong> Gerencia quem pode entrar e o que cada usuário pode fazer no sistema.</li>
+<li><strong>Python-Jose e Passlib:</strong> Ferramentas usadas para criar senhas seguras e logins protegidos.</li>
+</ul>
+<hr />
+<h2 id="5-ferramentas-de-apoio">5. Ferramentas de Apoio</h2>
+<ul>
+<li><strong>FFmpeg:</strong> Programa especialista em vídeo usado para receber as imagens da câmera industrial em alta resolução (4K) sem atrasos.</li>
+<li><strong>OpenPyXL:</strong> Usado para criar relatórios em Excel que podem ser baixados pelo gestor.</li>
+<li><strong>Requests:</strong> Permite que o programa do operador converse com o servidor de inteligência artificial.</li>
+</ul>
+<hr />
+<h2 id="lista-completa-de-bibliotecas-resumo-tecnico">Lista Completa de Bibliotecas (Resumo Técnico)</h2>
+<p>Para desenvolvedores ou equipe de TI, estas são as bibliotecas instaladas:</p>
+<ul>
+<li>fastapi</li>
+<li>uvicorn</li>
+<li>python-multipart</li>
+<li>pydantic</li>
+<li>pydantic-settings</li>
+<li>python-jose[cryptography]</li>
+<li>passlib[bcrypt]</li>
+<li>cryptography</li>
+<li>aiofiles</li>
+<li>requests</li>
+<li>opencv-python-headless</li>
+<li>numpy</li>
+<li>flask</li>
+<li>flask-login</li>
+<li>openvino</li>
+<li>pyqt5</li>
+<li>openpyxl</li>
+</ul>
+<hr />
+<p>Última atualização: Maio de 2026</p>
 
 
 
@@ -989,7 +1016,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "Mais 1 nesta p\u00e1gina", "search.result.more.other": "Mais # nesta p\u00e1gina", "search.result.none": "Nenhum resultado encontrado", "search.result.one": "1 resultado encontrado", "search.result.other": "# resultados encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "Mais 1 nesta p\u00e1gina", "search.result.more.other": "Mais # nesta p\u00e1gina", "search.result.none": "Nenhum resultado encontrado", "search.result.one": "1 resultado encontrado", "search.result.other": "# resultados encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>

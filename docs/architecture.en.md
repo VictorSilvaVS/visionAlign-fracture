@@ -1,28 +1,101 @@
-# AI System Architecture
+# System Architecture
 
-VisionAlign's intelligence is built on a multi-stage architecture designed for stability and precision in industrial environments.
+This document explains how the system works internally and how it is organized to ensure that no defect goes unnoticed.
 
-## OpenVINO Integration
-The processing core utilizes **OpenVINO IR (Intermediate Representation)** to optimize YOLO models for Intel processors and accelerators.
-- **INT8 Quantization:** Optimization that reduces memory footprint and increases processing speed with minimal impact on accuracy.
-- **Asynchronous Inference:** Efficient frame management allowing high-throughput inspection without UI latency.
+---
 
-## Uncertainty Detection
-The system employs uncertainty estimation logic to identify new defect patterns:
-- **Ambiguity Range:** Identifies detections with confidence levels between 30% and 60%.
-- **Automatic Capture:** Ambiguous images are isolated for subsequent human validation.
-- **Active Learning:** Human feedback on these images fuels the next training cycle, expanding the AI's knowledge base.
+## 1. System Organization (The 4 Layers)
 
-## Performance Evolution
-The system demonstrates logarithmic accuracy gains as site-specific data volume increases, stabilizing at levels of high operational reliability.
+Think of the system as a 4-story building, where each floor has a specific function:
 
 ```mermaid
-xychart-beta
-    title "Accuracy Evolution vs. Model Iterations"
-    x-axis ["V1.0 (Base)", "V1.2 (1 Wk)", "V1.5 (1 Mo)", "V2.0 (Optm)", "V2.1 (Current)"]
-    y-axis "Mean Accuracy (%)" 70 --> 100
-    bar [72, 85, 91, 96, 98]
-    line [72, 85, 91, 96, 98]
+graph TD
+    subgraph Layer_4 [4. Presentation and Visualization]
+        direction LR
+        A1[Operator Program] --- A2[Web Dashboard]
+    end
+
+    subgraph Layer_3 [3. Application and Security]
+        direction LR
+        B1[Data Communication] --- B2[Security Manager] --- B3[Database]
+    end
+
+    subgraph Layer_2 [2. Artificial Intelligence]
+        direction LR
+        C1[OpenVINO Engine] --- C2[Location Model] --- C3[Detail Model]
+    end
+
+    subgraph Layer_1 [1. Infrastructure and Base]
+        direction LR
+        D1[Video Reading] --- D2[Logging System] --- D3[Task Management]
+    end
+
+    Layer_1 --> Layer_2
+    Layer_2 --> Layer_3
+    Layer_3 --> Layer_4
 ```
 
+---
 
+## 2. Two-Stage Processing
+
+To ensure the system is both fast and accurate, it uses a funnel strategy:
+
+1.  **Step 1:** The system locates all cans on the conveyor belt and assigns a number to each one.
+2.  **Step 2 (VisionFracture):** It crops the image of each can and performs a deep analysis looking for cracks.
+
+![AI Fracture Detection](assets/images/heatmap.png)
+
+!!! tip "Heatmap Analysis"
+    The system uses heatmaps to highlight exactly where the flaw was found, making visual verification easier for the operator.
+
+```mermaid
+graph LR
+    A[Camera] --> B(Locate cans)
+    B --> C(Crop can image)
+    C --> D(Analyze for cracks)
+    D --> E{Result}
+```
+
+---
+
+## 3. Voting System (Preventing Errors)
+
+This is one of the most important parts of the system. To prevent a simple light reflection from causing a false alarm, the system uses a "voting" process:
+
+The system doesn't decide if there is a crack by looking only once. It looks at the same can multiple times as it passes by the camera.
+
+*   **Positive Vote:** If the system sees a flaw, the can gets +1 point.
+*   **Negative Vote:** If the system sees nothing, the can loses 1 point.
+*   **Alarm:** The alert is only triggered if the can accumulates **10 points**.
+
+```mermaid
+graph TD
+    A[Start: 0 points] --> B{Saw a flaw?}
+    B -- Yes --> C[Gain +1 point]
+    B -- No --> D[Lose 1 point]
+    C --> E{Reached 10?}
+    E -- Yes --> F[CONFIRMED ALERT]
+    E -- No --> B
+    D --> B
+```
+
+This logic ensures the system is extremely reliable, ignoring temporary flashes on the metal surface.
+
+---
+
+## 4. Performance Evolution
+
+The system is constantly learning. See how the accuracy has improved:
+
+| Version | Project Stage | Detection Accuracy |
+|---|---|---|
+| V1.0 | Start of Project | 62% |
+| V1.2 | Camera Adjustments | 75% |
+| V1.5 | Advanced Training | 78% |
+| V2.0 | Speed Optimization | 85% |
+| V2.1 | Current Version | 93% |
+
+---
+
+Last updated: May 2026

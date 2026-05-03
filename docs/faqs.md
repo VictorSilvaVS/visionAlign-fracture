@@ -1,50 +1,65 @@
-# Perguntas Frequentes (FAQ's)
+# Perguntas Frequentes
 
-Esta seção explica, de forma simples e direta, como a inteligência do VisionSystem ajuda a sua fábrica a produzir com mais qualidade e menos desperdício.
+Respostas simples para as dúvidas mais comuns sobre o funcionamento do sistema.
 
 ---
 
 ### Como os dois sistemas trabalham juntos?
-Imagine uma equipe de inspeção onde cada um tem uma especialidade:
-*   **VisionAlign (O Olheiro):** Localiza rapidamente a lata na esteira, ignorando vibrações ou desalinhamentos.
-*   **VisionFracture (O Inspetor):** Recebe a área isolada pelo olheiro e foca exclusivamente em encontrar microfissuras e ler o código da máquina.
 
-### Como o sistema consegue ler o BM ID em condições industriais?
-O VisionSystem resolve o desafio de ler códigos em metal (mesmo com reflexo e óleo) em dois passos:
-*   **Foco de Precisão:** O sistema isola apenas a área do código (ROI), criando uma imagem "limpa" para análise.
-*   **Visão Geométrica:** A IA reconstrói os relevos da gravação, permitindo a leitura mesmo que o código esteja fraco ou com excesso de lubrificante.
+Imagine uma equipe de inspeção com duas pessoas:
 
-### Como a IA consegue diferenciar letras parecidas (como "I" e "i")?
-Diferente de um scanner comum, a IA analisa a anatomia da letra:
-*   **Topologia:** Identifica o ponto no "i" minúsculo e a estrutura reta do "I" maiúsculo.
-*   **Geometria:** Avalia a proporção de altura e largura de cada caractere.
-*   **Contexto:** Entende o padrão de gravação da sua fábrica para evitar confusões estatísticas.
+*   **VisionAlign:** Localiza rapidamente a lata na esteira, ignorando vibrações ou desalinhamentos.
+*   **VisionFracture:** Recebe a área isolada pelo primeiro sistema e foca exclusivamente em encontrar microfissuras e ler o código da máquina.
 
-### 90% de precisão é bom? Por que o sistema demora a atualizar?
-Na indústria, **90% de superioridade** é um nível de excelência altíssimo:
-*   **Segurança Máxima:** O sistema só troca o "cérebro" se o novo modelo provar ser significativamente mais confiável que o atual.
-*   **Validação Rigorosa:** Testamos o novo modelo contra centenas de fotos reais (30% do banco de dados) antes de qualquer mudança.
-*   **Backup Garantido:** O modelo anterior nunca é apagado; ele fica guardado como uma reserva de segurança para reversão instantânea.
+---
 
-### Como o sistema fica mais inteligente sozinho?
-O sistema funciona como um funcionário que se especializa a cada dia:
-*   **Captura de Incerteza:** Toda vez que a IA encontra algo novo ou duvidoso, ela salva essa imagem.
-*   **Auto-Ajuste:** O motor OTX estuda essas novas imagens e ajusta o modelo automaticamente.
-*   **Evolução Sem Programador:** A IA aprende novas variações de defeitos sem que você precise contratar suporte técnico para isso.
+### O sistema consegue ler códigos em latas sujas?
 
-### O óleo ou a sujeira na lata atrapalham o sistema?
-Não, pois treinamos a inteligência para ser "imune" ao ruído visual:
-*   **Visão Seletiva:** A IA ignora manchas, reflexos e borrões.
-*   **Foco Estrutural:** O sistema foca apenas na deformação real do metal ou no formato físico do caractere gravado.
+Sim. A inteligência artificial resolve este desafio em dois passos:
 
-### O sistema é seguro? Quem pode acessar meus dados?
-A segurança é tratada com padrão industrial:
-*   **Edge Computing:** Todo o processamento é local. As fotos não saem da sua fábrica.
-*   **Privacidade Total:** Sem conexão obrigatória com a nuvem ou internet.
-*   **Controle de Acesso:** O dashboard é restrito à sua rede industrial interna.
+*   **Foco de Precisão:** O sistema isola apenas a área do código, criando uma imagem limpa para análise.
+*   **Visão Estrutural:** A inteligência ignora manchas e óleo, focando apenas no formato real dos caracteres gravados no metal.
 
-### As bibliotecas utilizadas são pagas?
-Não há custos de licença para o motor de inteligência:
-*   **Tecnologia Intel:** Utilizamos OpenVINO e OTX, que são ferramentas gratuitas e de código aberto.
-*   **Sem Mensalidades:** Você não paga taxas pelo uso da inteligência artificial.
-*   **Sistema Auditável:** As bibliotecas são seguras, transparentes e não transmitem dados para terceiros.
+---
+
+### Como o sistema fica mais inteligente com o tempo?
+
+O sistema funciona como um aprendiz que se especializa a cada dia:
+
+*   **Captura de Dúvidas:** Toda vez que a inteligência artificial encontra algo novo ou duvidoso, ela salva essa imagem automaticamente.
+*   **Auto-Ajuste:** Essas novas imagens são usadas para re-treinar o sistema, ensinando a ele novas variações de defeitos.
+*   **Evolução Constante:** A inteligência aprende sem a necessidade de um programador alterar o código.
+
+---
+
+### O sistema é seguro?
+
+Sim. A segurança é tratada com padrão industrial:
+
+*   **Processamento Local:** Todo o processamento é feito dentro da fábrica. As fotos não saem para a internet.
+*   **Privacidade:** Não há conexão obrigatória com a nuvem, garantindo total controle dos seus dados.
+*   **Criptografia:** Toda a comunicação interna é protegida por chaves digitais.
+
+---
+
+### O que é o Cérebro Global?
+
+O Cérebro Global é a tecnologia que permite que todas as máquinas da linha compartilhem a mesma inteligência:
+
+*   **Inteligência Compartilhada:** Se uma máquina aprende a identificar um novo tipo de falha, todas as outras máquinas recebem essa atualização automaticamente.
+*   **Padronização Total:** Garante que todos os pontos de inspeção da fábrica sigam os mesmos critérios e parâmetros de qualidade.
+*   **Evolução via OTX:** Utiliza a tecnologia de treinamento da Intel para que o conhecimento gerado em uma linha beneficie a fábrica inteira.
+
+---
+
+### Preciso pagar mensalidade pelo uso da inteligência artificial?
+
+Não. O sistema foi construído sobre tecnologias abertas:
+
+*   **Sem Custos de Licença:** Utilizamos ferramentas da Intel que são gratuitas para uso industrial.
+*   **Sem Mensalidades:** Você não paga taxas recorrentes pelo uso da inteligência artificial.
+*   **Investimento Único:** O sistema é seu e funciona de forma independente.
+
+---
+
+Última atualização: Maio de 2026

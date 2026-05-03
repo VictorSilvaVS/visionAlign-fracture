@@ -6,17 +6,17 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Documentação técnica do ecossistema industrial VisionSystem.">
+        <meta name="description" content="Sistema de Visão Computacional Industrial para Inspeção de Latas">
+      
+      
+        <meta name="author" content="Victor Silva">
       
       
       
-        <link rel="canonical" href="http://127.0.0.1:8000/en/architecture/">
+        <link rel="prev" href="../tecnologias/">
       
       
-        <link rel="prev" href="../vision_fracture/">
-      
-      
-        <link rel="next" href="../otx_training/">
+        <link rel="next" href="../como_foi_feito/">
       
       
         
@@ -31,7 +31,7 @@
     
     
       
-        <title>Arquitetura IA - VisionSystem Documentation</title>
+        <title>Arquitetura - VisionAlign-Fracture (EN)</title>
       
     
     
@@ -73,7 +73,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ai-system-architecture" class="md-skip">
+        <a href="#system-architecture" class="md-skip">
           Skip to content
         </a>
       
@@ -96,7 +96,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../" title="VisionSystem Documentation" class="md-header__button md-logo" aria-label="VisionSystem Documentation" data-md-component="logo">
+    <a href="../" title="VisionAlign-Fracture (EN)" class="md-header__button md-logo" aria-label="VisionAlign-Fracture (EN)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,13 +110,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            VisionSystem Documentation
+            VisionAlign-Fracture (EN)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Arquitetura IA
+              Arquitetura
             
           </span>
         </div>
@@ -129,9 +129,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Mudar para modo escuro"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+      <label class="md-header__button md-icon" title="Mudar para modo escuro" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -139,9 +139,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Mudar para modo claro"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+      <label class="md-header__button md-icon" title="Mudar para modo claro" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -247,7 +247,7 @@
   
     
   
-  VisionSystem
+  Início
 
       </a>
     </li>
@@ -259,18 +259,36 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="../vision_align/" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="../installation/" class="md-tabs__link">
+        
   
   
-  Módulos
+    
+  
+  Instalação
 
-        </a>
-      </li>
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../tecnologias/" class="md-tabs__link">
+        
+  
+  
     
+  
+  Tecnologias
+
+      </a>
+    </li>
   
 
       
@@ -281,18 +299,93 @@
     
   
   
-    
-    
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
-          
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
   
   
-  Inteligência Artificial
+    
+  
+  Arquitetura
 
-        </a>
-      </li>
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../como_foi_feito/" class="md-tabs__link">
+        
+  
+  
     
+  
+  Como foi feito
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../glossary/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Glossário
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../api_reference/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  API e Segurança
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../maintenance/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Manutenção
+
+      </a>
+    </li>
   
 
       
@@ -308,7 +401,7 @@
   
     
   
-  FAQ's
+  Perguntas Frequentes
 
       </a>
     </li>
@@ -337,13 +430,13 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../" title="VisionSystem Documentation" class="md-nav__button md-logo" aria-label="VisionSystem Documentation" data-md-component="logo">
+    <a href="../" title="VisionAlign-Fracture (EN)" class="md-nav__button md-logo" aria-label="VisionAlign-Fracture (EN)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    VisionSystem Documentation
+    VisionAlign-Fracture (EN)
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -362,7 +455,7 @@
   <span class="md-ellipsis">
     
   
-    VisionSystem
+    Início
   
 
     
@@ -377,73 +470,19 @@
     
       
       
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Módulos
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Módulos
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
   
   
   
   
     <li class="md-nav__item">
-      <a href="../vision_align/" class="md-nav__link">
+      <a href="../installation/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    VisionAlign
+    Instalação
   
 
     
@@ -455,23 +494,22 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
   
     <li class="md-nav__item">
-      <a href="../vision_fracture/" class="md-nav__link">
+      <a href="../tecnologias/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    VisionFracture
+    Tecnologias
   
 
     
@@ -483,74 +521,9 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
     
       
       
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-        
-        
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Inteligência Artificial
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Inteligência Artificial
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
   
   
     
@@ -572,7 +545,7 @@
   <span class="md-ellipsis">
     
   
-    Arquitetura IA
+    Arquitetura
   
 
     
@@ -590,7 +563,7 @@
   <span class="md-ellipsis">
     
   
-    Arquitetura IA
+    Arquitetura
   
 
     
@@ -616,10 +589,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#openvino-integration" class="md-nav__link">
+  <a href="#1-system-organization-the-4-layers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        OpenVINO Integration
+        1. System Organization (The 4 Layers)
       
     </span>
   </a>
@@ -627,10 +600,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#uncertainty-detection" class="md-nav__link">
+  <a href="#2-two-stage-processing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Uncertainty Detection
+        2. Two-Stage Processing
       
     </span>
   </a>
@@ -638,10 +611,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#performance-evolution" class="md-nav__link">
+  <a href="#3-voting-system-preventing-errors" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Performance Evolution
+        3. Voting System (Preventing Errors)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-performance-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Performance Evolution
       
     </span>
   </a>
@@ -655,23 +639,22 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
   
     <li class="md-nav__item">
-      <a href="../otx_training/" class="md-nav__link">
+      <a href="../como_foi_feito/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Treinamento OTX
+    Como foi feito
   
 
     
@@ -683,94 +666,9 @@
     </li>
   
 
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../continuous_improvement/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
     
-  
-    Melhoria Contínua
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../global_brain/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Cérebro Global
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../maintenance/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Manutenção
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
+      
+      
   
   
   
@@ -795,11 +693,57 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
+    
       
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api_reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API e Segurança
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maintenance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manutenção
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -818,7 +762,7 @@
   <span class="md-ellipsis">
     
   
-    FAQ's
+    Perguntas Frequentes
   
 
     
@@ -858,10 +802,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#openvino-integration" class="md-nav__link">
+  <a href="#1-system-organization-the-4-layers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        OpenVINO Integration
+        1. System Organization (The 4 Layers)
       
     </span>
   </a>
@@ -869,10 +813,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#uncertainty-detection" class="md-nav__link">
+  <a href="#2-two-stage-processing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Uncertainty Detection
+        2. Two-Stage Processing
       
     </span>
   </a>
@@ -880,10 +824,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#performance-evolution" class="md-nav__link">
+  <a href="#3-voting-system-preventing-errors" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Performance Evolution
+        3. Voting System (Preventing Errors)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-performance-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Performance Evolution
       
     </span>
   </a>
@@ -907,25 +862,111 @@
 
 
 
-<h1 id="ai-system-architecture">AI System Architecture</h1>
-<p>VisionAlign's intelligence is built on a multi-stage architecture designed for stability and precision in industrial environments.</p>
-<h2 id="openvino-integration">OpenVINO Integration</h2>
-<p>The processing core utilizes <strong>OpenVINO IR (Intermediate Representation)</strong> to optimize YOLO models for Intel processors and accelerators.
-- <strong>INT8 Quantization:</strong> Optimization that reduces memory footprint and increases processing speed with minimal impact on accuracy.
-- <strong>Asynchronous Inference:</strong> Efficient frame management allowing high-throughput inspection without UI latency.</p>
-<h2 id="uncertainty-detection">Uncertainty Detection</h2>
-<p>The system employs uncertainty estimation logic to identify new defect patterns:
-- <strong>Ambiguity Range:</strong> Identifies detections with confidence levels between 30% and 60%.
-- <strong>Automatic Capture:</strong> Ambiguous images are isolated for subsequent human validation.
-- <strong>Active Learning:</strong> Human feedback on these images fuels the next training cycle, expanding the AI's knowledge base.</p>
-<h2 id="performance-evolution">Performance Evolution</h2>
-<p>The system demonstrates logarithmic accuracy gains as site-specific data volume increases, stabilizing at levels of high operational reliability.</p>
-<pre class="mermaid"><code>xychart-beta
-    title "Accuracy Evolution vs. Model Iterations"
-    x-axis ["V1.0 (Base)", "V1.2 (1 Wk)", "V1.5 (1 Mo)", "V2.0 (Optm)", "V2.1 (Current)"]
-    y-axis "Mean Accuracy (%)" 70 --&gt; 100
-    bar [72, 85, 91, 96, 98]
-    line [72, 85, 91, 96, 98]</code></pre>
+<h1 id="system-architecture">System Architecture</h1>
+<p>This document explains how the system works internally and how it is organized to ensure that no defect goes unnoticed.</p>
+<hr />
+<h2 id="1-system-organization-the-4-layers">1. System Organization (The 4 Layers)</h2>
+<p>Think of the system as a 4-story building, where each floor has a specific function:</p>
+<pre class="mermaid"><code>graph TD
+    subgraph Layer_4 [4. Presentation and Visualization]
+        direction LR
+        A1[Operator Program] --- A2[Web Dashboard]
+    end
+
+    subgraph Layer_3 [3. Application and Security]
+        direction LR
+        B1[Data Communication] --- B2[Security Manager] --- B3[Database]
+    end
+
+    subgraph Layer_2 [2. Artificial Intelligence]
+        direction LR
+        C1[OpenVINO Engine] --- C2[Location Model] --- C3[Detail Model]
+    end
+
+    subgraph Layer_1 [1. Infrastructure and Base]
+        direction LR
+        D1[Video Reading] --- D2[Logging System] --- D3[Task Management]
+    end
+
+    Layer_1 --&gt; Layer_2
+    Layer_2 --&gt; Layer_3
+    Layer_3 --&gt; Layer_4</code></pre>
+<hr />
+<h2 id="2-two-stage-processing">2. Two-Stage Processing</h2>
+<p>To ensure the system is both fast and accurate, it uses a funnel strategy:</p>
+<ol>
+<li><strong>Step 1:</strong> The system locates all cans on the conveyor belt and assigns a number to each one.</li>
+<li><strong>Step 2 (VisionFracture):</strong> It crops the image of each can and performs a deep analysis looking for cracks.</li>
+</ol>
+<p><img alt="AI Fracture Detection" src="../../assets/images/heatmap.png" /></p>
+<div class="admonition tip">
+<p class="admonition-title">Heatmap Analysis</p>
+<p>The system uses heatmaps to highlight exactly where the flaw was found, making visual verification easier for the operator.</p>
+</div>
+<pre class="mermaid"><code>graph LR
+    A[Camera] --&gt; B(Locate cans)
+    B --&gt; C(Crop can image)
+    C --&gt; D(Analyze for cracks)
+    D --&gt; E{Result}</code></pre>
+<hr />
+<h2 id="3-voting-system-preventing-errors">3. Voting System (Preventing Errors)</h2>
+<p>This is one of the most important parts of the system. To prevent a simple light reflection from causing a false alarm, the system uses a "voting" process:</p>
+<p>The system doesn't decide if there is a crack by looking only once. It looks at the same can multiple times as it passes by the camera.</p>
+<ul>
+<li><strong>Positive Vote:</strong> If the system sees a flaw, the can gets +1 point.</li>
+<li><strong>Negative Vote:</strong> If the system sees nothing, the can loses 1 point.</li>
+<li><strong>Alarm:</strong> The alert is only triggered if the can accumulates <strong>10 points</strong>.</li>
+</ul>
+<pre class="mermaid"><code>graph TD
+    A[Start: 0 points] --&gt; B{Saw a flaw?}
+    B -- Yes --&gt; C[Gain +1 point]
+    B -- No --&gt; D[Lose 1 point]
+    C --&gt; E{Reached 10?}
+    E -- Yes --&gt; F[CONFIRMED ALERT]
+    E -- No --&gt; B
+    D --&gt; B</code></pre>
+<p>This logic ensures the system is extremely reliable, ignoring temporary flashes on the metal surface.</p>
+<hr />
+<h2 id="4-performance-evolution">4. Performance Evolution</h2>
+<p>The system is constantly learning. See how the accuracy has improved:</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Project Stage</th>
+<th>Detection Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V1.0</td>
+<td>Start of Project</td>
+<td>62%</td>
+</tr>
+<tr>
+<td>V1.2</td>
+<td>Camera Adjustments</td>
+<td>75%</td>
+</tr>
+<tr>
+<td>V1.5</td>
+<td>Advanced Training</td>
+<td>78%</td>
+</tr>
+<tr>
+<td>V2.0</td>
+<td>Speed Optimization</td>
+<td>85%</td>
+</tr>
+<tr>
+<td>V2.1</td>
+<td>Current Version</td>
+<td>93%</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Last updated: May 2026</p>
 
 
 
@@ -975,7 +1016,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>

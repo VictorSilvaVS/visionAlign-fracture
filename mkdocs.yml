@@ -1,30 +1,29 @@
-site_name: VisionSystem Documentation
-site_description: Documentação técnica do ecossistema industrial VisionSystem.
-site_url: http://127.0.0.1:8000/
+site_name: VisionAlign-Fracture
+site_description: Sistema de Visão Computacional Industrial para Inspeção de Latas
+site_author: Victor Silva
+
 theme:
   name: material
   language: pt
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: indigo
-      accent: blue
+      primary: blue grey
+      accent: indigo
       toggle:
         icon: material/brightness-7
-        name: Switch to dark mode
+        name: Mudar para modo escuro
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: indigo
-      accent: blue
+      primary: blue grey
+      accent: indigo
       toggle:
         icon: material/brightness-4
-        name: Switch to light mode
+        name: Mudar para modo claro
   features:
     - navigation.tabs
     - navigation.sections
-    - navigation.expand
     - content.code.copy
-    - content.code.annotate
 
 plugins:
   - search
@@ -33,35 +32,32 @@ plugins:
         - locale: pt
           name: Português
           default: true
+          build: true
+          site_name: VisionAlign-Fracture
         - locale: en
           name: English
+          build: true
+          site_name: VisionAlign-Fracture (EN)
+
+nav:
+  - Início: index.md
+  - Instalação: installation.md
+  - Tecnologias: tecnologias.md
+  - Arquitetura: architecture.md
+  - Como foi feito: como_foi_feito.md
+  - Glossário: glossary.md
+  - API e Segurança: api_reference.md
+  - Manutenção: maintenance.md
+  - Perguntas Frequentes: faqs.md
 
 markdown_extensions:
-  - pymdownx.highlight:
-      anchor_linenums: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.tabbed:
-      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
   - admonition
-  - attr_list
-  - md_in_html
-
-nav:
-  - VisionSystem: index.md
-  - Módulos:
-    - VisionAlign: vision_align.md
-    - VisionFracture: vision_fracture.md
-  - Inteligência Artificial:
-    - Arquitetura IA: architecture.md
-    - Treinamento OTX: otx_training.md
-    - Melhoria Contínua: continuous_improvement.md
-    - Cérebro Global: global_brain.md
-    - Manutenção: maintenance.md
-    - Glossário: glossary.md
-  - FAQ's: faqs.md

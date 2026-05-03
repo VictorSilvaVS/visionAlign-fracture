@@ -1,143 +1,129 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
-        <loc>http://127.0.0.1:8000/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>None./</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="None"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/architecture/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Noneapi_reference/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/architecture/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/architecture/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="Noneapi_reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/api_reference/"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/continuous_improvement/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Nonearchitecture/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/continuous_improvement/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/continuous_improvement/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="Nonearchitecture/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/architecture/"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/faqs/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Nonecomo_foi_feito/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/faqs/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/faqs/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="Nonecomo_foi_feito/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/como_foi_feito/"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/global_brain/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Nonefaqs/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/global_brain/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/global_brain/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="Nonefaqs/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/faqs/"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/glossary/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Noneglossary/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/glossary/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/glossary/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="Noneglossary/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/glossary/"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/maintenance/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Noneinstallation/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/maintenance/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/maintenance/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="Noneinstallation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/installation/"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/otx_training/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Nonemaintenance/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/otx_training/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/otx_training/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="Nonemaintenance/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/maintenance/"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/vision_align/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Nonetecnologias/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/vision_align/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/vision_align/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="Nonetecnologias/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/tecnologias/"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/vision_fracture/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Noneen/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/vision_fracture/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/vision_fracture/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="None"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/en/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Noneen/api_reference/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/"/>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/api_reference/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="Noneapi_reference/"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/en/architecture/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Noneen/architecture/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/architecture/"/>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/architecture/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/architecture/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="Nonearchitecture/"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/en/continuous_improvement/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Noneen/como_foi_feito/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/continuous_improvement/"/>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/continuous_improvement/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/como_foi_feito/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="Nonecomo_foi_feito/"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/en/faqs/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Noneen/faqs/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/faqs/"/>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/faqs/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/faqs/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="Nonefaqs/"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/en/global_brain/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Noneen/glossary/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/global_brain/"/>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/global_brain/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/glossary/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="Noneglossary/"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/en/glossary/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Noneen/installation/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/glossary/"/>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/glossary/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/installation/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="Noneinstallation/"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/en/maintenance/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Noneen/maintenance/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/maintenance/"/>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/maintenance/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/maintenance/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="Nonemaintenance/"/>
     </url>
     <url>
-        <loc>http://127.0.0.1:8000/en/otx_training/</loc>
-        <lastmod>2026-05-01</lastmod>
+        <loc>Noneen/tecnologias/</loc>
+        <lastmod>2026-05-03</lastmod>
         <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/otx_training/"/>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/otx_training/"/>
-    </url>
-    <url>
-        <loc>http://127.0.0.1:8000/en/vision_align/</loc>
-        <lastmod>2026-05-01</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/vision_align/"/>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/vision_align/"/>
-    </url>
-    <url>
-        <loc>http://127.0.0.1:8000/en/vision_fracture/</loc>
-        <lastmod>2026-05-01</lastmod>
-        <changefreq>daily</changefreq>
-        <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/vision_fracture/"/>
-        <xhtml:link rel="alternate" hreflang="pt" href="http://127.0.0.1:8000/vision_fracture/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneen/tecnologias/"/>
+        <xhtml:link rel="alternate" hreflang="pt" href="Nonetecnologias/"/>
     </url>
 </urlset>

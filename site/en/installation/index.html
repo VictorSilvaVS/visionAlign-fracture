@@ -6,21 +6,21 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Documentação técnica do ecossistema industrial VisionSystem.">
+        <meta name="description" content="Sistema de Visão Computacional Industrial para Inspeção de Latas">
+      
+      
+        <meta name="author" content="Victor Silva">
       
       
       
-        <link rel="canonical" href="http://127.0.0.1:8000/en/global_brain/">
+        <link rel="prev" href="../">
       
       
-        <link rel="prev" href="../continuous_improvement/">
-      
-      
-        <link rel="next" href="../maintenance/">
+        <link rel="next" href="../tecnologias/">
       
       
         
-          <link rel="alternate" href="../../global_brain/" hreflang="pt">
+          <link rel="alternate" href="../../installation/" hreflang="pt">
         
           <link rel="alternate" href="./" hreflang="en">
         
@@ -31,7 +31,7 @@
     
     
       
-        <title>Cérebro Global - VisionSystem Documentation</title>
+        <title>Instalação - VisionAlign-Fracture (EN)</title>
       
     
     
@@ -73,7 +73,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#global-brain-industrial-collective-intelligence" class="md-skip">
+        <a href="#installation-guide" class="md-skip">
           Skip to content
         </a>
       
@@ -96,7 +96,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../" title="VisionSystem Documentation" class="md-header__button md-logo" aria-label="VisionSystem Documentation" data-md-component="logo">
+    <a href="../" title="VisionAlign-Fracture (EN)" class="md-header__button md-logo" aria-label="VisionAlign-Fracture (EN)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,13 +110,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            VisionSystem Documentation
+            VisionAlign-Fracture (EN)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Cérebro Global
+              Instalação
             
           </span>
         </div>
@@ -129,9 +129,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Mudar para modo escuro"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+      <label class="md-header__button md-icon" title="Mudar para modo escuro" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -139,9 +139,9 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="indigo"  aria-label="Mudar para modo claro"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+      <label class="md-header__button md-icon" title="Mudar para modo claro" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
@@ -163,7 +163,7 @@
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="../../global_brain/" hreflang="pt" class="md-select__link">
+            <a href="../../installation/" hreflang="pt" class="md-select__link">
               Português
             </a>
           </li>
@@ -247,7 +247,28 @@
   
     
   
-  VisionSystem
+  Início
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Instalação
 
       </a>
     </li>
@@ -259,18 +280,17 @@
   
   
   
-    
-    
-      <li class="md-tabs__item">
-        <a href="../vision_align/" class="md-tabs__link">
-          
+    <li class="md-tabs__item">
+      <a href="../tecnologias/" class="md-tabs__link">
+        
   
   
-  Módulos
+    
+  
+  Tecnologias
 
-        </a>
-      </li>
-    
+      </a>
+    </li>
   
 
       
@@ -278,21 +298,94 @@
   
   
   
-    
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
   
   
     
-    
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../architecture/" class="md-tabs__link">
-          
   
-  
-  Inteligência Artificial
+  Arquitetura
 
-        </a>
-      </li>
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../como_foi_feito/" class="md-tabs__link">
+        
+  
+  
     
+  
+  Como foi feito
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../glossary/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Glossário
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../api_reference/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  API e Segurança
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../maintenance/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Manutenção
+
+      </a>
+    </li>
   
 
       
@@ -308,7 +401,7 @@
   
     
   
-  FAQ's
+  Perguntas Frequentes
 
       </a>
     </li>
@@ -337,13 +430,13 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../" title="VisionSystem Documentation" class="md-nav__button md-logo" aria-label="VisionSystem Documentation" data-md-component="logo">
+    <a href="../" title="VisionAlign-Fracture (EN)" class="md-nav__button md-logo" aria-label="VisionAlign-Fracture (EN)" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    VisionSystem Documentation
+    VisionAlign-Fracture (EN)
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -362,7 +455,7 @@
   <span class="md-ellipsis">
     
   
-    VisionSystem
+    Início
   
 
     
@@ -377,264 +470,6 @@
     
       
       
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Módulos
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Módulos
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../vision_align/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    VisionAlign
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../vision_fracture/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    VisionFracture
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-        
-        
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Inteligência Artificial
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Inteligência Artificial
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Arquitetura IA
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../otx_training/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Treinamento OTX
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../continuous_improvement/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Melhoria Contínua
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
   
   
     
@@ -656,7 +491,7 @@
   <span class="md-ellipsis">
     
   
-    Cérebro Global
+    Instalação
   
 
     
@@ -674,7 +509,7 @@
   <span class="md-ellipsis">
     
   
-    Cérebro Global
+    Instalação
   
 
     
@@ -700,10 +535,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-it-works-the-learn-once-know-everywhere-concept" class="md-nav__link">
+  <a href="#1-computer-requirements" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How it works (The "Learn Once, Know Everywhere" concept)
+        1. Computer Requirements
       
     </span>
   </a>
@@ -711,22 +546,105 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#explainable-ai-the-heatmap" class="md-nav__link">
+  <a href="#2-necessary-software" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Explainable AI: The Heatmap
+        2. Necessary Software
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Explainable AI: The Heatmap">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-installation-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Installation Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Installation Steps">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#where-is-the-ai-looking" class="md-nav__link">
+  <a href="#prepare-the-project-folder" class="md-nav__link">
     <span class="md-ellipsis">
       
-        "Where is the AI looking?"
+        Prepare the Project Folder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-isolated-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Isolated Environment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-libraries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install Libraries
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-security-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Security Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-how-to-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. How to Start
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. How to Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#start-the-server-camera-computer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Start the Server (Camera Computer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start-the-operator-screen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Start the Operator Screen
       
     </span>
   </a>
@@ -745,23 +663,22 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
   
   
   
   
     <li class="md-nav__item">
-      <a href="../maintenance/" class="md-nav__link">
+      <a href="../tecnologias/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Manutenção
+    Tecnologias
   
 
     
@@ -773,10 +690,63 @@
     </li>
   
 
-              
-            
-              
-                
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arquitetura
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../como_foi_feito/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Como foi feito
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
   
   
   
@@ -801,11 +771,57 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
+    
       
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api_reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API e Segurança
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maintenance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manutenção
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -824,7 +840,7 @@
   <span class="md-ellipsis">
     
   
-    FAQ's
+    Perguntas Frequentes
   
 
     
@@ -864,10 +880,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-it-works-the-learn-once-know-everywhere-concept" class="md-nav__link">
+  <a href="#1-computer-requirements" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How it works (The "Learn Once, Know Everywhere" concept)
+        1. Computer Requirements
       
     </span>
   </a>
@@ -875,22 +891,105 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#explainable-ai-the-heatmap" class="md-nav__link">
+  <a href="#2-necessary-software" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Explainable AI: The Heatmap
+        2. Necessary Software
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Explainable AI: The Heatmap">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-installation-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Installation Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Installation Steps">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#where-is-the-ai-looking" class="md-nav__link">
+  <a href="#prepare-the-project-folder" class="md-nav__link">
     <span class="md-ellipsis">
       
-        "Where is the AI looking?"
+        Prepare the Project Folder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-isolated-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Isolated Environment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-libraries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install Libraries
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-security-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Security Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-how-to-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. How to Start
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. How to Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#start-the-server-camera-computer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Start the Server (Camera Computer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start-the-operator-screen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Start the Operator Screen
       
     </span>
   </a>
@@ -919,29 +1018,47 @@
 
 
 
-<h1 id="global-brain-industrial-collective-intelligence">Global Brain: Industrial Collective Intelligence</h1>
-<p>The <strong>Global Brain</strong> is the most advanced feature of VisionSystem. It allows the learning from a single machine anywhere in the world to be shared instantly with all other units in your company.</p>
-<h2 id="how-it-works-the-learn-once-know-everywhere-concept">How it works (The "Learn Once, Know Everywhere" concept)</h2>
-<p>Imagine your factory in Poland encounters a brand-new defect caused by a rare variation in raw materials.
-1.  <strong>Local Discovery:</strong> The AI in Poland detects the anomaly, captures the image, and the OTX system performs automatic retraining.
-2.  <strong>Intelligence Sync:</strong> As soon as the new "knowledge" (model weights) is validated, it is sent to the Global Brain (Private Cloud).
-3.  <strong>Universal Update:</strong> Without anyone having to press a button, the factory in Brazil receives this update. Now, if that same defect appears in Brazil, the AI will already know exactly what to do, even without ever having seen that error locally before.</p>
-<pre class="mermaid"><code>graph TD
-    A[Poland Factory] --&gt;|New Defect| B(Local OTX)
-    B --&gt;|Weight Update| C{Global Brain}
-    C --&gt;|Synchronization| D[Brazil Factory]
-    C --&gt;|Synchronization| E[USA Factory]
-    D --&gt;|Immunity| F[Defect Detected Instantly]</code></pre>
+<h1 id="installation-guide">Installation Guide</h1>
+<p>Follow these steps to set up VisionAlign-Fracture on your computer.</p>
 <hr />
-<h2 id="explainable-ai-the-heatmap">Explainable AI: The Heatmap</h2>
-<p>To ensure that operators and managers fully trust the machine's decision, VisionSystem utilizes <strong>Explainable AI</strong>.</p>
-<h3 id="where-is-the-ai-looking">"Where is the AI looking?"</h3>
-<p>Instead of just displaying a text box saying "Fracture," the system generates a <strong>Thermal Heatmap</strong> over the image.
-*   <strong>Red Glow:</strong> Indicates zones of high neural activation—exactly where the AI found the deformation.
-*   <strong>Transparency:</strong> Allows you to see the original metal under the glow, visually confirming the failure.</p>
-<blockquote>
-<p><strong>Benefit for the CEO:</strong> You don't need to understand algorithms to know the AI is right. The glow on the screen shows the system's visual "reasoning," eliminating the fear of the "black box."</p>
-</blockquote>
+<h2 id="1-computer-requirements">1. Computer Requirements</h2>
+<ul>
+<li>Processor: Intel Core i5 or higher (8th generation onwards).</li>
+<li>RAM: 8GB or more.</li>
+<li>System: Windows 10/11 or Linux.</li>
+</ul>
+<hr />
+<h2 id="2-necessary-software">2. Necessary Software</h2>
+<p>You will need to install the following software before starting:
+1.  Python (version 3.10 or 3.11).
+2.  FFmpeg (added to the system PATH).</p>
+<hr />
+<h2 id="3-installation-steps">3. Installation Steps</h2>
+<h3 id="prepare-the-project-folder">Prepare the Project Folder</h3>
+<p>Ensure all system files are in the desired folder and open the terminal in that folder.</p>
+<h3 id="create-isolated-environment">Create Isolated Environment</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># On Windows:</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate
+</code></pre></div>
+<h3 id="install-libraries">Install Libraries</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>backend/requirements.txt
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span>PyQt5<span class="w"> </span>flask<span class="w"> </span>flask-login<span class="w"> </span>werkzeug<span class="w"> </span>openvino<span class="w"> </span>opencv-python<span class="w"> </span>numpy<span class="w"> </span>cryptography<span class="w"> </span>openpyxl<span class="w"> </span>requests<span class="w"> </span>fastapi<span class="w"> </span>uvicorn
+</code></pre></div>
+<hr />
+<h2 id="4-security-configuration">4. Security Configuration</h2>
+<p>The first time you run the server, it will create a security key in <code>config/server_security.key</code>.
+<strong>Important:</strong> If you are going to use the program on another computer to view the results, you must copy this key file to the same folder on the other computer.</p>
+<hr />
+<h2 id="5-how-to-start">5. How to Start</h2>
+<h3 id="start-the-server-camera-computer">Start the Server (Camera Computer)</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python<span class="w"> </span>run_client_only.py
+</code></pre></div>
+<h3 id="start-the-operator-screen">Start the Operator Screen</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python<span class="w"> </span>main.py
+</code></pre></div>
+<hr />
+<p>Last updated: May 2026</p>
 
 
 
@@ -991,7 +1108,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
