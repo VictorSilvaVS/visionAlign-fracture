@@ -20,10 +20,10 @@ from utils.security import SecurityManager
 from utils.server import run_server
 from model.yolo_model import YOLOModel
 from utils.timezone_utils import get_current_utc_timestamp
+from utils.clp_communication import CLPCommunication
+from utils.email_utils import set_email_config
 
 # --- Globais ---
-DEFAULT_DB_LOG_INTERVAL = 60
-DEFAULT_MAIN_LOOP_SLEEP = 0.1
 stats_lock = RLock()
 frame_lock = RLock()
 db_log_lock = RLock()
@@ -55,10 +55,8 @@ class ModelManager:
         """Inicializa e configura o modelo YOLO."""
         try:
             self._log_hardware_info()
-            
-            # Inicializamos o modelo - a lógica de path agora é interna ao YOLOModel
             self.model = YOLOModel(
-                None, # model_path não é mais necessário aqui
+                None,
                 self.settings.copy()
             )
             
@@ -141,7 +139,7 @@ def model_update_callback(data: Dict[str, Any]):
 
 # --- Background Tasks ---
 
-def log_stats_to_db_periodically(interval_seconds: int = DEFAULT_DB_LOG_INTERVAL):
+def log_stats_to_db_periodically(interval_seconds: int, db_path: str = None):
     logger = logging.getLogger("VisionAlign.DBLogger")
     logger.info(f"Iniciando logger periódico (intervalo: {interval_seconds}s)")
     
@@ -162,7 +160,8 @@ def log_stats_to_db_periodically(interval_seconds: int = DEFAULT_DB_LOG_INTERVAL
                     last_logged_db_counts[k] = current_stats[k]
 
             if any(v > 0 for v in deltas.values()):
-                if db is None: db = Database()
+                if db is None: 
+                    db = Database(db_path=db_path)
                 db.log_detection_counts(**deltas)
                 logger.debug(f"Deltas logados: {deltas}")
                 
@@ -211,14 +210,10 @@ def cleanup_old_files_task(settings_manager):
             settings = settings_manager.get_all()
             collection = settings.get('AI_PARAMS', {}).get('dataset_collection', {})
             retention_days = int(collection.get('retention_days', 30))
-            
-            # Garante limites (1 a 365)
             retention_days = max(1, min(365, retention_days))
             
             now = time.time()
             max_age_seconds = retention_days * 24 * 3600
-            
-            # Pastas para limpar (relativas ao root se necessário)
             project_root = os.path.dirname(os.path.abspath(__file__))
             target_dirs = [
                 os.path.join(project_root, "data", "alerts"),
@@ -248,8 +243,6 @@ def cleanup_old_files_task(settings_manager):
                 
         except Exception as e:
             logger.error(f"Erro na task de limpeza: {e}")
-            
-        # Roda uma vez por dia (86400 segundos)
         time.sleep(86400)
 
 # --- Main Server Logic ---
@@ -257,6 +250,7 @@ def cleanup_old_files_task(settings_manager):
 def main_server():
     model = None
     database = None
+    clp = None
     
     log_file = os.path.join(project_root, "server.log")
     logger = setup_logging(
@@ -269,26 +263,42 @@ def main_server():
     logger.info("Iniciando VisionAlign Server")
     
     try:
-        # Componentes
+        # Components
         settings_manager = Settings()
         settings = settings_manager.get_all()
-        database = Database()
-        
-        # Segurança
-        config_dir = os.path.join(project_root, "config")
-        key_path = os.path.join(config_dir, "server_security.key")
-        security_manager = SecurityManager(key_file=key_path)
+        db_path = settings.get('SYSTEM_CONFIG', {}).get('paths', {}).get('database')
+        database = Database(db_path=db_path)
+        # Security
+        sec_key_path = settings.get('SYSTEM_CONFIG', {}).get('paths', {}).get('security_key')
+        security_manager = SecurityManager(key_file=sec_key_path)
 
-        # Inicializa o modelo via Manager
+        # Email
+        email_config = settings.get('EMAIL_CONFIG', {})
+        set_email_config(email_config)
         model_manager = ModelManager(settings, logger)
         model = model_manager.initialize()
         
         if model:
             model.start_processing()
             logger.info("Modelo iniciado com sucesso.")
-
-        # Inicia Threads de Background
-        # Flask Server
+        clp_config = settings.get('CLP_CONFIG', {})
+        if clp_config.get('enabled', False):
+            try:
+                clp = CLPCommunication(ip=clp_config.get('ip'), slot=clp_config.get('slot', 0))
+                if clp.connect():
+                    clp.start_heartbeat(
+                        tag=clp_config.get('heartbeat_tag'), 
+                        interval=clp_config.get('heartbeat_interval')
+                    )
+                    logger.info("Comunicação com CLP e Heartbeat iniciados.")
+                else:
+                    logger.warning("Falha na conexão inicial com CLP. O Heartbeat tentará reconectar em background.")
+                    clp.start_heartbeat(
+                        tag=clp_config.get('heartbeat_tag'), 
+                        interval=clp_config.get('heartbeat_interval')
+                    )
+            except Exception as e:
+                logger.error(f"Erro ao inicializar CLP: {e}")
         flask_thread = threading.Thread(
             target=run_server,
             args=(settings_manager, logger, current_stats, stats_lock, 
@@ -299,15 +309,14 @@ def main_server():
         flask_thread.start()
 
         # DB Logger
-        db_interval = settings.get('DATABASE_CONFIG', {}).get('log_interval_seconds', DEFAULT_DB_LOG_INTERVAL)
+        db_interval = settings.get('SYSTEM_CONFIG', {}).get('logging', {}).get('db_log_interval', 60)
         db_thread = threading.Thread(
             target=log_stats_to_db_periodically,
-            args=(db_interval,),
+            args=(db_interval, db_path),
             daemon=True
         )
         db_thread.start()
-
-        # Task de Limpeza (Snapshot Retention)
+        """snapshot injection"""
         cleanup_thread = threading.Thread(
             target=cleanup_old_files_task,
             args=(settings_manager,),
@@ -316,8 +325,9 @@ def main_server():
         cleanup_thread.start()
 
         # Loop infinito principal
+        main_loop_sleep = settings.get('SYSTEM_CONFIG', {}).get('monitoring', {}).get('main_loop_sleep', 0.1)
         while True:
-            time.sleep(DEFAULT_MAIN_LOOP_SLEEP)
+            time.sleep(main_loop_sleep)
             logger.debug("Servidor ativo e monitorando...")
 
     except KeyboardInterrupt:
@@ -329,6 +339,8 @@ def main_server():
         logger.info("Iniciando limpeza de recursos...")
         if model:
             model.stop_processing()
+        if clp:
+            clp.close()
         if database:
             database.close()
         logger.info("Servidor finalizado.")

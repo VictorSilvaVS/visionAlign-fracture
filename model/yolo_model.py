@@ -12,14 +12,7 @@ from .detection_drawer import DetectionDrawer
 from utils.email_utils import send_fracture_alert_email
 from utils.database import Database
 # Parametros de ambiente para otimização do OpenCV e OpenVINO no Windows
-os.environ['OPENCV_CORE_OPTIMIZATION'] = '1'
-os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'rtsp_transport;tcp|buffer_size;2048000|fifo_size;100000|max_delay;0|timeout;5000000|reorder_queue_size;0|flags;nobuffer'
-os.environ["OMP_NUM_THREADS"] = "8"
-os.environ["MKL_NUM_THREADS"] = "8"
-os.environ["OPENCV_NUM_THREADS"] = "8"
-os.environ["NUMEXPR_NUM_THREADS"] = "8"
-os.environ["QT_QPA_PLATFORM"] = "offscreen"
-os.environ['OV_CPU_BACKEND'] = 'ONEDNN'
+# Os parâmetros de ambiente serão configurados dinamicamente no __init__ baseado no SYSTEM_CONFIG
 
 
 class YOLOModel:
@@ -66,7 +59,24 @@ class YOLOModel:
         self._update_gamma_table() # Precalcula a tabela LUT do Gamma
         self.clahe_enabled = ai_params.get('advanced', {}).get('clahe_enabled', True)
         self.clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-        self.device = 'cpu' 
+        
+        # Configurações de Sistema/Performance
+        sys_config = settings.get('SYSTEM_CONFIG', {})
+        perf_cfg = sys_config.get('performance', {})
+        ai_sys_cfg = sys_config.get('ai', {})
+        
+        self.device = perf_cfg.get('device', 'cpu')
+        num_threads = str(perf_cfg.get('num_threads', 8))
+        
+        # Aplica Otimizações de Ambiente
+        os.environ['OPENCV_CORE_OPTIMIZATION'] = '1'
+        os.environ["OMP_NUM_THREADS"] = num_threads
+        os.environ["MKL_NUM_THREADS"] = num_threads
+        os.environ["OPENCV_NUM_THREADS"] = num_threads
+        os.environ["NUMEXPR_NUM_THREADS"] = num_threads
+        os.environ["QT_QPA_PLATFORM"] = "offscreen"
+        os.environ['OV_CPU_BACKEND'] = 'ONEDNN'
+
         self.processing = False
         self.processing_event = Event()
         self.track_fracture_status = {}
@@ -82,12 +92,16 @@ class YOLOModel:
         self.track_lock = RLock()      # RLock para proteger estados de votação
         
         # POLÍTICA DE VOTAÇÃO DINÂMICA (Ganho e Perda de Confiança)
-        self.vote_policy = {
-            'threshold': 10,     # Meta de score para confirmar fratura
-            'gain': 1,          # Ganho por frame positivo
-            'loss': 1,          # Perda por frame negativo
-            'max_score': 15     # Limite para não acumular infinitamente
-        }
+        self.vote_policy = ai_sys_cfg.get('vote_policy', {
+            'threshold': 10,
+            'gain': 1,
+            'loss': 1,
+            'max_score': 15
+        })
+        self.roi_size_cfg = ai_sys_cfg.get('roi_size', 640)
+        self.default_stream_res = ai_sys_cfg.get('default_stream_res', [4096, 2160])
+        self.email_alert_cooldown = ai_sys_cfg.get('email_alert_cooldown', 300)
+        
         self.frame_duration = 1.0 / self.target_fps
         self.video_source = None
         self.current_source_type = None
@@ -103,7 +117,8 @@ class YOLOModel:
         self.counted_track_ids = {} # Mudado de set para dict para timestamping
         self.max_cache_size = 10000
         # Pipeline Assíncrono Triple-Tier
-        self.io_executor = ThreadPoolExecutor(max_workers=4) # Imagens e DB
+        io_workers = perf_cfg.get('io_workers', 4)
+        self.io_executor = ThreadPoolExecutor(max_workers=io_workers) # Imagens e DB
         self.email_executor = ThreadPoolExecutor(max_workers=1) # E-mail (isolado pois é lento)
         self.frame_callback = None
         detection_colors = settings.get('COLORS', {}).get('detection', {}).copy()
@@ -134,7 +149,6 @@ class YOLOModel:
         self.conf_distrust_range = collection.get('distrust_range', [0.3, 0.6])
         self.save_on_event = bool(collection.get('save_on_event', False))
         self.last_frame_clean = None
-        self.email_alert_cooldown = 300
         self.last_email_alert_time = 0
         
     def set_callback(self, callback):
@@ -246,7 +260,7 @@ class YOLOModel:
         distorções causadas por máscaras de segmentação com anomalias de escala.
         """
         h_img, w_img = frame.shape[:2]
-        ROI_SIZE = 640
+        ROI_SIZE = self.roi_size_cfg
         
         try:
             if results_align.boxes is None or results_align.boxes.id is None:
@@ -371,8 +385,8 @@ class YOLOModel:
         
         self.logger.info(f"Abrindo stream FFmpeg Pipe: {url}")
         
-        # FFmpeg Pipe - Stream 4K para VisionAlign (ROI é redimensionado p/ 640x640 para o modelo de fratura)
-        w, h = 4096, 2160
+        # FFmpeg Pipe
+        w, h = self.default_stream_res
         if resolution and 'x' in resolution:
             w, h = map(int, resolution.split('x'))
 
@@ -515,14 +529,11 @@ class YOLOModel:
             cycle_start = time.time()
 
             frame_count += 1
-            # Otimização: GC Periódico para não travar o loop
             if frame_count % 300 == 0:
                 self.io_executor.submit(self._cleanup_memory)
 
             if self.frame_skip > 0 and frame_count % (self.frame_skip + 1) != 0:
                 continue
-
-            # 1. Inferência de Alinhamento (Frame Puro)
             results_align = self.model_align.track(
                 frame, persist=True, conf=self.conf, iou=self.iou,
                 verbose=False, tracker="bytetrack.yaml"
@@ -531,7 +542,6 @@ class YOLOModel:
             if results_align and len(results_align) > 0:
                 r_align = results_align[0]
                 if r_align.boxes is not None and r_align.boxes.id is not None:
-                    # Vetorização: Convertendo tensores para NumPy antes do loop (Otimização Intel)
                     cls_arr = r_align.boxes.cls.int().cpu().numpy()
                     conf_arr = r_align.boxes.conf.cpu().numpy()
                     

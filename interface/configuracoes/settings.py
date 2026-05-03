@@ -78,6 +78,66 @@ class Settings:
         'SERVER_CONFIG': {
             'remote_host': '127.0.0.1',  # IP ou hostname do servidor principal
             'remote_port': 7586  # Porta do servidor principal
+        },
+        'CLP_CONFIG': {
+            'enabled': True,
+            'ip': '192.168.1.100',
+            'slot': 0,
+            'heartbeat_tag': 'Program:MainProgram.VisionHeartbeat',
+            'heartbeat_interval': 1.0,
+            'trigger_tag': 'Program:MainProgram.TriggerSensor',
+            'result_tag': 'Program:MainProgram.DetectionResult'
+        },
+        'EMAIL_CONFIG': {
+            'enabled': False,
+            'smtp_server': 'smtp.gmail.com',
+            'smtp_port': 587,
+            'smtp_username': '',
+            'smtp_password': '',
+            'smtp_sender': 'vision-align@factory.com'
+        },
+        'SYSTEM_CONFIG': {
+            'management_key': 'admin123',
+            'server': {
+                'port': 7586,
+                'host': '0.0.0.0',
+                'secret_key': 'aE39bVdKfLm0pQxRsZy1WiTgC7hJn2oU8gIb6yF5s4jPq9zDeXwA1lKrNtSh3fOcBmZjHuYvGtI2pQxR7sZ1wEiOvCbUn4mT',
+                'session_lifetime_minutes': 30,
+                'debug_mode': False
+            },
+            'logging': {
+                'max_console_lines': 500,
+                'db_log_interval': 60,
+                'level': 'INFO'
+            },
+            'monitoring': {
+                'alert_cooldown_seconds': 60,
+                'alert_state_expiry_seconds': 300,
+                'web_stream_fps': 12,
+                'main_loop_sleep': 0.1
+            },
+            'ai': {
+                'vote_policy': {
+                    'threshold': 10,
+                    'gain': 1,
+                    'loss': 1,
+                    'max_score': 15
+                },
+                'email_alert_cooldown': 300,
+                'roi_size': 640,
+                'default_stream_res': [4096, 2160]
+            },
+            'performance': {
+                'num_threads': 8,
+                'device': 'cpu',
+                'io_workers': 4
+            },
+            'paths': {
+                'database': 'data/users.db',
+                'security_key': 'config/security.key',
+                'logs': 'logs/',
+                'artifacts': 'artifacts/'
+            }
         }
     }
 
@@ -121,7 +181,7 @@ class Settings:
         """Validação detalhada das configurações"""
         try:
             required_sections = ['MODEL_PARAMS', 'AI_PARAMS', 'VIDEO_PARAMS', 'UI_PARAMS', 'COLORS',
-                                 'SERVER_CONFIG']  # Adicionado SERVER_CONFIG
+                                 'SERVER_CONFIG', 'CLP_CONFIG', 'SYSTEM_CONFIG', 'EMAIL_CONFIG'] 
 
             # Verificar seções principais
             if not all(section in settings for section in required_sections):

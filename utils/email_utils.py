@@ -10,21 +10,32 @@ from dotenv import load_dotenv
 load_dotenv()
 
 logger = logging.getLogger("VisionAlign.Email")
+_config = None
+
+def set_email_config(config):
+    """Define a configuração global de e-mail."""
+    global _config
+    _config = config
+    logger.info("Configuração de e-mail atualizada.")
 
 def send_fracture_alert_email(recipients, subject, body_text, image_path=None, roi_path=None):
     """
     Envia um e-mail de alerta com um relatório visual das fraturas detectadas.
     """
-    enabled = os.getenv('EMAIL_NOTIFICATIONS_ENABLED', 'false').lower() == 'true'
-    if not enabled:
-        logger.info("Notificações por email estão desativadas globalmente.")
-        return False
-
-    smtp_server = os.getenv('SMTP_SERVER')
-    smtp_port = int(os.getenv('SMTP_PORT', 587))
-    smtp_user = os.getenv('SMTP_USERNAME')
-    smtp_password = os.getenv('SMTP_PASSWORD')
-    smtp_sender = os.getenv('SMTP_SENDER')
+    if _config:
+        enabled = _config.get('enabled', False)
+        smtp_server = _config.get('smtp_server')
+        smtp_port = int(_config.get('smtp_port', 587))
+        smtp_user = _config.get('smtp_username')
+        smtp_password = _config.get('smtp_password')
+        smtp_sender = _config.get('smtp_sender')
+    else:
+        enabled = os.getenv('EMAIL_NOTIFICATIONS_ENABLED', 'false').lower() == 'true'
+        smtp_server = os.getenv('SMTP_SERVER')
+        smtp_port = int(os.getenv('SMTP_PORT', 587))
+        smtp_user = os.getenv('SMTP_USERNAME')
+        smtp_password = os.getenv('SMTP_PASSWORD')
+        smtp_sender = os.getenv('SMTP_SENDER')
 
     try:
         msg = MIMEMultipart('related') # 'related' é necessário para imagens inline
@@ -111,11 +122,18 @@ def send_password_reset_email(recipient_email, reset_link):
     """
     Envia um email com o link para reset de senha renderizado em HTML.
     """
-    smtp_server = os.getenv('SMTP_SERVER')
-    smtp_port = int(os.getenv('SMTP_PORT', 587)) # Porta 587 é o padrão para TLS
-    smtp_user = os.getenv('SMTP_USERNAME')
-    smtp_password = os.getenv('SMTP_PASSWORD')
-    smtp_sender = os.getenv('SMTP_SENDER')
+    if _config:
+        smtp_server = _config.get('smtp_server')
+        smtp_port = int(_config.get('smtp_port', 587))
+        smtp_user = _config.get('smtp_username')
+        smtp_password = _config.get('smtp_password')
+        smtp_sender = _config.get('smtp_sender')
+    else:
+        smtp_server = os.getenv('SMTP_SERVER')
+        smtp_port = int(os.getenv('SMTP_PORT', 587))
+        smtp_user = os.getenv('SMTP_USERNAME')
+        smtp_password = os.getenv('SMTP_PASSWORD')
+        smtp_sender = os.getenv('SMTP_SENDER')
 
     if not smtp_server or not smtp_sender:
         logger.error("Configurações de SMTP incompletas no arquivo .env.")

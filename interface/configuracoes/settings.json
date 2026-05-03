@@ -4,77 +4,59 @@
         "align_model_path": "model/_openvino_model/VisionAlign_openvino_model",
         "fracture_model_path": "model/_openvino_model/VisionFracture_openvino_model",
         "dataset_path": "data/dataset_collect/images",
-        "model_version": "3.4.1",
-        "model_type": "yolo26.openvino",
-        "size_dataset": "79",
-        "last_training": "2026-02-06"
+        "model_version": "v11s",
+        "model_type": "openvino"
     },
     "AI_PARAMS": {
-        "conf_default": 0.1,
-        "iou_default": 0.12,
+        "conf_default": 0.5,
+        "iou_default": 0.45,
         "max_queue_size": 30,
         "advanced": {
-            "exclusion_zones": [],
-            "gamma": 1.1,
-            "clahe_enabled": true,
-            "roi_fixed_size": 437,
-            "roi_radius": 250,
-            "roi_offset_x": 0,
-            "roi_offset_y": 0,
-            "drawing": {
-                "box_thickness": 7,
-                "font_scale": 0.7,
-                "font_thickness": 2,
-                "show_label": true,
-                "show_conf": true,
-                "show_bg": true,
-                "show_mask": true
+            "frame_skip": 2,
+            "batch_size": 1,
+            "detection_threshold": 3,
+            "nms_threshold": 0.45,
+            "max_det": 300,
+            "agnostic_nms": false,
+            "video_source": {
+                "type": "stream",
+                "stream_url": "rtsp://admin:VisionAlign123%4010.81.50.64:554/cam/realmonitor?channel=1&subtype=0"
+            },
+            "dataset_collection": {
+                "enabled": true,
+                "save_on_event": true,
+                "save_interval": 10,
+                "distrust_range": [
+                    0.3,
+                    0.6
+                ],
+                "retention_days": 30
             }
-        },
-        "thresholds": {
-            "lata_normal": 0.22,
-            "lata_tombada": 0.25,
-            "lata_invertida": 0.23,
-            "fracture": 0.6
-        },
-        "dataset_collection": {
-            "enabled": false,
-            "save_on_event": false,
-            "save_interval": 10,
-            "retention_days": 30,
-            "distrust_range": [
-                0.3,
-                0.6
-            ]
         }
     },
     "VIDEO_PARAMS": {
-        "save_path": "rtsp://admin:VisionAlign123@10.81.50.64:554/cam/realmonitor?channel=1&subtype=0",
-        "default_resolution": "640x480",
+        "save_path": "output/videos",
+        "default_resolution": "1280x720",
         "default_fps": 30,
         "resolutions": {
             "1280x720": {
-                "height": 720,
-                "width": 1280
+                "width": 1280,
+                "height": 720
             },
             "1920x1080": {
-                "height": 1080,
-                "width": 1920
+                "width": 1920,
+                "height": 1080
             },
             "640x480": {
-                "height": 480,
-                "width": 640
+                "width": 640,
+                "height": 480
             }
         },
         "fps_options": [
             15,
             30,
             60
-        ],
-        "source_type": "stream",
-        "source_param": "rtsp://admin:Abc123456@10.81.50.64:554/Streaming/Channels/101?transportmode=unicast&p=tcp",
-        "resolution": "",
-        "fps": ""
+        ]
     },
     "UI_PARAMS": {
         "update_interval": 30,
@@ -104,58 +86,76 @@
                 255,
                 165,
                 0
-            ],
-            "fracture": [
-                0,
-                0,
-                255
             ]
         },
         "success": "#00cc00",
         "warning": "#ffcc00",
         "error": "#cc0000"
     },
-    "VISUAL_STYLE": {
-        "detection_box": {
-            "thickness": 2,
-            "line_type": "solid",
-            "show_label": true,
-            "show_confidence": false,
-            "label_position": "top"
+    "SERVER_CONFIG": {
+        "remote_host": "127.0.0.1",
+        "remote_port": 7586
+    },
+    "CLP_CONFIG": {
+        "enabled": true,
+        "ip": "192.168.1.100",
+        "slot": 0,
+        "heartbeat_tag": "Program:MainProgram.VisionHeartbeat",
+        "heartbeat_interval": 1.0,
+        "trigger_tag": "Program:MainProgram.TriggerSensor",
+        "result_tag": "Program:MainProgram.DetectionResult"
+    },
+    "EMAIL_CONFIG": {
+        "enabled": false,
+        "smtp_server": "smtp.gmail.com",
+        "smtp_port": 587,
+        "smtp_username": "",
+        "smtp_password": "",
+        "smtp_sender": "vision-align@factory.com"
+    },
+    "SYSTEM_CONFIG": {
+        "server": {
+            "port": 7586,
+            "host": "0.0.0.0",
+            "secret_key": "aE39bVdKfLm0pQxRsZy1WiTgC7hJn2oU8gIb6yF5s4jPq9zDeXwA1lKrNtSh3fOcBmZjHuYvGtI2pQxR7sZ1wEiOvCbUn4mT",
+            "session_lifetime_minutes": 30,
+            "debug_mode": false
         },
-        "detection_alert": {
-            "thickness": 3,
-            "line_type": "solid",
-            "blink_enabled": false,
-            "icon_type": "circle"
+        "logging": {
+            "max_console_lines": 500,
+            "db_log_interval": 60,
+            "level": "INFO"
         },
-        "fracture_alert": {
-            "thickness": 3,
-            "line_type": "dashed",
-            "text_size": "large",
-            "background_color": [
-                0,
-                0,
-                255
-            ],
-            "text_color": [
-                255,
-                255,
-                255
+        "monitoring": {
+            "alert_cooldown_seconds": 60,
+            "alert_state_expiry_seconds": 300,
+            "web_stream_fps": 12,
+            "main_loop_sleep": 0.1
+        },
+        "ai": {
+            "vote_policy": {
+                "threshold": 10,
+                "gain": 1,
+                "loss": 1,
+                "max_score": 15
+            },
+            "email_alert_cooldown": 300,
+            "roi_size": 640,
+            "default_stream_res": [
+                4096,
+                2160
             ]
         },
-        "roi_display": {
-            "show_circle_mask": true,
-            "circle_color": [
-                0,
-                255,
-                255
-            ],
-            "circle_thickness": 2
+        "performance": {
+            "num_threads": 8,
+            "device": "cpu",
+            "io_workers": 4
+        },
+        "paths": {
+            "database": "data/users.db",
+            "security_key": "config/security.key",
+            "logs": "logs/",
+            "artifacts": "artifacts/"
         }
-    },
-    "SERVER_CONFIG": {
-        "remote_host": "10.81.5.219",
-        "remote_port": 7586
     }
 }

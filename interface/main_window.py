@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QObject, QFileSystemWatcher, QThread, pyqtSlot # QDateTime removido
 from PyQt5.QtGui import QImage, QPixmap, QIcon # Adicionar QIcon
 import cv2
-import torch, socket # Adicionar socket
+import socket # Adicionar socket
 import time
 import os
 from PyQt5 import sip
@@ -514,157 +514,195 @@ class MainWindow(QMainWindow):
         self.update_default_message()
 
     def setup_theme(self):
-        # Configuração do tema escuro usando settings
-        colors = self.settings['COLORS']
+        """Define o sistema de cores e estilos CSS global da aplicação."""
+        # Paleta de cores premium (Deep Ocean / Slate)
+        self.colors = {
+            'bg_main': '#0f172a',
+            'bg_card': '#1e293b',
+            'primary': '#3b82f6',
+            'secondary': '#64748b',
+            'accent': '#10b981',
+            'danger': '#ef4444',
+            'text_main': '#f8fafc',
+            'text_muted': '#94a3b8',
+            'border': '#334155'
+        }
+        
         self.setStyleSheet(f"""
-            QMainWindow {{
-                background-color: {colors['background']};
+            QMainWindow, QWidget {{
+                background-color: {self.colors['bg_main']};
+                color: {self.colors['text_main']};
+                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
             }}
-            QLabel {{
-                color: {colors['text']};
-                background-color: {colors['widget_bg']};
-                border: 1px solid {colors['border']};
-            }}
-            QPushButton {{
-                background-color: {colors['interface_primary']};
-                color: {colors['text']};
-                border: none;
-                padding: 5px 15px;
-                border-radius: 3px;
-                font-weight: bold;
-            }}
-            QPushButton:hover {{
-                background-color: {colors['interface_hover']};
-            }}
+            
             QGroupBox {{
-                color: {colors['text']};
-                border: 1px solid {colors['border']};
+                border: 1px solid {self.colors['border']};
+                border-radius: 12px;
+                margin-top: 20px;
+                padding-top: 15px;
+                font-weight: bold;
+                background-color: rgba(30, 41, 59, 0.4);
             }}
+            
+            QGroupBox::title {{
+                subcontrol-origin: margin;
+                left: 15px;
+                padding: 0 10px;
+                color: {self.colors['primary']};
+                font-size: 14px;
+            }}
+            
+            QPushButton {{
+                background-color: {self.colors['bg_card']};
+                border: 1px solid {self.colors['border']};
+                border-radius: 8px;
+                padding: 10px 20px;
+                color: {self.colors['text_main']};
+                font-weight: 600;
+                font-size: 13px;
+            }}
+            
+            QPushButton:hover {{
+                background-color: {self.colors['primary']};
+                border-color: {self.colors['primary']};
+            }}
+            
+            QPushButton:pressed {{
+                background-color: #2563eb;
+            }}
+            
+            QPushButton:disabled {{
+                background-color: #0f172a;
+                color: #475569;
+                border-color: #1e293b;
+            }}
+            
+            #primary_action {{
+                background-color: {self.colors['primary']};
+            }}
+            
+            #danger_action {{
+                background-color: {self.colors['danger']};
+            }}
+
+            QScrollBar:vertical {{
+                border: none;
+                background: {self.colors['bg_main']};
+                width: 10px;
+                margin: 0px;
+            }}
+            
+            QScrollBar::handle:vertical {{
+                background: {self.colors['border']};
+                min-height: 20px;
+                border-radius: 5px;
+            }}
+            
             QStatusBar {{
-                background-color: {colors['widget_bg']};
-                color: {colors['text']};
+                background-color: {self.colors['bg_main']};
+                border-top: 1px solid {self.colors['border']};
+                color: {self.colors['text_muted']};
+                padding: 5px;
             }}
         """)
 
     def setup_ui(self):
-        self.setWindowTitle("VisionAlign - Sistema de Inspeção")
-        self.setWindowIcon(QIcon(os.path.join(os.path.dirname(__file__), 'assets', 'icon.png'))) # Adiciona ícone
-        self.setGeometry(100, 100, 1400, 900)
+        self.setWindowTitle("VisionAlign v3.0 | Industrial Monitoring")
+        self.setWindowIcon(QIcon(os.path.join(os.path.dirname(__file__), 'assets', 'icon.png')))
+        self.setGeometry(100, 100, 1500, 950)
 
-        # Widget central com layout em grade
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
-        grid_layout = QGridLayout(central_widget)
-        grid_layout.setSpacing(10)
+        # Main Layout (Vertical)
+        main_container = QWidget()
+        self.setCentralWidget(main_container)
+        main_layout = QVBoxLayout(main_container)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+
+        # 1. Header Bar
+        header = self.create_header()
+        main_layout.addWidget(header)
+
+        # 2. Content Area (Grid)
+        content_wrapper = QWidget()
+        content_layout = QGridLayout(content_wrapper)
+        content_layout.setContentsMargins(20, 20, 20, 20)
+        content_layout.setSpacing(20)
         
-        # Área de vídeo principal (2/3 da largura)
+        # Vídeo (70% largura)
         video_container = self.create_video_container()
-        grid_layout.addWidget(video_container, 0, 0, 2, 2)
+        content_layout.addWidget(video_container, 0, 0, 2, 2)
         
-        # Painel lateral (1/3 da largura)
+        # Painel lateral (30% largura)
         side_panel = self.create_side_panel()
-        grid_layout.addWidget(side_panel, 0, 2, 2, 1)
+        content_layout.addWidget(side_panel, 0, 2, 2, 1)
         
-        # Console na parte inferior
+        # Console (Parte inferior)
         console_container = self.create_console_container()
-        grid_layout.addWidget(console_container, 2, 0, 1, 3)
+        content_layout.addWidget(console_container, 2, 0, 1, 3)
         
-        # Configurar proporções do grid
-        grid_layout.setColumnStretch(0, 2)
-        grid_layout.setColumnStretch(1, 2)
-        grid_layout.setColumnStretch(2, 1)
+        content_layout.setColumnStretch(0, 2)
+        content_layout.setColumnStretch(1, 2)
+        content_layout.setColumnStretch(2, 1)
+        content_layout.setRowStretch(0, 3)
+        content_layout.setRowStretch(2, 1)
+
+        main_layout.addWidget(content_wrapper)
         
-        # Barra de status moderna
+        # Status Bar
         self.create_status_bar()
-        
-        # Estilo base
-        self.setStyleSheet("""
-            QMainWindow, QWidget {
-                background-color: #1a1a1a;
-                color: #ffffff;
-                font-family: 'Roboto', sans-serif;
-            }
-            
-            QGroupBox {
-                border: 2px solid #2d2d2d;
-                border-radius: 8px;
-                margin-top: 12px;
-                font-weight: bold;
-                font-size: 13px;
-                font-family: 'Roboto Medium', sans-serif;
-            }
-            
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 5px;
-            }
-            
-            QPushButton {
-                background-color: #2d2d2d;
-                border: none;
-                border-radius: 4px;
-                padding: 8px 16px;
-                color: #ffffff;
-                font-weight: 500;
-                font-family: 'Roboto Medium', sans-serif;
-            }
-            
-            QPushButton:hover {
-                background-color: #3d3d3d;
-            }
-            
-            QPushButton:pressed {
-                background-color: #404040;
-            }
-            
-            QLabel {
-                color: #ffffff;
-                font-size: 12px;
-                font-family: 'Roboto', sans-serif;
-            }
-            
-            QSlider::groove:horizontal {
-                border: 1px solid #2d2d2d;
-                height: 8px;
-                background: #2d2d2d;
-                margin: 2px 0;
-                border-radius: 4px;
-            }
-            
-            QSlider::handle:horizontal {
-                background: #0066cc;
-                border: none;
-                width: 16px;
-                margin: -4px 0;
-                border-radius: 8px;
-            }
-            
-            QTextEdit {
-                background-color: #2d2d2d;
-                border: 1px solid #3d3d3d;
-                border-radius: 4px;
-                padding: 8px;
-                color: #00ff00;
-                font-family: 'Roboto Mono', monospace;
-            }
+
+    def create_header(self):
+        header = QFrame()
+        header.setFixedHeight(70)
+        header.setStyleSheet(f"""
+            QFrame {{
+                background-color: {self.colors['bg_card']};
+                border-bottom: 2px solid {self.colors['primary']};
+            }}
         """)
+        layout = QHBoxLayout(header)
+        layout.setContentsMargins(25, 0, 25, 0)
+
+        # Logo e Título
+        title_container = QVBoxLayout()
+        title = QLabel("VISIONALIGN 3.0")
+        title.setStyleSheet(f"font-size: 22px; font-weight: 800; color: {self.colors['text_main']}; border: none; background: transparent;")
+        subtitle = QLabel("SISTEMA DE INSPEÇÃO DE FRATURAS EM TEMPO REAL")
+        subtitle.setStyleSheet(f"font-size: 11px; font-weight: 600; color: {self.colors['primary']}; border: none; background: transparent; letter-spacing: 2px;")
+        title_container.addWidget(title)
+        title_container.addWidget(subtitle)
+        layout.addLayout(title_container)
+
+        layout.addStretch()
+
+        # Status Indicators
+        self.conn_status_label = QLabel("● SERVER: CONNECTED")
+        self.conn_status_label.setStyleSheet(f"color: {self.colors['accent']}; font-weight: bold; border: 1px solid {self.colors['border']}; padding: 8px 15px; border-radius: 20px; background: {self.colors['bg_main']};")
+        layout.addWidget(self.conn_status_label)
+
+        # User Info
+        user_label = QLabel(f"👤 {self.current_user.get('username', 'Operador').upper()}")
+        user_label.setStyleSheet(f"font-weight: 700; color: {self.colors['text_muted']}; border: none; background: transparent; padding-left: 20px;")
+        layout.addWidget(user_label)
+
+        return header
 
     def create_video_container(self):
-        container = QGroupBox("Visualização em Tempo Real")
+        container = QGroupBox("MONITORAMENTO AO VIVO")
         layout = QVBoxLayout(container)
+        layout.setContentsMargins(15, 25, 15, 15)
         
         self.video_label = QLabel()
         self.video_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.video_label.setMinimumSize(800, 600)
+        self.video_label.setMinimumSize(800, 500)
         self.video_label.setAlignment(Qt.AlignCenter)
-        self.video_label.setStyleSheet("""
-            QLabel {
-                border: 2px solid #2d2d2d;
-                border-radius: 8px;
-                background-color: #2d2d2d;
+        self.video_label.setStyleSheet(f"""
+            QLabel {{
+                border: 1px solid {self.colors['border']};
+                border-radius: 12px;
+                background-color: #000000;
                 padding: 0px;
-            }
+            }}
         """)
         
         # Adicionar texto padrão
@@ -705,26 +743,31 @@ class MainWindow(QMainWindow):
 
     def create_stat_card(self, title, key):
         card = QFrame()
-        card.setStyleSheet("""
-            QFrame {
-                background-color: #2d2d2d;
-                border-radius: 6px;
-                padding: 8px;
-            }
+        card.setMinimumHeight(100)
+        card.setStyleSheet(f"""
+            QFrame {{
+                background-color: {self.colors['bg_card']};
+                border: 1px solid {self.colors['border']};
+                border-radius: 10px;
+            }}
+            QFrame:hover {{
+                border-color: {self.colors['primary']};
+            }}
         """)
         
         layout = QVBoxLayout(card)
-        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setContentsMargins(15, 15, 15, 15)
         
-        title_label = QLabel(title)
-        title_label.setStyleSheet("font-weight: bold; color: #888888;")
+        title_label = QLabel(title.upper())
+        title_label.setStyleSheet(f"font-weight: 700; color: {self.colors['text_muted']}; font-size: 10px; border: none; background: transparent;")
         
         value_label = QLabel("0")
-        value_label.setStyleSheet("font-size: 18px; font-weight: bold;")
+        value_label.setStyleSheet(f"font-size: 28px; font-weight: 800; color: {self.colors['text_main']}; border: none; background: transparent;")
         self.status_labels[key] = value_label
         
         layout.addWidget(title_label)
         layout.addWidget(value_label)
+        layout.addStretch()
         return card
 
     def create_side_panel(self):
@@ -810,50 +853,47 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout()
         # Indicador da Sirene
         siren_container = QFrame()
-        siren_container.setStyleSheet("""
-            QFrame {
-                background-color: #2d2d2d;
-                background-color: #3a3a3a; /* Cor de fundo um pouco diferente */
-                border-radius: 4px;
-                padding: 8px;
-            }
+        siren_container.setStyleSheet(f"""
+            QFrame {{
+                background-color: {self.colors['bg_main']};
+                border: 1px solid {self.colors['border']};
+                border-radius: 8px;
+                padding: 10px;
+            }}
         """)
         siren_layout = QHBoxLayout(siren_container)
-        siren_layout.setContentsMargins(8, 4, 8, 4) # Margens menores
+        siren_layout.setContentsMargins(10, 5, 10, 5)
 
-        siren_title_label = QLabel("Sirene PLC:")
-        siren_title_label.setStyleSheet("font-weight: bold; color: #888888; background: none; border: none;")
-        self.siren_status_label = QLabel("OFF") # Estado inicial
-        self.siren_status_label.setStyleSheet("font-size: 16px; font-weight: bold; color: #ff4d4d; background: none; border: none;") # Vermelho para OFF
-        siren_layout.setContentsMargins(8, 4, 8, 4)
-
-        siren_title_label = QLabel("Status da Sirene:")
-        siren_title_label.setStyleSheet("font-weight: bold; color: #cccccc; background: none; border: none;") # Cor mais clara
-        self.siren_status_label = QLabel("DESATIVADA") # Estado inicial
-        self.siren_status_label.setStyleSheet("font-size: 14px; font-weight: bold; color: #ff4d4d; background: none; border: none; padding: 2px 5px; border-radius: 3px;") # Vermelho para OFF
+        siren_title_label = QLabel("STATUS DA SIRENE:")
+        siren_title_label.setStyleSheet(f"font-weight: 800; color: {self.colors['text_muted']}; font-size: 10px; border: none; background: transparent;")
+        self.siren_status_label = QLabel("DESATIVADA")
+        self.siren_status_label.setStyleSheet(f"font-size: 12px; font-weight: 800; color: {self.colors['danger']}; background: transparent; border: none;")
 
         siren_layout.addWidget(siren_title_label)
-        siren_layout.addStretch() # Empurra o status para a direita
+        siren_layout.addStretch()
         siren_layout.addWidget(self.siren_status_label)
 
         layout.addWidget(siren_container)
 
         # Botão Desligar Sirene
-        self.deactivate_siren_btn = QPushButton("🚨 Desligar Sirene")
-        self.deactivate_siren_btn.setMinimumHeight(35)
-        self.deactivate_siren_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #cc3300; /* Vermelho escuro */
+        self.deactivate_siren_btn = QPushButton("🚨 DESLIGAR SIRENE")
+        self.deactivate_siren_btn.setObjectName("danger_action")
+        self.deactivate_siren_btn.setMinimumHeight(45)
+        self.deactivate_siren_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {self.colors['danger']};
                 color: white;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #e63900;
-            }
-            QPushButton:disabled {
-                background-color: #555555; /* Cinza quando desabilitado */
-                color: #999999;
-            }
+                font-weight: 800;
+                border-radius: 8px;
+            }}
+            QPushButton:hover {{
+                background-color: #dc2626;
+            }}
+            QPushButton:disabled {{
+                background-color: {self.colors['bg_main']};
+                color: {self.colors['secondary']};
+                border: 1px solid {self.colors['border']};
+            }}
         """)
         self.deactivate_siren_btn.setEnabled(False) # Começa desabilitado
         self.deactivate_siren_btn.clicked.connect(self.deactivate_siren_clicked)
@@ -1845,12 +1885,14 @@ class MainWindow(QMainWindow):
 
             self.update_status(stats_data) # Atualiza a UI com os novos stats
             self.status_label.setText("Status: Conectado") # Atualiza status bar
+            self.update_connection_status(True) # <<< NOVO: Atualiza indicador visual
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
             # Se for o primeiro erro, loga como ERROR e entra em reconexão
             # Se já estiver reconectando, loga como DEBUG
             log_level = logging.DEBUG if self.is_reconnecting else logging.ERROR
             self.logger.log(log_level, f"Erro de conexão/timeout ao buscar stats: {e}")
+            self.update_connection_status(False) # <<< NOVO: Atualiza indicador visual
             if not self.is_reconnecting:
                 self._enter_reconnecting_mode(f"Erro ao buscar stats: {e}")
 
@@ -1898,6 +1940,17 @@ class MainWindow(QMainWindow):
         self._fetch_remote_stats()
         # Se _fetch_remote_stats for bem-sucedido, ele chamará _exit_reconnecting_mode
         # Se falhar, ele manterá o estado is_reconnecting e o timer continuará
+    def update_connection_status(self, is_connected):
+        """Atualiza visualmente o indicador de conexão no cabeçalho."""
+        if not hasattr(self, 'conn_status_label'): return
+        
+        if is_connected:
+            self.conn_status_label.setText("● SERVER: CONNECTED")
+            self.conn_status_label.setStyleSheet(f"color: {self.colors['accent']}; font-weight: bold; border: 1px solid {self.colors['border']}; padding: 8px 15px; border-radius: 20px; background: {self.colors['bg_main']};")
+        else:
+            self.conn_status_label.setText("○ SERVER: OFFLINE")
+            self.conn_status_label.setStyleSheet(f"color: {self.colors['danger']}; font-weight: bold; border: 1px solid {self.colors['danger']}; padding: 8px 15px; border-radius: 20px; background: {self.colors['bg_main']};")
+
     def _enter_reconnecting_mode(self, reason=""):
         """Ativa o modo de reconexão."""
         if self.is_reconnecting: return # Já está no modo
@@ -1965,13 +2018,8 @@ class MainWindow(QMainWindow):
         """
 
     def get_gpu_memory(self):
-        """Retorna uso de memória GPU se disponível"""
-        try:
-            if torch.cuda.is_available():
-                return int(torch.cuda.memory_allocated() / torch.cuda.max_memory_allocated() * 100)
-            return 0
-        except:
-            return 0
+        """Uso de GPU não é mais monitorado via Torch (Backend OpenVINO)."""
+        return 0
 
     def get_execution_time(self):
         """Retorna o tempo de execução desde o início do processamento"""
@@ -2024,32 +2072,36 @@ class MainWindow(QMainWindow):
 
         # Aplicar estilo aos containers
         for container in [conf_container, iou_container]:
-            container.setStyleSheet("""
-                QWidget {
-                    background-color: #2d2d2d;
-                    border-radius: 4px;
-                    padding: 4px;
-                }
-                QLabel {
-                    color: #ffffff;
-                    background: none;
-                    border: none;
-                }
-                QSlider::groove:horizontal {
-                    background: #3d3d3d;
-                    height: 8px;
-                    border-radius: 4px;
-                }
-                QSlider::handle:horizontal {
-                    background: #0066cc;
-                    border: none;
-                    width: 16px;
-                    margin: -4px 0;
+            container.setStyleSheet(f"""
+                QWidget {{
+                    background-color: {self.colors['bg_main']};
+                    border: 1px solid {self.colors['border']};
                     border-radius: 8px;
-                }
-                QSlider::handle:horizontal:hover {
-                    background: #0077ee;
-                }
+                    padding: 8px;
+                }}
+                QLabel {{
+                    color: {self.colors['text_muted']};
+                    font-weight: 700;
+                    font-size: 11px;
+                    background: transparent;
+                    border: none;
+                }}
+                QSlider::groove:horizontal {{
+                    background: {self.colors['bg_card']};
+                    height: 6px;
+                    border-radius: 3px;
+                }}
+                QSlider::handle:horizontal {{
+                    background: {self.colors['primary']};
+                    border: none;
+                    width: 14px;
+                    height: 14px;
+                    margin: -4px 0;
+                    border-radius: 7px;
+                }}
+                QSlider::handle:horizontal:hover {{
+                    background: {self.colors['accent']};
+                }}
             """)
 
         layout.addWidget(conf_container)
@@ -2203,6 +2255,16 @@ class MainWindow(QMainWindow):
             # Usar POST conforme definido no servidor
             response = self.api_session.post(api_url, timeout=15) # Timeout maior para download
             response.raise_for_status()
+        except requests.exceptions.ConnectionError as e:
+            self.logger.error(f"Erro de conexão ao solicitar frame: {e}")
+            self.update_connection_status(False)
+            QMessageBox.critical(self, "Erro de Conexão", 
+                               "Não foi possível conectar ao servidor para extrair o frame.\nVerifique se o servidor está ativo.")
+            return
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Erro na requisição de frame: {e}")
+            QMessageBox.warning(self, "Falha na Requisição", f"Ocorreu um erro ao solicitar o frame:\n{e}")
+            return
 
             # Verificar se a resposta é do tipo esperado (criptografado)
             if response.headers.get('Content-Type') != 'application/octet-stream':

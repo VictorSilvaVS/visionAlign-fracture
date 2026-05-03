@@ -4,7 +4,10 @@ import logging
 logger = logging.getLogger("VisionAlign.Security") # More specific logger name
 
 class SecurityManager:
-    def __init__(self, key_file: str = "security.key"):
+    def __init__(self, key_file: str = None):
+        # Fallback para o comportamento anterior se nada for passado
+        if key_file is None:
+            key_file = "security.key"
 
         self.key_file = key_file
         self.key = self._load_or_create_key()

@@ -2,24 +2,24 @@ import sqlite3
 import hashlib
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
-import logging # Importar logging
+import logging
 from .timezone_utils import get_current_timestamp_for_storage, get_current_utc_timestamp, format_datetime_for_storage
-from werkzeug.security import check_password_hash # <<< ADICIONAR IMPORT
+from werkzeug.security import check_password_hash
 
 
 class Database:
-    def __init__(self):
-        self.db_path = Path(__file__).parent.parent / 'data' / 'users.db'
+    def __init__(self, db_path=None):
+        if db_path:
+            self.db_path = Path(db_path)
+        else:
+            self.db_path = Path(__file__).parent.parent / 'data' / 'users.db' 
         self.db_path.parent.mkdir(exist_ok=True)
-        self.conn = sqlite3.connect(str(self.db_path))
-        # <<< ADICIONADO: Inicializar logger >>>
+        self.conn = sqlite3.connect(str(self.db_path), check_same_thread=False)
         self.logger = logging.getLogger('VisionAlign.Database')
         self.create_tables()
-        # self.create_admin() # Mover para main.py
     def get_activity_since(self, timestamp_threshold):
         try:
             cursor = self.conn.cursor()
-            # Formata o timestamp para o formato do SQLite (TEXT ISO8601)
             threshold_str = timestamp_threshold.strftime('%Y-%m-%d %H:%M:%S')
             cursor.execute("""
                 SELECT id, timestamp, username, ip_address, action, details 
@@ -30,8 +30,8 @@ class Database:
             logs = cursor.fetchall()
             return logs
         except sqlite3.Error as e:
-            print(f"Erro ao buscar logs de atividade: {e}") # Idealmente usar logger
-            return [] # Retorna lista vazia em caso de erro
+            print(f"Erro ao buscar logs de atividade: {e}")
+            return []
     def create_tables(self):
         with self.conn:
             self.conn.execute('''
@@ -46,7 +46,6 @@ class Database:
                     created_at TEXT NOT NULL
                 )
             ''')
-            # Nova tabela de log de atividades
             self.conn.execute('''
                 CREATE TABLE IF NOT EXISTS activity_log (
                     id INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -114,7 +113,6 @@ class Database:
             self.logger.info("Tabelas do banco de dados verificadas/criadas com sucesso.")
     def get_daily_counts(self, target_date):
         try:
-            # target_date é um objeto date. Convertê-lo para datetime UTC para comparação.
             start_datetime_obj_utc = datetime.combine(target_date, datetime.min.time()).replace(tzinfo=timezone.utc)
             end_datetime_obj_utc = datetime.combine(target_date, datetime.max.time()).replace(tzinfo=timezone.utc)
             start_datetime_utc_str = format_datetime_for_storage(start_datetime_obj_utc)
@@ -126,7 +124,7 @@ class Database:
                 FROM detection_log
                 WHERE timestamp BETWEEN ? AND ?
             """
-            cursor = self.conn.cursor() # <<< CORRIGIDO: Obter um novo cursor da conexão
+            cursor = self.conn.cursor()
             cursor.execute(query, (start_datetime_utc_str, end_datetime_utc_str))
             result = cursor.fetchone()
             return {'normal': result[0] or 0, 'inverted': result[1] or 0, 'fallen': result[2] or 0, 'fracture': result[3] or 0} if result else {'normal': 0, 'inverted': 0, 'fallen': 0, 'fracture': 0}
@@ -136,8 +134,8 @@ class Database:
     def log_detection_counts(self, normal_count, inverted_count, fallen_count, fracture_count=0):
         """Registra as contagens atuais de detecção no histórico."""
         try:
-            current_ts_str = get_current_timestamp_for_storage() # Obter timestamp UTC formatado
-            with self.conn: # Usar 'with' para commit/rollback automático
+            current_ts_str = get_current_timestamp_for_storage()
+            with self.conn:     
                 self.conn.execute('''  
                     INSERT INTO detection_log (timestamp, normal_count, inverted_count, fallen_count, fracture_count)
                     VALUES (?, ?, ?, ?, ?)
@@ -151,12 +149,8 @@ class Database:
     # <<< NOVO: Método para buscar histórico de detecção >>>
     def get_detection_history(self, period_minutes=60):
         try:
-            # Calcula o timestamp limite
             time_threshold_utc = get_current_utc_timestamp() - timedelta(minutes=period_minutes)
-            # Formata para o formato do SQLite (YYYY-MM-DD HH:MM:SS)
             time_threshold_str = get_current_timestamp_for_storage(time_threshold_utc)
-
-            # <<< CORRIGIDO: Obter cursor e usar >>>
             cursor = self.conn.cursor()
             cursor.execute('''
             SELECT timestamp, normal_count, inverted_count, fallen_count, COALESCE(fracture_count, 0)
@@ -169,8 +163,8 @@ class Database:
             return history
         except sqlite3.Error as e:
             self.logger.error(f"Erro ao buscar histórico de detecção: {e}")
-            return [] # Retorna lista vazia em caso de erro
-        finally: # <<< ADICIONADO: Fechar cursor >>>
+            return []
+        finally: 
             if 'cursor' in locals() and cursor: cursor.close()
 
     def get_aggregated_detection_data(self, period_type='hour', num_periods=24):
@@ -185,14 +179,10 @@ class Database:
         try:
             cursor = self.conn.cursor()
             results = []
-            raw_data = [] # Inicializar raw_data como uma lista vazia
-            
-            # Define o formato do strftime e o timedelta para cada período
+            raw_data = []
             if period_type == 'hour':
-                # Para as últimas N horas
-                date_format_group = "%Y-%m-%d %H:00" # Agrupa por hora
-                date_format_label = "%H:00"         # Rótulo apenas com a hora
-                # Para buscar as últimas N horas, o end_time é agora (UTC), e o start_time é N horas atrás (UTC).
+                date_format_group = "%Y-%m-%d %H:00"
+                date_format_label = "%H:00"
                 end_time_utc = get_current_utc_timestamp()
                 start_time_limit_utc = end_time_utc - timedelta(hours=num_periods)
                 
@@ -215,45 +205,38 @@ class Database:
                 self.logger.debug(f"DB: Query para 'hour': {query.strip()} \nParams: {params}")
                 cursor.execute(query, params)
                 raw_data = cursor.fetchall()
-                # Reordenar para ASC para o gráfico e formatar o label
-                for row_desc in reversed(raw_data): # Inverte a ordem para ASC
+                for row_desc in reversed(raw_data):
                     period_group_dt = datetime.strptime(row_desc[0], '%Y-%m-%d %H:00')
                     label = period_group_dt.strftime(date_format_label)
                     results.append((label, row_desc[1] or 0, row_desc[2] or 0, row_desc[3] or 0, (row_desc[1] or 0) + (row_desc[2] or 0) + (row_desc[3] or 0) + (row_desc[4] or 0), row_desc[4] or 0))
 
-            elif period_type == 'day': # Anteriormente, esta lógica estava aninhada de forma diferente
-                # Exemplo para 'day' (últimos N dias):
+            elif period_type == 'day':
                 date_format_group = "%Y-%m-%d"
-                date_format_label = "%d/%m" # Dia/Mês
-                # end_time é o final do dia atual (UTC) para incluir todos os dados de hoje.
+                date_format_label = "%d/%m"
                 current_utc = get_current_utc_timestamp()
                 today_end_of_day_utc = current_utc.replace(hour=23, minute=59, second=59, microsecond=999999)
                 end_time_utc = today_end_of_day_utc
-                # start_time_limit é o início do primeiro dia do período (UTC).
                 start_time_limit_utc = (today_end_of_day_utc - timedelta(days=num_periods - 1)).replace(hour=0, minute=0, second=0, microsecond=0)
                 query = f"""
                     SELECT strftime('{date_format_group}', timestamp) as period_group, SUM(normal_count), SUM(inverted_count), SUM(fallen_count), SUM(COALESCE(fracture_count, 0))
                     FROM detection_log WHERE timestamp >= ? AND timestamp <= ?
                     GROUP BY period_group ORDER BY period_group DESC LIMIT ?
-                """ # DESC para pegar os mais recentes
+                """
                 params = (get_current_timestamp_for_storage(start_time_limit_utc), get_current_timestamp_for_storage(end_time_utc), num_periods)
                 self.logger.debug(f"DB: Query para 'day': {query.strip()} \nParams: {params}")
                 cursor.execute(query, params)
                 raw_data = cursor.fetchall()
-                for row_desc in reversed(raw_data): # Inverte a ordem para ASC
+                for row_desc in reversed(raw_data):
                     period_group_dt = datetime.strptime(row_desc[0], '%Y-%m-%d')
                     label = period_group_dt.strftime(date_format_label)
                     results.append((label, row_desc[1] or 0, row_desc[2] or 0, row_desc[3] or 0, (row_desc[1] or 0) + (row_desc[2] or 0) + (row_desc[3] or 0) + (row_desc[4] or 0), row_desc[4] or 0))
             elif period_type == 'month':
-                date_format_group = "%Y-%m"  # Agrupa por Ano-Mês
-                date_format_label = "%m/%Y"  # Rótulo Mês/Ano
-                # end_time é o final do dia atual (UTC) para incluir todos os dados do mês corrente.
+                date_format_group = "%Y-%m"
+                date_format_label = "%m/%Y"
                 current_utc = get_current_utc_timestamp()
                 today_end_of_day_utc = current_utc.replace(hour=23, minute=59, second=59, microsecond=999999)
                 end_time_utc = today_end_of_day_utc
-                # start_time_limit é o início do primeiro dia do primeiro mês do período (UTC).
-                start_time_limit_utc = (today_end_of_day_utc.replace(day=1) - timedelta(days=sum(30 for _ in range(num_periods-1)))).replace(day=1, hour=0, minute=0, second=0, microsecond=0) # Aproximação
-
+                start_time_limit_utc = (today_end_of_day_utc.replace(day=1) - timedelta(days=sum(30 for _ in range(num_periods-1)))).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
                 query = f"""
                     SELECT strftime('{date_format_group}', timestamp) as period_group,
                            SUM(normal_count), SUM(inverted_count), SUM(fallen_count), SUM(COALESCE(fracture_count, 0))
@@ -268,7 +251,7 @@ class Database:
                 self.logger.debug(f"DB: Query para 'month': {query.strip()} \nParams: {params}")
                 cursor.execute(query, params)
                 raw_data = cursor.fetchall()
-                for row_desc in reversed(raw_data): # Inverte a ordem para ASC para o gráfico
+                for row_desc in reversed(raw_data):
                     try:
                         period_group_dt = datetime.strptime(row_desc[0], '%Y-%m')
                         label = period_group_dt.strftime(date_format_label)
@@ -276,7 +259,6 @@ class Database:
                     except ValueError:
                         self.logger.warning(f"Não foi possível analisar o period_group '{row_desc[0]}' para o tipo de período 'month'.")
             else:
-                # Se um period_type não esperado for passado, raw_data e results permanecerão vazios.
                 self.logger.warning(f"DB: Tipo de período não suportado '{period_type}' em get_aggregated_detection_data. Nenhum dado será retornado.")
 
             self.logger.info(f"DB: Dados agregados brutos retornados pela query ({len(raw_data)} registros): {raw_data}")
@@ -287,8 +269,6 @@ class Database:
             return []
         finally:
             if cursor: cursor.close()
-
-    # <<< NOVO: Método para calcular KPIs básicos (exemplo) >>>
     def get_kpis_last_hour(self):
         """Calcula KPIs básicos da última hora."""
         history = self.get_detection_history(period_minutes=60)
@@ -314,17 +294,12 @@ class Database:
         hashed = hashlib.sha256(password.encode()).hexdigest()
         email_default = f"{username.lower().replace(' ', '.')}@example.com"
         first_name_default = username.capitalize()
-        last_name_default = "User" # Sobrenome genérico
+        last_name_default = "User"
         is_admin_int = 1 if is_admin else 0
-
-        # Chama o método create_user existente, que lida com a inserção na nova estrutura da tabela.
-        # create_user já lida com try/except e retorna True/False.
         return self.create_user(username, hashed, email_default, first_name_default, last_name_default, is_admin_int)
 
     def verify_user(self, username, password):
         """Verifica o nome de usuário e a senha usando o hash armazenado."""
-        # Buscar o usuário e seu hash de senha armazenado
-        # <<< CORRIGIDO: Adicionar first_name e last_name à query >>>
         cursor = self.conn.execute(
             'SELECT id, username, password, is_admin, first_name, last_name FROM users WHERE username = ?',
             (username,)
@@ -332,17 +307,15 @@ class Database:
         user = cursor.fetchone()
 
         if user:
-            # <<< CORRIGIDO: Desempacotar first_name e last_name >>>
             user_id, db_username, stored_password_hash, is_admin_flag, first_name, last_name = user
-            # Verificar a senha fornecida contra o hash armazenado
             if check_password_hash(stored_password_hash, password):
                 self.logger.info(f"Senha verificada com sucesso para o usuário '{username}'.")
                 return {
                     'id': user_id,
                     'username': db_username,
                     'is_admin': bool(is_admin_flag),
-                    'first_name': first_name, # <<< CORRIGIDO: Incluir no dicionário retornado >>>
-                    'last_name': last_name    # <<< CORRIGIDO: Incluir no dicionário retornado >>>
+                    'first_name': first_name,
+                    'last_name': last_name
                 }
         self.logger.warning(f"Falha na verificação de senha para o usuário '{username}'.")
         return None
@@ -378,11 +351,8 @@ class Database:
         return None
     def get_recent_alerts(self, limit=20):
         """Busca os alertas mais recentes do banco de dados."""
-        # <<< CORRIGIDO: Usar self.conn diretamente >>>
-        # Não é necessário verificar self.conn aqui, pois __init__ estabelece ou falha.
         cursor = self.conn.cursor()
         try:
-            # Ordena por timestamp DESC para pegar os mais recentes
             cursor.execute("""
                 SELECT id, timestamp, type, lata_id, details 
                 FROM alerts 
@@ -399,14 +369,13 @@ class Database:
             if cursor: cursor.close()
     def log_alert(self, timestamp, alert_type, lata_id, details):
         """Registra um alerta no banco de dados."""
-        # <<< CORRIGIDO: Usar self.conn diretamente >>>
         cursor = self.conn.cursor()
         try:
             cursor.execute("""
                 INSERT INTO alerts (timestamp, type, lata_id, details)
                 VALUES (?, ?, ?, ?)
             """, (timestamp, alert_type, lata_id, details))
-            self.conn.commit() # <<< CORRIGIDO: Usar self.conn.commit() >>>
+            self.conn.commit()
             self.logger.info(f"Alerta registrado: Tipo {alert_type}, Lata {lata_id}, Detalhes: {details}")
         except sqlite3.Error as e:
             self.logger.error(f"Erro ao registrar alerta no DB: {e}")
@@ -432,7 +401,7 @@ class Database:
 
             if start_date and start_date.lower() != 'none' and start_date.strip() != '':
                 start_date_dt_str = start_date
-                if len(start_date) == 10: # Apenas data YYYY-MM-DD
+                if len(start_date) == 10:
                     start_date_dt_str += " 00:00:00"
                 conditions.append("timestamp >= ?")
                 data_params.append(start_date_dt_str)
@@ -440,7 +409,7 @@ class Database:
             
             if end_date and end_date.lower() != 'none' and end_date.strip() != '':
                 end_date_dt_str = end_date
-                if len(end_date) == 10: # Apenas data YYYY-MM-DD
+                if len(end_date) == 10:
                     end_date_dt_str += " 23:59:59"
                 conditions.append("timestamp <= ?")
                 data_params.append(end_date_dt_str)

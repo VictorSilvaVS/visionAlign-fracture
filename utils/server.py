@@ -71,7 +71,7 @@ _web_stream_paused = False
 _web_stream_lock = Lock() 
 _security_manager = None 
 _otx_manager = None
-MAX_CONSOLE_LINES = 500 
+MAX_CONSOLE_LINES = 500 # Default inicial, será atualizado no run_server
 log_queue = collections.deque(maxlen=MAX_CONSOLE_LINES) 
 sse_listeners = [] 
 _active_alerts_cache = collections.defaultdict(lambda: {'timestamp': 0, 'type': None, 'last_detail': ''})
@@ -81,7 +81,7 @@ base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 template_dir = os.path.join(base_dir, 'interface', 'flask', 'templates')
 static_dir = os.path.join(base_dir, 'interface', 'flask', 'static')
 flask_app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
-flask_app.secret_key = 'aE39bVdKfLm0pQxRsZy1WiTgC7hJn2oU8gIb6yF5s4jPq9zDeXwA1lKrNtSh3fOcBmZjHuYvGtI2pQxR7sZ1wEiOvCbUn4mT' 
+# flask_app.secret_key será definido no run_server
 
 active_users = {}  
                     
@@ -104,14 +104,17 @@ class SSELogHandler(logging.Handler):
                 listener_queue.put_nowait(msg)
         except Exception:
             self.handleError(record)
-flask_app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30) 
+# PERMANENT_SESSION_LIFETIME será definido no run_server
 
 
 def get_db():
     """Abre uma nova conexão de banco de dados se não houver uma para a requisição atual."""
     if 'db' not in g:
-
-        g.db = Database()
+        db_path = None
+        if _settings_manager:
+            db_path = _settings_manager.get_setting('SYSTEM_CONFIG', 'paths', {}).get('database')
+        
+        g.db = Database(db_path=db_path)
     return g.db
 
 @flask_app.teardown_appcontext
@@ -140,7 +143,11 @@ def generate_video_frames():
     """Generator function para o stream MJPEG."""
     global _web_stream_paused, _web_stream_lock 
     last_frame_time = time.time()
-    target_fps = 12  
+    
+    # Busca FPS das configurações ou usa default 12
+    target_fps = 12
+    if _settings_manager:
+        target_fps = _settings_manager.get_setting('SYSTEM_CONFIG', 'monitoring', {}).get('web_stream_fps', 12)
     while True:
         frame_copy = None 
         if _frame_lock is None or _frame_container is None:
@@ -2403,8 +2410,10 @@ def record_detection_event(timestamp_utc_iso, alert_type_str, detected_lata_ids_
         
         _logger.error(f"Erro em record_detection_event: {e}", exc_info=True)
 
-def run_server(settings_mgr, logger_instance, shared_stats, lock_stats, frame_cont, lock_frame, start_time, model_instance, security_mgr, listen_host='0.0.0.0', port=7586): 
+def run_server(settings_mgr, logger_instance, shared_stats, lock_stats, frame_cont, lock_frame, start_time, model_instance, security_mgr): 
     global _settings_manager, _logger, _current_stats, _stats_lock, _frame_container, _frame_lock, _system_start_time, _extract_frame_flag, _model_instance, _security_manager, _otx_manager
+    global MAX_CONSOLE_LINES, log_queue, _ALERT_COOLDOWN_SECONDS, _ALERT_STATE_EXPIRY_SECONDS
+    
     _settings_manager = settings_mgr
     _logger = logger_instance
     _current_stats = shared_stats
@@ -2415,6 +2424,28 @@ def run_server(settings_mgr, logger_instance, shared_stats, lock_stats, frame_co
     _model_instance = model_instance 
     _security_manager = security_mgr 
     _otx_manager = OTXManager(settings_mgr, logger=logger_instance)
+
+    # --- Aplicação de Configurações do SYSTEM_CONFIG ---
+    sys_config = settings_mgr.get_setting('SYSTEM_CONFIG', {})
+    server_cfg = sys_config.get('server', {})
+    logging_cfg = sys_config.get('logging', {})
+    monitor_cfg = sys_config.get('monitoring', {})
+
+    # Flask Config
+    flask_app.secret_key = server_cfg.get('secret_key', 'dev_key_fallback')
+    session_lifetime = server_cfg.get('session_lifetime_minutes', 30)
+    flask_app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=session_lifetime)
+
+    # Module Constants
+    MAX_CONSOLE_LINES = logging_cfg.get('max_console_lines', 500)
+    if log_queue.maxlen != MAX_CONSOLE_LINES:
+        # Recria a fila se o tamanho mudar
+        log_queue = collections.deque(log_queue, maxlen=MAX_CONSOLE_LINES)
+    
+    _ALERT_COOLDOWN_SECONDS = monitor_cfg.get('alert_cooldown_seconds', 60)
+    _ALERT_STATE_EXPIRY_SECONDS = monitor_cfg.get('alert_state_expiry_seconds', 300)
+
+    _logger.info(f"Configurações de sistema aplicadas: Port={server_cfg.get('port')}, Host={server_cfg.get('host')}")
 
     
     
@@ -2467,6 +2498,9 @@ def run_server(settings_mgr, logger_instance, shared_stats, lock_stats, frame_co
     log.setLevel(logging.ERROR)
 
     local_ip = get_ipv4_address()
+    listen_host = server_cfg.get('host', '0.0.0.0')
+    port = server_cfg.get('port', 7586)
+    
     access_message = f"Servidor Flask iniciado. Acessível em:"
     access_message += f"\n   - Localmente: http://localhost:{port} ou http://127.0.0.1:{port}"
     if local_ip:

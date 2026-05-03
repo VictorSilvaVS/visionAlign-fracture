@@ -23,11 +23,10 @@ def initialize_components(logger):
         if not settings_manager.validate_settings(settings):
             raise ValueError("Configurações inválidas ou incompletas")
         database = Database()
-        project_root = os.path.dirname(os.path.abspath(__file__))
-        config_dir = os.path.join(project_root, "config")
-        key_path = os.path.join(config_dir, "server_security.key") 
-        logger.info(f"CLIENT: Tentando inicializar SecurityManager com key_file='{key_path}'")
-        security = SecurityManager(key_file=key_path) 
+        
+        sec_key_path = settings.get('SYSTEM_CONFIG', {}).get('paths', {}).get('security_key')
+        logger.info(f"CLIENT: Tentando inicializar SecurityManager com key_file='{sec_key_path}'")
+        security = SecurityManager(key_file=sec_key_path) 
         return settings_manager, settings, database, security
     except Exception as e:
         logger.error(f"Erro fatal na inicialização: {str(e)}")
@@ -36,6 +35,7 @@ def initialize_components(logger):
         sys.exit(1)
 def main():
     app = QApplication(sys.argv)
+    app.setStyle("Fusion")
     app.setApplicationName("VisionAlign")
     app.setOrganizationName("VisionAlign Inc.")
     app.setOrganizationDomain("visionalign.com")
@@ -64,7 +64,7 @@ def main():
     
     user_info = default_user
     current_host = settings.get('SERVER_CONFIG', {}).get('remote_host', '127.0.0.1')
-    login_dialog = LoginDialog(database, current_server_ip=current_host)
+    login_dialog = LoginDialog(database, settings, current_server_ip=current_host)
     result = login_dialog.exec_()
     if result == QDialog.Accepted:
         user_info = login_dialog.user_info 
@@ -80,7 +80,7 @@ def main():
             logger.info(f"Login realizado como visitante. IP: {socket.gethostbyname(socket.gethostname())}")
         else:
             is_admin_flag = user_info.get('is_admin', False)
-            normalized_role = 'admin' if is_admin_flag else 'user'
+            normalized_role = 'admin' if is_admin_flag else 'usesr'
             user_info['role'] = normalized_role 
             logger.info(f"Usuário '{user_info['username']}' logado. Role normalizada para: '{normalized_role}'.")
     else: 
