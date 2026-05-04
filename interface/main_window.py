@@ -22,6 +22,31 @@ from utils.timezone_utils import get_current_utc_timestamp, convert_utc_to_local
 class FrameUpdateSignal(QObject):
     signal = pyqtSignal(dict)
 
+class ClickableLabel(QLabel):
+    double_clicked = pyqtSignal()
+    def mouseDoubleClickEvent(self, event):
+        self.double_clicked.emit()
+
+class FullScreenVideoDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Monitoramento Full Screen")
+        self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
+        self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(0,0,0,0)
+        self.video_label = QLabel()
+        self.video_label.setAlignment(Qt.AlignCenter)
+        self.video_label.setStyleSheet("background-color: black;")
+        self.layout.addWidget(self.video_label)
+        self.showFullScreen()
+        
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape or event.key() == Qt.Key_F11:
+            self.accept()
+    
+    def mouseDoubleClickEvent(self, event):
+        self.accept()
+
 # --- Thread para buscar o stream MJPEG ---
 class StreamClientThread(QThread):
     new_frame_signal = pyqtSignal(np.ndarray)
@@ -692,7 +717,64 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout(container)
         layout.setContentsMargins(15, 25, 15, 15)
         
-        self.video_label = QLabel()
+        # --- Área do Vídeo com Filtros ---
+        video_container = QWidget()
+        video_layout = QVBoxLayout(video_container)
+        video_layout.setContentsMargins(0, 0, 0, 0)
+        video_layout.setSpacing(5)
+
+        # Barra de Filtros (Pequenas funções solicitadas)
+        filter_bar = QWidget()
+        filter_layout = QHBoxLayout(filter_bar)
+        filter_layout.setContentsMargins(5, 5, 5, 5)
+        filter_layout.setSpacing(10)
+        
+        filter_label = QLabel("Filtros de Visão:")
+        filter_label.setStyleSheet("font-weight: bold; color: #94a3b8;")
+        filter_layout.addWidget(filter_label)
+
+        self.filter_btns = {}
+        # Mapeamento Humano -> Nome Interno do YOLO (visto em names_align)
+        classes_to_filter = {
+            "Normal": "lata_normal",
+            "Invertida": "lata_invertida",
+            "Tombada": "lata_tombada",
+            "Fratura": "fracture"
+        }
+        
+        for label, internal_name in classes_to_filter.items():
+            btn = QPushButton(label)
+            btn.setCheckable(True)
+            btn.setChecked(True) # Começa mostrando tudo
+            btn.setMinimumHeight(30)
+            btn.setStyleSheet("""
+                QPushButton { 
+                    background-color: #1e293b; border: 1px solid #334155; 
+                    border-radius: 4px; padding: 2px 10px; color: #94a3b8;
+                }
+                QPushButton:checked { 
+                    background-color: #3b82f6; color: white; border: none;
+                }
+            """)
+            btn.clicked.connect(self._update_class_filters)
+            self.filter_btns[internal_name] = btn
+            filter_layout.addWidget(btn)
+        
+        filter_layout.addStretch()
+        
+        # Dica Full Screen
+        fs_hint = QLabel("(Dê duplo clique para Full Screen)")
+        fs_hint.setStyleSheet("color: #475569; font-size: 10px; font-style: italic;")
+        filter_layout.addWidget(fs_hint)
+
+        video_layout.addWidget(filter_bar)
+
+        self.video_label = ClickableLabel()
+        self.video_label.double_clicked.connect(self.toggle_video_full_screen)
+        video_layout.addWidget(self.video_label, 1) # Expande
+        
+        self.fs_dialog = None # Guardará a janela full screen se aberta
+        self.excluded_classes = []
         self.video_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.video_label.setMinimumSize(800, 500)
         self.video_label.setAlignment(Qt.AlignCenter)
@@ -708,7 +790,7 @@ class MainWindow(QMainWindow):
         # Adicionar texto padrão
         self.update_default_message()
         
-        layout.addWidget(self.video_label, stretch=1)
+        layout.addWidget(video_container, stretch=1)
         stats_grid = self.create_stats_grid()
         layout.addWidget(stats_grid)
         
@@ -1793,44 +1875,32 @@ class MainWindow(QMainWindow):
             self.logger.error(f"Erro ao atualizar display (Servidor): {str(e)}", exc_info=True)
 
     def _display_frame_on_label(self, frame_bgr):
-        """Converte e exibe um frame BGR (numpy array) no video_label."""
-        if frame_bgr is None or frame_bgr.size == 0 or not hasattr(self, 'video_label') or sip.isdeleted(self.video_label):
-            self.logger.warning("_display_frame_on_label: Frame inválido ou label não disponível.")
-            return
+        """Auxiliar para converter e exibir o frame no QLabel correto (Main ou FullScreen)."""
+        if frame_bgr is None or frame_bgr.size == 0: return
+        
+        # Determinar qual label usar
+        target_label = self.video_label
+        if hasattr(self, 'fs_dialog') and self.fs_dialog and self.fs_dialog.isVisible():
+            target_label = self.fs_dialog.video_label
 
-            processed_frame_bgr = data.get('frame') # Frame já deve estar em BGR (ou o formato que o OpenCV usa)
-            if processed_frame_bgr is not None:
-                frame = data['frame']
-                if frame is not None and frame.size > 0:
-                    # Atualizar o frame compartilhado para o stream MJPEG (protegido por lock)
-                    # Fazemos uma cópia para evitar problemas se o array for modificado
-                    with self.frame_lock: # Usa o lock passado
-                        self.frame_container[0] = processed_frame_bgr.copy() # Atualiza o container
+        if sip.isdeleted(target_label): return
 
         try:
-            self.logger.debug(f"_display_frame_on_label: Recebido frame com shape {frame_bgr.shape}") # Log do shape
-            height, width, channel = frame_bgr.shape
-            bytes_per_line = 3 * width
-            # Converter BGR para RGB para QImage
-            image_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
-            qt_image = QImage(image_rgb.data, width, height, bytes_per_line, QImage.Format_RGB888)
-
-            # Redimensionar mantendo proporção
-            video_size = self.video_label.size()
-            pixmap = QPixmap.fromImage(qt_image).scaled(
-                video_size,
-                Qt.KeepAspectRatio,
-                Qt.SmoothTransformation
-            )
-            self.video_label.setPixmap(pixmap)
-            self.logger.debug("_display_frame_on_label: Pixmap definido no label.") # Log de sucesso
-            # Guardar frame atual para quando pausar (se a pausa for implementada no cliente)
-            # self.frozen_frame = pixmap
-            self.is_video_active = True # Marcar que vídeo está sendo exibido
-
+            h, w, ch = frame_bgr.shape
+            bytes_per_line = ch * w
+            # Usar Format_BGR888 diretamente se disponível (PyQt5 suporta)
+            q_img = QImage(frame_bgr.data, w, h, bytes_per_line, QImage.Format_BGR888)
+            
+            # Redimensionar mantendo aspect ratio baseado no tamanho atual da label
+            label_w = target_label.width()
+            label_h = target_label.height()
+            
+            if label_w > 0 and label_h > 0:
+                pixmap = QPixmap.fromImage(q_img)
+                target_label.setPixmap(pixmap.scaled(label_w, label_h, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+                self.is_video_active = True
         except Exception as e:
-            # Logar erro específico na conversão/exibição
-            self.logger.error(f"Erro ao converter/exibir frame: {e}", exc_info=True)
+            self.logger.error(f"Erro ao exibir frame: {e}")
 
     @pyqtSlot(np.ndarray)
     def _handle_remote_frame(self, frame_bgr):
@@ -2309,6 +2379,47 @@ class MainWindow(QMainWindow):
         except Exception as e:
             self.logger.error(f"Erro inesperado ao processar frame extraído: {e}", exc_info=True)
             QMessageBox.critical(self, "Erro Inesperado", f"Ocorreu um erro ao processar o frame:\n{e}")
+
+    def toggle_video_full_screen(self):
+        """Alterna o vídeo para modo tela cheia em uma nova janela dedicada."""
+        if not hasattr(self, 'fs_dialog') or self.fs_dialog is None:
+            self.logger.info("Entrando em modo Full Screen (Vídeo)")
+            self.fs_dialog = FullScreenVideoDialog(self)
+            self.fs_dialog.finished.connect(self._on_fs_closed)
+            self.fs_dialog.show()
+        else:
+            self.fs_dialog.accept()
+
+    def _on_fs_closed(self):
+        self.logger.info("Saindo de modo Full Screen (Vídeo)")
+        self.fs_dialog = None
+
+    def _update_class_filters(self):
+        """Atualiza a lista de classes ocultas e sincroniza com o servidor/modelo."""
+        excluded = []
+        if hasattr(self, 'filter_btns'):
+            for internal_name, btn in self.filter_btns.items():
+                if not btn.isChecked():
+                    excluded.append(internal_name)
+        
+        self.excluded_classes = excluded
+        self.logger.info(f"Filtros alterados. Excluindo: {excluded}")
+        
+        # Se estiver em modo cliente, enviar para o servidor
+        if self.is_client_only:
+            try:
+                url = f"{self.remote_server_address}/api/set_stream_filters"
+                from threading import Thread
+                def send_req():
+                    try:
+                        self.api_session.post(url, json={"excluded_classes": excluded}, timeout=2)
+                    except: pass
+                Thread(target=send_req).start()
+            except Exception as e:
+                self.logger.error(f"Falha ao enviar filtros: {e}")
+        else:
+            if self.model:
+                self.model.set_excluded_classes(excluded)
 
     def toggle_fullscreen(self):
         """Alterna entre o modo janela e tela cheia."""

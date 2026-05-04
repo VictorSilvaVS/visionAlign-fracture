@@ -1305,6 +1305,29 @@ def logout():
     db.log_activity(username, client_ip, 'LOGOUT')
     logout_user()
     return redirect(url_for('login_page'))
+_excluded_classes = set()
+_excluded_classes_lock = Lock()
+
+@flask_app.route('/api/set_stream_filters', methods=['POST'])
+@login_required
+def set_stream_filters():
+    """Define quais classes devem ser ocultadas no desenho das detecções."""
+    global _excluded_classes
+    try:
+        data = request.get_json()
+        classes = data.get('excluded_classes', [])
+        with _excluded_classes_lock:
+            _excluded_classes = set(classes)
+        _logger.info(f"Filtros de stream atualizados: Ocultando {list(_excluded_classes)}")
+        
+        # Sincroniza com o modelo se ele existir
+        if _model_instance and hasattr(_model_instance, 'set_excluded_classes'):
+            _model_instance.set_excluded_classes(list(_excluded_classes))
+            
+        return jsonify({"status": "success", "excluded": list(_excluded_classes)})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 400
+
 @flask_app.route('/video_feed')
 def video_feed():
     """Rota que retorna o stream MJPEG."""

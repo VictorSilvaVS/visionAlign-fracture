@@ -25,12 +25,13 @@ class DetectionDrawer:
         self.show_mask = bool(params.get('show_mask', self.show_mask))
         self.show_heatmap = bool(params.get('show_heatmap', self.show_heatmap))
 
-    def draw_detections(self, frame, results_obj, names_map, show_track_id=True):
+    def draw_detections(self, frame, results_obj, names_map, show_track_id=True, excluded_classes=None):
         """Desenha detecções com suporte a masks (segmentação) e heatmaps."""
+        if excluded_classes is None: excluded_classes = []
         
         # IA Explicável: Desenha Heatmap (Brilho de Atenção) antes de tudo para ficar sob as labels
         if self.show_heatmap:
-            self.draw_heatmap(frame, results_obj, names_map)
+            self.draw_heatmap(frame, results_obj, names_map, excluded_classes)
 
         # Primeiro, desenha masks se show_mask estiver ativado
         if self.show_mask and getattr(results_obj, 'masks', None) is not None:
@@ -40,6 +41,10 @@ class DetectionDrawer:
                     if len(mask_xy) > 0 and mask_idx < len(cls_list):
                         c = int(cls_list[mask_idx])
                         cls_name = names_map.get(c, "Unknown")
+                        
+                        if cls_name in excluded_classes:
+                            continue
+                            
                         color = self.colors.get(cls_name, (0, 255, 0))
                         
                         # Desenha máscara com preenchimento translúcido
@@ -72,8 +77,12 @@ class DetectionDrawer:
             ids = [None] * len(cls)
 
         for box, c, s, tid in zip(xyxy, cls, conf, ids):
-            x1, y1, x2, y2 = box
             cls_name = names_map.get(int(c), "Unknown")
+            
+            if cls_name in excluded_classes:
+                continue
+                
+            x1, y1, x2, y2 = box
             color = self.colors.get(cls_name, (0, 255, 0))
             
             # Desenha o retângulo (apenas se não temos masks)
@@ -116,8 +125,9 @@ class DetectionDrawer:
         text_color = (255, 255, 255) if self.show_bg else color
         cv2.putText(frame, label_text, (text_x, text_y), font, self.font_scale, text_color, self.font_thickness, cv2.LINE_AA)
 
-    def draw_heatmap(self, frame, results_obj, names_map):
+    def draw_heatmap(self, frame, results_obj, names_map, excluded_classes=None):
         """Gera um mapa de calor (Glow de Atenção) sobre os defeitos detectados."""
+        if excluded_classes is None: excluded_classes = []
         if results_obj.boxes is None or len(results_obj.boxes) == 0:
             return
             
@@ -129,6 +139,10 @@ class DetectionDrawer:
         
         for idx, (box, c) in enumerate(zip(boxes_xyxy, cls_list)):
             cls_name = names_map.get(int(c), "Unknown")
+            
+            if cls_name in excluded_classes:
+                continue
+                
             # Só gera heatmap para defeitos ou itens críticos para não poluir
             if cls_name.lower() in ['fracture', 'defect', 'fail', 'lata_invertida', 'lata_tombada']:
                 has_heatmap = True
@@ -150,10 +164,10 @@ class DetectionDrawer:
             # Aplica desfoque gaussiano pesado para criar o efeito de "brilho de atenção" (IA Explicável)
             heatmap_overlay = cv2.GaussianBlur(heatmap_overlay, (51, 51), 0)
             # Aplica o mapa de cores JET para parecer um heatmap térmico profissional
-            # (Note: convertemos para escala de cinza primeiro para aplicar o colormap corretamente)
             gray = cv2.cvtColor(heatmap_overlay, cv2.COLOR_BGR2GRAY)
             colored_heatmap = cv2.applyColorMap(gray, cv2.COLORMAP_JET)
             
             # Mescla com o frame original de forma suave (apenas onde há ativação)
             mask_inv = gray > 10
             frame[mask_inv] = cv2.addWeighted(frame, 0.7, colored_heatmap, 0.3, 0)[mask_inv]
+e, 0.7, colored_heatmap, 0.3, 0)[mask_inv]

@@ -148,6 +148,12 @@ class YOLOModel:
         self.save_interval = float(collection.get('save_interval', 10.0))
         self.conf_distrust_range = collection.get('distrust_range', [0.3, 0.6])
         self.save_on_event = bool(collection.get('save_on_event', False))
+        self.excluded_classes = [] # Classes a serem ocultadas no desenho
+
+    def set_excluded_classes(self, classes):
+        """Define quais classes devem ser ignoradas pelo desenhista."""
+        self.excluded_classes = classes
+        self.logger.info(f"Filtro de visualização atualizado: {classes}")
         self.last_frame_clean = None
         self.last_email_alert_time = 0
         
@@ -629,7 +635,7 @@ class YOLOModel:
                                 cv2.putText(frame, f"!!! FRATURA CONFIRMADA ({tid}) !!!", (box[0], box[1] - 20), 
                                             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 3)
 
-                    self.drawer.draw_detections(frame, r_align, self.names_align, show_track_id=True)
+                    self.drawer.draw_detections(frame, r_align, self.names_align, show_track_id=True, excluded_classes=self.excluded_classes)
             actual_duration = time.time() - cycle_start
             self.fps = 1.0 / max(actual_duration, self.frame_duration)
             if self.frame_callback:

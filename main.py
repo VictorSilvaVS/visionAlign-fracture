@@ -80,7 +80,7 @@ def main():
             logger.info(f"Login realizado como visitante. IP: {socket.gethostbyname(socket.gethostname())}")
         else:
             is_admin_flag = user_info.get('is_admin', False)
-            normalized_role = 'admin' if is_admin_flag else 'usesr'
+            normalized_role = 'admin' if is_admin_flag else 'user'
             user_info['role'] = normalized_role 
             logger.info(f"Usuário '{user_info['username']}' logado. Role normalizada para: '{normalized_role}'.")
     else: 

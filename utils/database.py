@@ -4,7 +4,7 @@ from pathlib import Path
 from datetime import datetime, timedelta, timezone
 import logging
 from .timezone_utils import get_current_timestamp_for_storage, get_current_utc_timestamp, format_datetime_for_storage
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 
 class Database:
@@ -291,7 +291,7 @@ class Database:
             self.add_user('admin', 'admin123', True)
 
     def add_user(self, username, password, is_admin=False):
-        hashed = hashlib.sha256(password.encode()).hexdigest()
+        hashed = generate_password_hash(password)
         email_default = f"{username.lower().replace(' ', '.')}@example.com"
         first_name_default = username.capitalize()
         last_name_default = "User"
@@ -299,7 +299,7 @@ class Database:
         return self.create_user(username, hashed, email_default, first_name_default, last_name_default, is_admin_int)
 
     def verify_user(self, username, password):
-        """Verifica o nome de usuário e a senha usando o hash armazenado."""
+        """Verifica o nome de usuário e a senha usando o hash armazenado (com suporte a migração de SHA-256)."""
         cursor = self.conn.execute(
             'SELECT id, username, password, is_admin, first_name, last_name FROM users WHERE username = ?',
             (username,)
@@ -308,15 +308,30 @@ class Database:
 
         if user:
             user_id, db_username, stored_password_hash, is_admin_flag, first_name, last_name = user
-            if check_password_hash(stored_password_hash, password):
-                self.logger.info(f"Senha verificada com sucesso para o usuário '{username}'.")
+            
+            # 1. Tentar verificação padrão (Werkzeug)
+            try:
+                if check_password_hash(stored_password_hash, password):
+                    self.logger.info(f"Senha verificada (Werkzeug) para usuário '{username}'.")
+                    return {
+                        'id': user_id, 'username': db_username, 'is_admin': bool(is_admin_flag),
+                        'first_name': first_name, 'last_name': last_name
+                    }
+            except Exception:
+                pass # Não é um hash Werkzeug válido
+
+            # 2. Fallback para SHA-256 legado e migração automática
+            import hashlib
+            legacy_hash = hashlib.sha256(password.encode()).hexdigest()
+            if stored_password_hash == legacy_hash:
+                self.logger.info(f"Detectada senha legada (SHA-256) para '{username}'. Migrando...")
+                new_hash = generate_password_hash(password)
+                self.update_user_password(user_id, new_hash)
                 return {
-                    'id': user_id,
-                    'username': db_username,
-                    'is_admin': bool(is_admin_flag),
-                    'first_name': first_name,
-                    'last_name': last_name
+                    'id': user_id, 'username': db_username, 'is_admin': bool(is_admin_flag),
+                    'first_name': first_name, 'last_name': last_name
                 }
+                
         self.logger.warning(f"Falha na verificação de senha para o usuário '{username}'.")
         return None
 

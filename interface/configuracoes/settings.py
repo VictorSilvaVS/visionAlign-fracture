@@ -206,6 +206,13 @@ class Settings:
             if not isinstance(server_config.get('remote_port'), int):
                 return False
 
+            # Validar SYSTEM_CONFIG e inserir chaves faltantes se necessário
+            system_config = settings.get('SYSTEM_CONFIG', {})
+            if 'management_key' not in system_config:
+                self.logger.info("Inserindo 'management_key' padrão nas configurações.")
+                system_config['management_key'] = 'admin123'
+                settings['SYSTEM_CONFIG'] = system_config
+            
             # Mais validações específicas podem ser adicionadas aqui
 
             return True
