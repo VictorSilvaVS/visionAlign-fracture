@@ -71,6 +71,7 @@ _web_stream_paused = False
 _web_stream_lock = Lock() 
 _security_manager = None 
 _otx_manager = None
+_results_container = None
 MAX_CONSOLE_LINES = 500 # Default inicial, será atualizado no run_server
 log_queue = collections.deque(maxlen=MAX_CONSOLE_LINES) 
 sse_listeners = [] 
@@ -166,17 +167,32 @@ def generate_video_frames():
             current_frame = _frame_container[0]
             if current_frame is not None:
                 try:
+                    # Redimensionar para o stream web (HD é suficiente para o dashboard)
                     h, w = current_frame.shape[:2]
                     if w > 1280:
                         scale = 1280 / w
                         frame_copy = cv2.resize(current_frame, (1280, int(h * scale)), interpolation=cv2.INTER_AREA)
                     else:
                         frame_copy = current_frame.copy()
+                        
+                    # --- NOVO: Desenho Individual por Cliente ---
+                    client_ip = request.remote_addr
+                    excluded = _filters_per_client.get(client_ip, [])
+                    
+                    if _model_instance and hasattr(_model_instance, 'drawer') and _results_container is not None:
+                        results = _results_container[0]
+                        if results is not None:
+                            # Desenha usando as preferências deste cliente específico
+                            _model_instance.drawer.draw_detections(
+                                frame_copy, 
+                                results, 
+                                getattr(_model_instance, 'names_align', {}),
+                                excluded_classes=excluded
+                            )
+                            
                 except Exception as e:
-                    _logger.error(f"Erro ao redimensionar frame web: {e}")
-                    frame_copy = current_frame.copy()
-            else:
-                pass 
+                    _logger.error(f"Erro ao preparar frame individual para {request.remote_addr}: {e}")
+                    if current_frame is not None: frame_copy = current_frame.copy()
 
         if frame_copy is not None:
 
@@ -1305,26 +1321,23 @@ def logout():
     db.log_activity(username, client_ip, 'LOGOUT')
     logout_user()
     return redirect(url_for('login_page'))
-_excluded_classes = set()
-_excluded_classes_lock = Lock()
+_filters_per_client = {} # {ip: [excluded_classes]}
+_filters_lock = Lock()
 
 @flask_app.route('/api/set_stream_filters', methods=['POST'])
 @login_required
 def set_stream_filters():
-    """Define quais classes devem ser ocultadas no desenho das detecções."""
-    global _excluded_classes
+    """Define quais classes devem ser ocultadas no desenho das detecções para ESTE cliente."""
     try:
         data = request.get_json()
         classes = data.get('excluded_classes', [])
-        with _excluded_classes_lock:
-            _excluded_classes = set(classes)
-        _logger.info(f"Filtros de stream atualizados: Ocultando {list(_excluded_classes)}")
+        client_ip = request.remote_addr
         
-        # Sincroniza com o modelo se ele existir
-        if _model_instance and hasattr(_model_instance, 'set_excluded_classes'):
-            _model_instance.set_excluded_classes(list(_excluded_classes))
+        with _filters_lock:
+            _filters_per_client[client_ip] = list(set(classes))
             
-        return jsonify({"status": "success", "excluded": list(_excluded_classes)})
+        _logger.info(f"Filtros atualizados para o cliente {client_ip}: Ocultando {classes}")
+        return jsonify({"status": "success", "client_ip": client_ip, "excluded": classes})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
 
@@ -2422,19 +2435,8 @@ def record_detection_event(timestamp_utc_iso, alert_type_str, detected_lata_ids_
 
                     _logger.info(f"Registrando novo alerta: Tipo='{alert_type_str}', ID='{lata_id}', Detalhes='{final_detail_for_this_id}'")
                     db.log_alert(timestamp_utc_iso, alert_type_str, lata_id, final_detail_for_this_id)
-                    
-                    _active_alerts_cache[lata_id] = {
-                        'timestamp': current_time_unix,
-                        'type': alert_type_str,
-                        'last_detail': final_detail_for_this_id
-                    }
-                    new_alerts_logged_count += 1
-    except Exception as e:
-        
-        _logger.error(f"Erro em record_detection_event: {e}", exc_info=True)
-
-def run_server(settings_mgr, logger_instance, shared_stats, lock_stats, frame_cont, lock_frame, start_time, model_instance, security_mgr): 
-    global _settings_manager, _logger, _current_stats, _stats_lock, _frame_container, _frame_lock, _system_start_time, _extract_frame_flag, _model_instance, _security_manager, _otx_manager
+def run_server(settings_mgr, logger_instance, shared_stats, lock_stats, frame_cont, lock_frame, start_time, model_instance, security_mgr, results_cont=None): 
+    global _settings_manager, _logger, _current_stats, _stats_lock, _frame_container, _frame_lock, _system_start_time, _extract_frame_flag, _model_instance, _security_manager, _otx_manager, _results_container
     global MAX_CONSOLE_LINES, log_queue, _ALERT_COOLDOWN_SECONDS, _ALERT_STATE_EXPIRY_SECONDS
     
     _settings_manager = settings_mgr
@@ -2445,7 +2447,8 @@ def run_server(settings_mgr, logger_instance, shared_stats, lock_stats, frame_co
     _frame_lock = lock_frame 
     _system_start_time = start_time 
     _model_instance = model_instance 
-    _security_manager = security_mgr 
+    _security_manager = security_mgr
+    _results_container = results_cont
     _otx_manager = OTXManager(settings_mgr, logger=logger_instance)
 
     # --- Aplicação de Configurações do SYSTEM_CONFIG ---

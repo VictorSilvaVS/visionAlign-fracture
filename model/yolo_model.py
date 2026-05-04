@@ -148,7 +148,7 @@ class YOLOModel:
         self.save_interval = float(collection.get('save_interval', 10.0))
         self.conf_distrust_range = collection.get('distrust_range', [0.3, 0.6])
         self.save_on_event = bool(collection.get('save_on_event', False))
-        self.excluded_classes = [] # Classes a serem ocultadas no desenho
+        self.excluded_classes = []
 
     def set_excluded_classes(self, classes):
         """Define quais classes devem ser ignoradas pelo desenhista."""
@@ -640,7 +640,9 @@ class YOLOModel:
             self.fps = 1.0 / max(actual_duration, self.frame_duration)
             if self.frame_callback:
                 self.frame_callback({
-                    'frame': frame,
+                    'frame': frame, # Com desenhos (para UI local)
+                    'frame_clean': self.last_frame_clean, # Sem desenhos (para stream MJPEG individual)
+                    'results': r_align,
                     'stats': {**self.detection_stats, 'fps': round(self.fps, 1), 'processamento': 'OpenVINO CPU'}
                 })
             time_to_sleep = self.frame_duration - actual_duration

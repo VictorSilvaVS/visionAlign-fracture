@@ -29,6 +29,7 @@ frame_lock = RLock()
 db_log_lock = RLock()
 
 frame_container = [None]
+results_container = [None] # [r_align]
 system_start_time = get_current_utc_timestamp().timestamp()
 
 last_logged_db_counts = {'lata_normal': 0, 'lata_invertida': 0, 'lata_tombada': 0, 'fracture': 0}
@@ -124,10 +125,13 @@ def model_update_callback(data: Dict[str, Any]):
     logger = logging.getLogger("VisionAlign.Callback")
     
     with frame_lock:
-        if (frame := data.get('frame')) is not None:
+        if (frame := data.get('frame_clean')) is not None:
             frame_container[0] = frame
-    
+            
     with stats_lock:
+        if (results := data.get('results')) is not None:
+            results_container[0] = results
+            
         new_stats = data.get('stats', {})
         # Atualiza contagens acumuladas
         for can_type in ['lata_normal', 'lata_invertida', 'lata_tombada', 'fracture']:
@@ -303,7 +307,7 @@ def main_server():
             target=run_server,
             args=(settings_manager, logger, current_stats, stats_lock, 
                   frame_container, frame_lock, system_start_time, 
-                  model, security_manager),
+                  model, security_manager, results_container),
             daemon=True
         )
         flask_thread.start()
