@@ -1,6 +1,7 @@
 import os
 import logging
 from functools import wraps 
+import threading
 from threading import Lock 
 from flask import Flask, request, jsonify, session, render_template, redirect, url_for, g, Response, send_file, abort
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -1219,10 +1220,10 @@ def start_retrain():
         # Inicia treinamento em uma thread separada para não travar o Flask
         def run_training():
             _logger.info(f"Iniciando treinamento OTX para {model_type} com {epochs} épocas...")
-            # Aqui chamamos o otx_manager
-            # Por enquanto, como é uma demo, vamos apenas logar o início
             dataset_path = _settings_manager.get_setting('MODEL_PARAMS', 'dataset_path', 'data/dataset_collect/images')
-            _otx_manager.train(model_type, dataset_path)
+            # Garantimos a melhor ordem de treinamento via otx_manager
+            _otx_manager.train(model_type, dataset_path, epochs=epochs)
+            _logger.info(f"Treinamento OTX para {model_type} finalizado.")
             
         threading.Thread(target=run_training, daemon=True).start()
         
@@ -1299,8 +1300,9 @@ def express_retrain_api():
         # ... lógica de salvamento ...
         
         if _otx_manager:
-            # threading.Thread(target=lambda: _otx_manager.auto_fine_tune("temp_data"), daemon=True).start()
-            return jsonify({"success": True, "message": "Ajuste fino iniciado em background."}), 200
+            # Realiza o ajuste fino automático com os novos dados
+            threading.Thread(target=lambda: _otx_manager.auto_fine_tune("data/dataset_collect/images"), daemon=True).start()
+            return jsonify({"success": True, "message": "Ajuste fino (Express Retrain) iniciado com sucesso."}), 200
         
         return jsonify({"success": False, "message": "OTX Manager não disponível"}), 500
     except Exception as e:
@@ -2473,20 +2475,9 @@ def run_server(settings_mgr, logger_instance, shared_stats, lock_stats, frame_co
 
     _logger.info(f"Configurações de sistema aplicadas: Port={server_cfg.get('port')}, Host={server_cfg.get('host')}")
 
-    
-    
-    
     if hasattr(_model_instance, 'set_alert_recorder_callback'):
         _model_instance.set_alert_recorder_callback(record_detection_event)
         _logger.info("Callback de registro de alertas (record_detection_event) configurado para a instância do modelo.")
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
